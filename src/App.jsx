@@ -1,0 +1,94 @@
+import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuth } from './context/AuthContext';
+import { getCart } from './api/cartApi';
+import Navbar from './components/common/Navbar';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailPage from './pages/ProductDetailPage';
+import CartPage from './pages/CartPage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminCategories from './pages/admin/AdminCategories';
+import ProfilePage from './pages/ProfilePage';
+import AddressPage from './pages/AddressPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
+import Footer from './components/common/Footer';
+
+function App() {
+    const { user, isAuthenticated, setCartCount } = useAuth();
+
+    useEffect(() => {
+        const initCart = async () => {
+            if (isAuthenticated() && user?.id) {
+                try {
+                    const response = await getCart(user.id);
+                    setCartCount(response.data.items.length);
+                } catch (e) {
+                    console.log('We have a problem with cart, error: ' + e);
+                }
+            }
+        };
+        initCart();
+    }, [user?.id]);
+
+    return (
+        <>
+            <Navbar />
+            <div className="pt-4">
+                <Routes>
+                    <Route path="*" element={<NotFoundPage />} />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/products/:id" element={<ProductDetailPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/cart" element={
+                        <ProtectedRoute><CartPage /></ProtectedRoute>
+                    } />
+                    <Route path="/orders" element={
+                        <ProtectedRoute><OrdersPage /></ProtectedRoute>
+                    } />
+                    <Route path="/orders/:orderId" element={
+                        <ProtectedRoute><OrderDetailPage /></ProtectedRoute>
+                    } />
+                    <Route path="/admin" element={
+                        <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/products" element={
+                        <ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/categories" element={
+                        <ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/orders" element={
+                        <ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                        <ProtectedRoute><ProfilePage /></ProtectedRoute>
+                    } />
+                    <Route path="/addresses" element={
+                        <ProtectedRoute><AddressPage /></ProtectedRoute>
+                    } />
+                    <Route path="/change-password" element={
+                        <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>
+                    } />
+                </Routes>
+            </div>
+            <Footer />
+        </>
+    );
+}
+
+export default App;

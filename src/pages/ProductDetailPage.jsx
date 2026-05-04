@@ -80,61 +80,65 @@ const ProductDetailPage = () => {
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="bg-zinc-900 border border-white/10 rounded-xl h-80 flex items-center justify-center">
+                {/* Image */}
+                <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden">
                     {product.imageUrl ? (
                         <img
-                            src={product.imageUrl}
+                            src={`http://localhost:8080${product.imageUrl}`}
                             alt={product.name}
-                            className="h-full w-full object-cover rounded-xl"
+                            className="w-full h-full object-contain p-4"
                         />
                     ) : (
-                        <span className="text-zinc-600 text-sm">No image</span>
+                        <span className="text-gray-400 text-sm">No image available</span>
                     )}
                 </div>
 
+                {/* Info */}
                 <div className="flex flex-col justify-center">
-                    <p className="text-xs text-zinc-500 mb-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
                         {product.categoryName || 'Uncategorized'}
                     </p>
-                    <h1 className="text-2xl font-semibold text-white mb-2">
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
                         {product.name}
                     </h1>
-                    <p className="text-xs text-zinc-600 mb-4">SKU: {product.sku}</p>
-                    <p className="text-sm text-zinc-400 leading-relaxed mb-8">
+                    {/* Sakrij SKU ili preimenuj */}
+                    <p className="text-xs text-gray-400 mb-6">Product Code: {product.sku}</p>
+
+                    <p className="text-sm text-gray-600 leading-relaxed mb-8">
                         {product.description}
                     </p>
 
-                    <div className="flex items-center justify-between mb-6">
-                        <span className="text-2xl font-semibold text-white">
+                    <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200">
+                        <span className="text-2xl font-bold text-black">
                             ${product.price}
                         </span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                            product.stockQuantity > 0
-                                ? 'bg-emerald-500/10 text-emerald-400'
-                                : 'bg-red-500/10 text-red-400'
-                        }`}>
+                                        <span className={`text-xs font-semibold uppercase tracking-wide ${
+                                            product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
+                                        }`}>
                             {product.stockQuantity > 0
                                 ? `${product.stockQuantity} in stock`
-                                : 'Out of stock'}
+                                : 'Sold Out'}
                         </span>
                     </div>
 
                     {product.stockQuantity > 0 && (
-                        <div className="flex items-center gap-4 mb-6">
-                            <span className="text-xs text-zinc-500">Quantity</span>
-                            <div className="flex items-center border border-white/10 rounded-md">
+                        <div className="flex items-center gap-6 mb-6">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-black">
+                                Quantity
+                            </span>
+                            <div className="flex items-center border border-gray-300">
                                 <button
                                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                    className="px-3 py-1.5 text-zinc-400 hover:text-white transition-colors text-sm"
+                                    className="w-10 h-10 flex items-center justify-center text-black hover:bg-gray-100 transition-colors text-lg"
                                 >
-                                    -
+                                −
                                 </button>
-                                <span className="px-3 py-1.5 text-sm text-white border-x border-white/10">
+                                <span className="w-10 h-10 flex items-center justify-center text-sm font-semibold text-black border-x border-gray-300">
                                     {quantity}
                                 </span>
                                 <button
                                     onClick={() => setQuantity(q => Math.min(product.stockQuantity, q + 1))}
-                                    className="px-3 py-1.5 text-zinc-400 hover:text-white transition-colors text-sm"
+                                    className="w-10 h-10 flex items-center justify-center text-black hover:bg-gray-100 transition-colors text-lg"
                                 >
                                     +
                                 </button>
@@ -145,9 +149,9 @@ const ProductDetailPage = () => {
                     <button
                         onClick={handleAddToCart}
                         disabled={product.stockQuantity === 0 || addingToCart}
-                        className="bg-white text-black text-sm font-medium py-2.5 hover:bg-zinc-200 transition-colors disabled:opacity-30"
+                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                     >
-                        {addingToCart ? 'Adding...' : 'Add to cart'}
+                        {addingToCart ? 'Adding...' : 'Add to Cart'}
                     </button>
                 </div>
             </div>

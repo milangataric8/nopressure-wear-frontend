@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import Skeleton from '../components/common/Skeleton';
 
 const CartPage = () => {
-    const { user } = useAuth();
+    const { user, setCartCount } = useAuth();
     const navigate = useNavigate();
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -17,6 +17,7 @@ const CartPage = () => {
         try {
             const response = await getCart(user.id);
             setCart(response.data);
+            setCartCount(response.data.items.length);
         } catch (e) {
             toast.error('Failed to load cart, error: ' + e);
         } finally {

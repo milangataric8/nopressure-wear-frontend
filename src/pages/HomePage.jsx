@@ -99,9 +99,9 @@ const HomePage = () => {
                                 <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                     {product.imageUrl ? (
                                         <img
-                                            src={product.imageUrl}
+                                            src={`http://localhost:8080${product.imageUrl}`}
                                             alt={product.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
                                         <span className="text-gray-400 text-xs">No image</span>

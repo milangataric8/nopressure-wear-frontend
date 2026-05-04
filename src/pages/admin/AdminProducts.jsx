@@ -1,3 +1,4 @@
+import ImageUpload from '../../components/common/ImageUpload';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -28,19 +29,14 @@ const AdminProducts = () => {
         categoryId: '',
     });
 
-    useEffect(() => {
-        fetchProducts();
-        fetchCategories();
-    }, [page]);
-
     const fetchProducts = async () => {
         setLoading(true);
         try {
             const response = await getProducts({ page, size: 10 });
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
-        } catch (error) {
-            toast.error('Failed to load products');
+        } catch (e) {
+            toast.error('Failed to load products, error: ' + e);
         } finally {
             setLoading(false);
         }
@@ -50,10 +46,15 @@ const AdminProducts = () => {
         try {
             const response = await getCategories();
             setCategories(response.data);
-        } catch (error) {
-            console.log('Failed to load categories');
+        } catch (e) {
+            console.log('Failed to load categories, error: ' + e);
         }
     };
+
+    useEffect(() => {
+        fetchProducts();
+        fetchCategories();
+    }, [page]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -105,8 +106,8 @@ const AdminProducts = () => {
             await deleteProduct(id);
             toast.success('Product deleted');
             fetchProducts();
-        } catch (error) {
-            toast.error('Failed to delete product');
+        } catch (e) {
+            toast.error('Failed to delete product, error: ' + e);
         }
     };
 
@@ -120,8 +121,8 @@ const AdminProducts = () => {
                 toast.success('Product activated');
             }
             fetchProducts();
-        } catch (error) {
-            toast.error('Failed to update product status');
+        } catch (e) {
+            toast.error('Failed to update product status, error: ' + e);
         }
     };
 
@@ -235,15 +236,11 @@ const AdminProducts = () => {
                             </select>
                         </div>
 
-                        <div>
-                            <label className={labelClass}>Image URL</label>
-                            <input
-                                type="text"
-                                name="imageUrl"
-                                value={formData.imageUrl}
-                                onChange={handleChange}
-                                className={inputClass}
-                                placeholder="https://..."
+                        <div className="md:col-span-2">
+                            <label className={labelClass}>Product Image</label>
+                            <ImageUpload
+                                currentImageUrl={formData.imageUrl}
+                                onImageUploaded={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))}
                             />
                         </div>
 

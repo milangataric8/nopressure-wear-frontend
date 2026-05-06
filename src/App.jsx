@@ -23,6 +23,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import Footer from './components/common/Footer';
+import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -83,6 +84,9 @@ function App() {
                     } />
                     <Route path="/change-password" element={
                         <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/coupons" element={
+                        <ProtectedRoute adminOnly><AdminCoupons /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

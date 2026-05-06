@@ -1,6 +1,7 @@
 import axiosInstance from './axiosInstance';
 
-export const checkout = (userId) => axiosInstance.post(`/orders/${userId}/checkout`);
+export const checkout = (userId, couponCode) =>
+    axiosInstance.post(`/orders/${userId}/checkout`, null, { params: couponCode ? { couponCode } : {} });
 export const getOrders = (userId, params) =>
     axiosInstance.get(`/orders/${userId}`, { params });
 export const getOrderById = (userId, orderId) =>

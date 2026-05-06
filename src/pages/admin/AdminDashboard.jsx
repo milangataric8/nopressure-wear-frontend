@@ -44,6 +44,18 @@ const AdminDashboard = () => {
                         Manage product categories
                     </p>
                 </Link>
+
+                <Link
+                    to="/admin/coupons"
+                    className="border border-gray-200 p-8 hover:border-black transition-colors group"
+                >
+                    <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
+                        Coupons
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                        Create and manage discount coupons
+                    </p>
+                </Link>
             </div>
         </div>
     );

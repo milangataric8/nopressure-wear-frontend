@@ -307,11 +307,11 @@ const AdminProducts = () => {
                                 <td className="px-4 py-3 text-sm text-black">{product.stockQuantity}</td>
                                 <td className="px-4 py-3">
                                         <span className={`text-xs font-semibold uppercase px-2 py-1 ${
-                                            product.isActive
-                                                ? 'bg-green-100 text-green-700'
+                                            product.active 
+                                                ? 'bg-green-100 text-green-700' 
                                                 : 'bg-red-100 text-red-700'
                                         }`}>
-                                            {product.isActive ? 'Active' : 'Inactive'}
+                                            {product.active ? 'Active' : 'Inactive'}
                                         </span>
                                 </td>
                                 <td className="px-4 py-3">
@@ -326,7 +326,7 @@ const AdminProducts = () => {
                                             onClick={() => handleToggleActive(product)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            {product.isActive ? 'Deactivate' : 'Activate'}
+                                            {product.active ? 'Deactivate' : 'Activate'}
                                         </button>
                                         <button
                                             onClick={() => handleDelete(product.id)}

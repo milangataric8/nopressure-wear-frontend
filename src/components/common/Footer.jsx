@@ -7,7 +7,7 @@ const Footer = () => {
                     {/* Branding */}
                     <div className="w-1/3">
                         <h3 className="text-sm font-black uppercase tracking-widest text-black mb-4">
-                            NoPressure Shop
+                            WebShop
                         </h3>
                         <p className="text-xs text-gray-500 leading-relaxed max-w-xs">
                             Your premium destination for quality products.

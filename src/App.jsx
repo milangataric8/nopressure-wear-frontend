@@ -24,6 +24,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import Footer from './components/common/Footer';
 import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
+import OAuth2CallbackPage from './pages/OAuth2CallbackPage';
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -88,6 +89,7 @@ function App() {
                     <Route path="/admin/coupons" element={
                         <ProtectedRoute adminOnly><AdminCoupons /></ProtectedRoute>
                     } />
+                    <Route path="/oauth2/callback" element={<OAuth2CallbackPage />} />
                 </Routes>
             </div>
             <Footer />

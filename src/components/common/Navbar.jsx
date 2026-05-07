@@ -16,7 +16,7 @@ const Navbar = () => {
                 <div className="flex items-center justify-between h-16 relative">
                     {/* Logo */}
                     <Link to="/" className="text-xl font-black tracking-tight text-black uppercase">
-                        WebShop
+                        nopressure
                     </Link>
 
                     {/* Links */}

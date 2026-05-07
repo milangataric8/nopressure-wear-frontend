@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getActiveProducts, getProductsByCategory } from '../api/productApi';
+import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 
 const HomePage = () => {
@@ -36,13 +36,13 @@ const HomePage = () => {
             <div className="bg-gray-100 py-32 px-6">
                 <div className="max-w-7xl mx-auto">
                     <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">
-                        New Collection
+                         New Collection
                     </p>
                     <h1 className="text-6xl font-black uppercase tracking-tight text-black mb-6 leading-none">
-                        webshop
+                        no pressure
                     </h1>
                     <p className="text-gray-500 text-lg mb-10 max-w-md">
-                        Discover the latest products and find your perfect match.
+                         Be relaxed. Shop easy.
                     </p>
                     <Link
                         to="/products"

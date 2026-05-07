@@ -23,7 +23,7 @@ const CartPage = () => {
             setCart(response.data);
             setCartCount(response.data.items.length);
         } catch (e) {
-            toast.error('Failed to load cart, error: ' + e);
+            toast.error('Failed to load cart, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -39,7 +39,7 @@ const CartPage = () => {
             const response = await updateCartItem(user.id, cartItemId, { productId, quantity });
             setCart(response.data);
         } catch (e) {
-            toast.error('Failed to update quantity, error: ' + e);
+            toast.error('Failed to update quantity, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -49,7 +49,7 @@ const CartPage = () => {
             setCart(response.data);
             toast.success('Item removed');
         } catch (e) {
-            toast.error('Failed to remove item, error: ' + e);
+            toast.error('Failed to remove item, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -59,7 +59,7 @@ const CartPage = () => {
             setCart({ ...cart, items: [], totalAmount: 0 });
             toast.success('Cart cleared');
         } catch (e) {
-            toast.error('Failed to clear cart, error: ' + e);
+            toast.error('Failed to clear cart, error: ' + e.message || 'Unknown error');
         }
     };
 

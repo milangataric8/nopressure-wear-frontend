@@ -22,7 +22,7 @@ const OrdersPage = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error('Failed to load orders, error: ' + e);
+            toast.error('Failed to load orders, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }

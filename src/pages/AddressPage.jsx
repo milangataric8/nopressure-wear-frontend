@@ -80,7 +80,7 @@ const AddressPage = () => {
             toast.success('Address deleted');
             fetchAddresses();
         } catch (e) {
-            toast.error('Failed to delete address, error: ' + e);
+            toast.error('Failed to delete address, error: ' + e.message || 'Unknown error');
         }
     };
 

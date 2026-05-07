@@ -48,7 +48,7 @@ const ProductsPage = () => {
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load products, error: ' + e);
+            toast.error('Failed to load products, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -59,7 +59,7 @@ const ProductsPage = () => {
             const response = await getCategories();
             setCategories(response.data);
         } catch (e) {
-            console.log('Failed to load categories: error: ' + e);
+            console.log('Failed to load categories: error: ' + e.message || 'Unknown error');
         }
     }, []);
 

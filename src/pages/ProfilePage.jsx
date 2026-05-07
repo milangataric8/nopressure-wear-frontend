@@ -39,7 +39,7 @@ const ProfilePage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error('Failed to load addresses, error: ' + e);
+            toast.error('Failed to load addresses, error: ' + e.message || 'Unknown error');
         }
     }, [user.id]);
 

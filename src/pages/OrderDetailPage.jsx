@@ -16,7 +16,7 @@ const OrderDetailPage = () => {
             const response = await getOrderById(user.id, orderId);
             setOrder(response.data);
         } catch (e) {
-            toast.error('Failed to load order, error: ' + e);
+            toast.error('Failed to load order, error: ' + e.message || 'Unknown error');
             navigate('/orders');
         } finally {
             setLoading(false);

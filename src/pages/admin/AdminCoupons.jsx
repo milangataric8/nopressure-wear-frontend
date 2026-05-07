@@ -65,7 +65,7 @@ const AdminCoupons = () => {
             toast.success('Coupon deleted');
             fetchCoupons();
         } catch (e) {
-            toast.error('Failed to delete coupon, error: ' + e);
+            toast.error('Failed to delete coupon, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -74,7 +74,7 @@ const AdminCoupons = () => {
             await axiosInstance.patch(`/coupons/${id}/toggle`);
             fetchCoupons();
         } catch (e) {
-            toast.error('Failed to toggle coupon, error: ' + e);
+            toast.error('Failed to toggle coupon, error: ' + e.message || 'Unknown error');
         }
     };
 

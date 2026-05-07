@@ -35,7 +35,7 @@ function App() {
                     const response = await getCart(user.id);
                     setCartCount(response.data.items.length);
                 } catch (e) {
-                    console.log('We have a problem with cart, error: ' + e);
+                    console.log('We have a problem with cart, error: ' + e.message || 'Unknown error');
                 }
             }
         };

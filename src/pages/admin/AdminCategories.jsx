@@ -23,8 +23,8 @@ const AdminCategories = () => {
         try {
             const response = await getCategories();
             setCategories(response.data);
-        } catch (_) {
-            toast.error('Failed to load categories');
+        } catch (e) {
+            toast.error('Failed to load categories, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -79,8 +79,8 @@ const AdminCategories = () => {
             await deleteCategory(id);
             toast.success('Category deleted');
             fetchCategories();
-        } catch (_) {
-            toast.error('Failed to delete category');
+        } catch (e) {
+            toast.error('Failed to delete category, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -103,10 +103,17 @@ const AdminCategories = () => {
                     <p className="text-sm text-gray-500">Manage product categories</p>
                 </div>
                 <button
-                    onClick={() => { setShowForm(!showForm); resetForm(); }}
+                    onClick={() => {
+                        if (showForm) {
+                            resetForm();
+                        } else {
+                            setShowForm(true);
+                            setEditingCategory(null);
+                        }
+                    }}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                 >
-                    {showForm ? 'Cancel' : '+ New Category'}
+                    {showForm ? 'Cancel' : '+ New Product'}
                 </button>
             </div>
 

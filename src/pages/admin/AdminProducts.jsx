@@ -6,8 +6,7 @@ import {
     createProduct,
     updateProduct,
     deleteProduct,
-    activateProduct,
-    deactivateProduct
+    activateDeactivateProduct
 } from '../../api/productApi';
 import { getCategories } from '../../api/categoryApi';
 
@@ -36,7 +35,7 @@ const AdminProducts = () => {
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load products, error: ' + e);
+            toast.error('Failed to load products, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
@@ -47,7 +46,7 @@ const AdminProducts = () => {
             const response = await getCategories();
             setCategories(response.data);
         } catch (e) {
-            console.log('Failed to load categories, error: ' + e);
+            console.log('Failed to load categories, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -107,22 +106,16 @@ const AdminProducts = () => {
             toast.success('Product deleted');
             fetchProducts();
         } catch (e) {
-            toast.error('Failed to delete product, error: ' + e);
+            toast.error('Failed to delete product, error: ' + e.message || 'Unknown error');
         }
     };
 
-    const handleToggleActive = async (product) => {
+    const handleToggle = async (id) => {
         try {
-            if (product.isActive) {
-                await deactivateProduct(product.id);
-                toast.success('Product deactivated');
-            } else {
-                await activateProduct(product.id);
-                toast.success('Product activated');
-            }
+            await activateDeactivateProduct(id);
             fetchProducts();
         } catch (e) {
-            toast.error('Failed to update product status, error: ' + e);
+            toast.error('Failed to toggle coupon, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -153,7 +146,14 @@ const AdminProducts = () => {
                     <p className="text-sm text-gray-500">Manage your product catalog</p>
                 </div>
                 <button
-                    onClick={() => { setShowForm(!showForm); setEditingProduct(null); resetForm(); }}
+                    onClick={() => {
+                        if (showForm) {
+                            resetForm();
+                        } else {
+                            setShowForm(true);
+                            setEditingProduct(null);
+                        }
+                    }}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                 >
                     {showForm ? 'Cancel' : '+ New Product'}
@@ -323,7 +323,7 @@ const AdminProducts = () => {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleToggleActive(product)}
+                                            onClick={() => handleToggle(product.id)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
                                             {product.active ? 'Deactivate' : 'Activate'}

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { getOrders } from '../api/orderApi';
 import { useAuth } from '../context/AuthContext';
 import Skeleton from '../components/common/Skeleton';
+import {getImageUrl} from "../utils/imageUtils.js";
 
 const OrdersPage = () => {
     const { user } = useAuth();
@@ -140,7 +141,15 @@ const OrdersPage = () => {
                                         <div key={item.id} className="flex justify-between items-center">
                                             <div className="flex items-center gap-4">
                                                 <div className="bg-gray-100 w-16 h-16 flex items-center justify-center flex-shrink-0">
-                                                    <span className="text-gray-400 text-xs">No img</span>
+                                                    {item.imageUrl ? (
+                                                        <img
+                                                            src={getImageUrl(item.imageUrl)}
+                                                            alt={item.name}
+                                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                                        />
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">No image</span>
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-semibold text-black">

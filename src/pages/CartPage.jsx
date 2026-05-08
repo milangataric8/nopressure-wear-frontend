@@ -6,6 +6,7 @@ import { checkout } from '../api/orderApi';
 import { useAuth } from '../context/AuthContext';
 import { validateCoupon } from '../api/couponApi';
 import Skeleton from '../components/common/Skeleton';
+import {getImageUrl} from "../utils/imageUtils.js";
 
 const CartPage = () => {
     const { user, setCartCount } = useAuth();
@@ -47,6 +48,7 @@ const CartPage = () => {
         try {
             const response = await removeCartItem(user.id, cartItemId);
             setCart(response.data);
+            setCartCount(response.data.items.length);
             toast.success('Item removed');
         } catch (e) {
             toast.error('Failed to remove item, error: ' + e.message || 'Unknown error');
@@ -57,6 +59,7 @@ const CartPage = () => {
         try {
             await clearCart(user.id);
             setCart({ ...cart, items: [], totalAmount: 0 });
+            setCartCount(0);
             toast.success('Cart cleared');
         } catch (e) {
             toast.error('Failed to clear cart, error: ' + e.message || 'Unknown error');
@@ -144,7 +147,15 @@ const CartPage = () => {
                         <div key={item.id} className="flex gap-6 pb-6 border-b border-gray-200">
                             {/* Image */}
                             <div className="bg-gray-100 w-28 h-28 flex-shrink-0 flex items-center justify-center">
-                                <span className="text-gray-400 text-xs">No image</span>
+                                {item.imageUrl ? (
+                                    <img
+                                        src={getImageUrl(item.imageUrl)}
+                                        alt={item.name}
+                                        className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                ) : (
+                                    <span className="text-gray-400 text-xs">No image</span>
+                                )}
                             </div>
 
                             {/* Info */}

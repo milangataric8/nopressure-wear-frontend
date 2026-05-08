@@ -5,6 +5,7 @@ import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
 import { useAuth } from '../context/AuthContext';
 import Skeleton from '../components/common/Skeleton';
+import {getImageUrl} from "../utils/imageUtils.js";
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -84,7 +85,7 @@ const ProductDetailPage = () => {
                 <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden">
                     {product.imageUrl ? (
                         <img
-                            src={`http://localhost:8080${product.imageUrl}`}
+                            src={getImageUrl(product.imageUrl)}
                             alt={product.name}
                             className="w-full h-full object-contain p-4"
                         />

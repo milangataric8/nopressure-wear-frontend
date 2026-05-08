@@ -5,6 +5,7 @@ import { getActiveProducts, searchProducts, getProductsByCategory, getProductsBy
 import { getCategories } from '../api/categoryApi';
 import { useSearchParams } from 'react-router-dom';
 import Skeleton from '../components/common/Skeleton';
+import {getImageUrl} from "../utils/imageUtils.js";
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
@@ -257,7 +258,7 @@ const ProductsPage = () => {
                             <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                 {product.imageUrl ? (
                                     <img
-                                        src={`http://localhost:8080${product.imageUrl}`}
+                                        src={getImageUrl(product.imageUrl)}
                                         alt={product.name}
                                         className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                     />

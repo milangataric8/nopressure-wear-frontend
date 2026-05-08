@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { uploadImage } from '../../api/uploadApi';
+import {getImageUrl} from "../../utils/imageUtils.js";
 
 const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
     const [uploading, setUploading] = useState(false);
@@ -21,8 +22,8 @@ const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
             const response = await uploadImage(file);
             onImageUploaded(response.data.url);
             toast.success('Image uploaded');
-        } catch (_) {
-            toast.error('Failed to upload image');
+        } catch (e) {
+            toast.error('Failed to upload image, error: ' + e.message);
         } finally {
             setUploading(false);
         }
@@ -33,7 +34,7 @@ const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
             <div className="border border-gray-300 p-4 mb-3">
                 {preview ? (
                     <img
-                        src={preview.startsWith('data:') ? preview : `http://localhost:8080${preview}`}
+                        src={preview.startsWith('data:') ? preview : getImageUrl(preview)}
                         alt="Preview"
                         className="w-full h-40 object-cover"
                     />

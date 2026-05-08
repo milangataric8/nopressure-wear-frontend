@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getOrderById } from '../api/orderApi';
 import { useAuth } from '../context/AuthContext';
+import {getImageUrl} from "../utils/imageUtils.js";
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
@@ -141,7 +142,15 @@ const OrderDetailPage = () => {
                                 }`}
                             >
                                 <div className="bg-gray-100 w-20 h-20 flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-gray-400 text-xs">No img</span>
+                                    {item.imageUrl ? (
+                                        <img
+                                            src={getImageUrl(item.imageUrl)}
+                                            alt={item.name}
+                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-400 text-xs">No image</span>
+                                    )}
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex justify-between">

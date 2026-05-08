@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { getCart } from './api/cartApi';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -25,6 +25,7 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import Footer from './components/common/Footer';
 import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
 import OAuth2CallbackPage from './pages/OAuth2CallbackPage';
+import AdminEmployees from "./pages/admin/AdminEmployees.jsx";
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -66,16 +67,16 @@ function App() {
                         <ProtectedRoute><OrderDetailPage /></ProtectedRoute>
                     } />
                     <Route path="/admin" element={
-                        <ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>
+                        <ProtectedRoute adminOnly employeeAllowed><AdminDashboard /></ProtectedRoute>
                     } />
                     <Route path="/admin/products" element={
-                        <ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>
+                        <ProtectedRoute adminOnly employeeAllowed><AdminProducts /></ProtectedRoute>
                     } />
                     <Route path="/admin/categories" element={
-                        <ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>
+                        <ProtectedRoute adminOnly employeeAllowed><AdminCategories /></ProtectedRoute>
                     } />
                     <Route path="/admin/orders" element={
-                        <ProtectedRoute adminOnly><AdminOrders /></ProtectedRoute>
+                        <ProtectedRoute adminOnly employeeAllowed><AdminOrders /></ProtectedRoute>
                     } />
                     <Route path="/profile" element={
                         <ProtectedRoute><ProfilePage /></ProtectedRoute>
@@ -87,9 +88,15 @@ function App() {
                         <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>
                     } />
                     <Route path="/admin/coupons" element={
-                        <ProtectedRoute adminOnly><AdminCoupons /></ProtectedRoute>
+                        <ProtectedRoute adminOnly employeeAllowed><AdminCoupons /></ProtectedRoute>
                     } />
                     <Route path="/oauth2/callback" element={<OAuth2CallbackPage />} />
+                    <Route path="/admin/employees" element={
+                        <ProtectedRoute adminOnly><AdminEmployees /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/employees" element={
+                        <ProtectedRoute adminOnly><AdminEmployees /></ProtectedRoute>
+                    } />
                 </Routes>
             </div>
             <Footer />

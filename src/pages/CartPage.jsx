@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getCart, updateCartItem, removeCartItem, clearCart } from '../api/cartApi';
 import { checkout } from '../api/orderApi';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { validateCoupon } from '../api/couponApi';
 import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";

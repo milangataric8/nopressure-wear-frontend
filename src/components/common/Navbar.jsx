@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth.js';
 
 const Navbar = () => {
-    const { user, logoutUser, isAuthenticated, isAdmin, cartCount } = useAuth();
+    const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -39,7 +39,7 @@ const Navbar = () => {
                                 </Link>
                             </>
                         )}
-                        {isAdmin() && (
+                        {(isAdmin() || isEmployee()) && (
                             <Link to="/admin" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
                                 Admin
                             </Link>

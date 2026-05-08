@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth.js';
 
 const AdminDashboard = () => {
+    const { isAdmin } = useAuth();
+
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
@@ -56,6 +59,20 @@ const AdminDashboard = () => {
                         Create and manage discount coupons
                     </p>
                 </Link>
+
+                {isAdmin() && (
+                    <Link
+                        to="/admin/employees"
+                        className="border border-gray-200 p-8 hover:border-black transition-colors group"
+                    >
+                        <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
+                            Employees
+                        </h2>
+                        <p className="text-sm text-gray-500">
+                            Manage store employees
+                        </p>
+                    </Link>
+                )}
             </div>
         </div>
     );

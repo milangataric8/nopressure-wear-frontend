@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";
 

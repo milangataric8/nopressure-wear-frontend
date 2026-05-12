@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -27,12 +28,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     const isAdmin = () => user?.role === 'ADMIN';
+    const isEmployee = () => user?.role === 'Employee';
     const isAuthenticated = () => !!token;
 
     return (
         <AuthContext.Provider value={{
             user, token, loginUser, logoutUser,
-            isAdmin, isAuthenticated,
+            isAdmin, isEmployee, isAuthenticated,
             cartCount, setCartCount
         }}>
             {children}

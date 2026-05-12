@@ -8,3 +8,5 @@ export const getOrderById = (userId, orderId) =>
     axiosInstance.get(`/orders/${userId}/${orderId}`);
 export const updateOrderStatus = (orderId, status) =>
     axiosInstance.patch(`/orders/${orderId}/status`, null, { params: { status } });
+export const getOrderByIdAdmin = (orderId) =>
+    axiosInstance.get(`/orders/admin/${orderId}`);

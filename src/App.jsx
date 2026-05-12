@@ -97,6 +97,9 @@ function App() {
                     <Route path="/admin/employees" element={
                         <ProtectedRoute adminOnly><AdminEmployees /></ProtectedRoute>
                     } />
+                    <Route path="/admin/orders/:orderId" element={
+                        <ProtectedRoute adminOnly employeeAllowed><OrderDetailPage /></ProtectedRoute>
+                    } />
                 </Routes>
             </div>
             <Footer />

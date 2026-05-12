@@ -1,32 +1,49 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getOrderById } from '../api/orderApi';
+import {getOrderById, getOrderByIdAdmin, updateOrderStatus} from '../api/orderApi';
 import { useAuth } from '../hooks/useAuth';
 import {getImageUrl} from "../utils/imageUtils.js";
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, isAdmin, isEmployee } = useAuth();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const isStaff = isAdmin() || isEmployee();
+
     const fetchOrder = useCallback(async () => {
         try {
-            const response = await getOrderById(user.id, orderId);
+            let response;
+            if (isStaff) {
+                response = await getOrderByIdAdmin(orderId);
+            } else {
+                response = await getOrderById(user.id, orderId);
+            }
             setOrder(response.data);
         } catch (e) {
             toast.error('Failed to load order, error: ' + e.message || 'Unknown error');
-            navigate('/orders');
+            navigate(isStaff ? '/admin/orders' : '/orders');
         } finally {
             setLoading(false);
         }
-    }, [user.id, orderId, navigate]);
+    }, [orderId, navigate, isStaff, user.id]);
 
     useEffect(() => {
         fetchOrder();
     }, [fetchOrder]);
+
+    const handleStatusUpdate = async (status) => {
+        try {
+            await updateOrderStatus(orderId, status);
+            toast.success('Status updated');
+            fetchOrder();
+        } catch (e) {
+            toast.error('Failed to update status, error: ' + e.message || 'Unknown error');
+        }
+    };
 
     const getStatusStyle = (status) => {
         switch (status) {
@@ -62,7 +79,7 @@ const OrderDetailPage = () => {
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">
             <button
-                onClick={() => navigate('/orders')}
+                onClick={() => navigate(isStaff ? '/admin/orders' : '/orders')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"
             >
                 ← Back to Orders
@@ -82,9 +99,25 @@ const OrderDetailPage = () => {
                     })}
                     </p>
                 </div>
+                <div className="flex items-center gap-4">
                 <span className={`text-xs font-semibold uppercase tracking-wide px-3 py-1.5 ${getStatusStyle(order.status)}`}>
                     {order.status}
                 </span>
+                    {/* Status update for admin/employee */}
+                    {isStaff && (
+                        <select
+                            value={order.status}
+                            onChange={(e) => handleStatusUpdate(e.target.value)}
+                            className="text-xs border border-gray-300 px-3 py-2 focus:outline-none focus:border-black transition-colors"
+                        >
+                            <option value="PENDING">Pending</option>
+                            <option value="CONFIRMED">Confirmed</option>
+                            <option value="SHIPPED">Shipped</option>
+                            <option value="DELIVERED">Delivered</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    )}
+                </div>
             </div>
 
             {/* Status tracker — ne prikazuj ako je CANCELLED */}

@@ -2,33 +2,35 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { updateOrderStatus } from '../../api/orderApi';
 import axiosInstance from '../../api/axiosInstance';
+import {useNavigate} from "react-router-dom";
 
 const AdminOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchAllOrders();
-    }, []);
+    const navigate = useNavigate();
 
     const fetchAllOrders = async () => {
         try {
             const response = await axiosInstance.get('/orders/all');
             setOrders(response.data);
-        } catch (error) {
-            toast.error('Failed to load orders');
+        } catch (e) {
+            toast.error('Failed to load orders, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchAllOrders();
+    }, []);
 
     const handleStatusUpdate = async (orderId, status) => {
         try {
             await updateOrderStatus(orderId, status);
             toast.success('Order status updated');
             fetchAllOrders();
-        } catch (error) {
-            toast.error('Failed to update status');
+        } catch (e) {
+            toast.error('Failed to update status, error: ' + e.message || 'Unknown error');
         }
     };
 
@@ -79,7 +81,9 @@ const AdminOrders = () => {
                         </thead>
                         <tbody>
                         {orders.map(order => (
-                            <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                            <tr key={order.id}
+                                onClick={() => navigate(`/admin/orders/${order.id}`)}
+                                className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
                                 <td className="px-4 py-3">
                                     <p className="text-sm font-semibold text-black">#{order.id}</p>
                                     <p className="text-xs text-gray-400">

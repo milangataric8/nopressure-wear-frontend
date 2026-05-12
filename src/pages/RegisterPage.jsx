@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { register } from '../api/authApi';
+import PasswordStrength from "../components/common/PasswordStrength.jsx";
+import {isPasswordValid} from "../utils/passwordUtils.js";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -9,6 +11,7 @@ const RegisterPage = () => {
         lastName: '',
         email: '',
         password: '',
+        confirmPassword: '',
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -19,9 +22,25 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!isPasswordValid(formData.password)) {
+            toast.error('Password does not meet requirements');
+            return;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            toast.error('Passwords do not match');
+            return;
+        }
+
         setLoading(true);
         try {
-            await register(formData);
+            await register({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                password: formData.password,
+            });
             toast.success('Account created!');
             navigate('/login');
         } catch (error) {
@@ -94,16 +113,42 @@ const RegisterPage = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Password</label>
+                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
+                                Password
+                            </label>
                             <input
                                 type="password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className="w-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none
+                                         focus:border-black transition-colors"
                                 placeholder="••••••••"
                                 required
                             />
+                            <PasswordStrength password={formData.password} />
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div>
+                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
+                                Confirm Password
+                            </label>
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                                placeholder="••••••••"
+                                required
+                            />
+                            {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                                <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                            )}
+                            {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                                <p className="text-xs text-green-600 mt-1">✓ Passwords match</p>
+                            )}
                         </div>
 
                         <button

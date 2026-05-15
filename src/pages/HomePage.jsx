@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import {getImageUrl} from "../utils/imageUtils.js";
+import HeroBanner from "../components/common/HeroBanner.jsx";
 
 const HomePage = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -33,26 +34,7 @@ const HomePage = () => {
 
     return (
         <div>
-            {/* Hero */}
-            <div className="bg-gray-100 py-32 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-4">
-                        New Collection
-                    </p>
-                    <h1 className="text-6xl font-black uppercase tracking-tight text-black mb-6 leading-none">
-                        webshop
-                    </h1>
-                    <p className="text-gray-500 text-lg mb-10 max-w-md">
-                        Discover the latest products and find your perfect match.
-                    </p>
-                    <Link
-                        to="/products"
-                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-4 hover:bg-gray-800 transition-colors inline-block"
-                    >
-                        Shop Now
-                    </Link>
-                </div>
-            </div>
+            <HeroBanner />
 
             {/* Categories */}
             {categories.length > 0 && (
@@ -96,7 +78,11 @@ const HomePage = () => {
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
                         {featuredProducts.map(product => (
-                            <div key={product.id} className="group cursor-pointer">
+                            <Link
+                                key={product.id}
+                                to={`/products/${product.id}`}
+                                className="group cursor-pointer block"
+                            >
                                 <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                     {product.imageUrl ? (
                                         <img
@@ -115,8 +101,53 @@ const HomePage = () => {
                                     <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                         {product.name}
                                     </h3>
+                                    {/* Color variants */}
+                                    {(product.colorVariants?.length > 0 || product.colorHex) && (
+                                        <div className="flex gap-1 mt-2 flex-wrap">
+                                            {/* Current product */}
+                                            {product.colorHex && (
+                                                <Link
+                                                    to={`/products/${product.id}`}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-8 h-8 border-2 border-transparent hover:border-black overflow-hidden flex-shrink-0"
+                                                    title={product.colorName}
+                                                >
+                                                    {product.imageUrl ? (
+                                                        <img
+                                                            src={getImageUrl(product.imageUrl)}
+                                                            alt={product.colorName || ''}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
+                                                    )}
+                                                </Link>
+                                            )}
+
+                                            {/* Variants */}
+                                            {product.colorVariants?.map(variant => (
+                                                <Link
+                                                    key={variant.variantId}
+                                                    to={`/products/${variant.variantId}`}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="w-8 h-8 border-2 border-transparent hover:border-black transition-colors overflow-hidden flex-shrink-0"
+                                                    title={variant.colorName}
+                                                >
+                                                    {variant.imageUrl ? (
+                                                        <img
+                                                            src={getImageUrl(variant.imageUrl)}
+                                                            alt={variant.colorName || ''}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />
+                                                    )}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-bold text-black">
+                                        <span className="text-md font-bold text-black">
                                             ${product.price}
                                         </span>
                                         <span className={`text-xs ${
@@ -125,14 +156,8 @@ const HomePage = () => {
                                             {product.stockQuantity > 0 ? 'In Stock' : 'Sold Out'}
                                         </span>
                                     </div>
-                                    <Link
-                                        to={`/products/${product.id}`}
-                                        className="mt-2 block text-center text-xs font-semibold uppercase tracking-wide bg-black text-white py-2 hover:bg-gray-800 transition-colors"
-                                    >
-                                        View Product
-                                    </Link>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

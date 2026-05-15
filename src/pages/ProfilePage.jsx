@@ -95,6 +95,18 @@ const ProfilePage = () => {
                     My Profile
                 </h1>
                 <p className="text-sm text-gray-500">Manage your account details</p>
+
+                {(user?.role === 'ADMIN' || user?.role === 'EMPLOYEE') && (
+                    <div className="mt-3">
+                        <span className={`text-xs font-semibold uppercase tracking-wide px-3 py-1 ${
+                            user?.role === 'ADMIN'
+                                ? 'bg-black text-white'
+                                : 'bg-gray-200 text-gray-700'
+                        }`}>
+                            {user?.role}
+                        </span>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">

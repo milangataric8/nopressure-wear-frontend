@@ -89,7 +89,7 @@ const OrderDetailPage = () => {
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                        Order #{order.id}
+                        Order - {order.orderCode}
                     </h1>
                     <p className="text-sm text-gray-500">
                         Placed on {new Date(order.createdAt).toLocaleDateString('en-US', {
@@ -259,8 +259,8 @@ const OrderDetailPage = () => {
                             <div className="flex justify-between text-xs">
                                 <span className="text-gray-500">Name</span>
                                 <span className="font-medium">
-                {order.customerFirstName} {order.customerLastName}
-            </span>
+                                    {order.customerFullName}
+                                </span>
                             </div>
                             <div className="flex justify-between text-xs">
                                 <span className="text-gray-500">Email</span>

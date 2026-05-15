@@ -1,20 +1,29 @@
+import {useNavigate} from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { updateOrderStatus } from '../../api/orderApi';
-import axiosInstance from '../../api/axiosInstance';
-import {useNavigate} from "react-router-dom";
+import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
 
 const AdminOrders = () => {
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [statusFilter, setStatusFilter] = useState('');
 
     const fetchAllOrders = async () => {
         try {
-            const response = await axiosInstance.get('/orders/all');
-            setOrders(response.data);
+            const params = { page, size: 10 };
+            if (searchQuery && searchQuery.trim() !== '') params.search = searchQuery;
+            if (statusFilter && statusFilter.trim() !== '') params.status = statusFilter;
+
+            const response = await getOrdersByAdmin(params);
+            setOrders(response.data.content);
+            setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load orders, error: ' + e.message || 'Unknown error');
+            toast.error('Failed to load orders, error: ' + e.message);
         } finally {
             setLoading(false);
         }
@@ -22,7 +31,7 @@ const AdminOrders = () => {
 
     useEffect(() => {
         fetchAllOrders();
-    }, []);
+    }, [page, searchQuery, statusFilter]);
 
     const handleStatusUpdate = async (orderId, status) => {
         try {
@@ -62,6 +71,59 @@ const AdminOrders = () => {
                 <p className="text-sm text-gray-500">Manage customer orders</p>
             </div>
 
+            {/* Search */}
+            <form
+                onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
+                className="flex gap-3 mb-6"
+            >
+                <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder="Search orders by order code or user name..."
+                    className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                />
+                <button
+                    type="submit"
+                    className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
+                >
+                    Search
+                </button>
+                {searchQuery && (
+                    <button
+                        type="button"
+                        onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
+                        className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                    >
+                        Clear
+                    </button>
+                )}
+            </form>
+
+            {/* Status filter */}
+            <div className="flex border border-gray-200 mb-6">
+                {[
+                    { label: 'All', value: '', bg: 'bg-white', text: 'text-gray-600', active: 'bg-gray-200 text-black' },
+                    { label: 'Pending', value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-200 text-yellow-800' },
+                    { label: 'Confirmed', value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-200 text-blue-800' },
+                    { label: 'Shipped', value: 'SHIPPED', bg: 'bg-purple-50', text: 'text-purple-700', active: 'bg-purple-200 text-purple-800' },
+                    { label: 'Delivered', value: 'DELIVERED', bg: 'bg-green-50', text: 'text-green-700', active: 'bg-green-200 text-green-800' },
+                    { label: 'Cancelled', value: 'CANCELLED', bg: 'bg-red-50', text: 'text-red-700', active: 'bg-red-200 text-red-800' },
+                ].map(status => (
+                    <button
+                        key={status.value}
+                        onClick={() => { setStatusFilter(status.value); setPage(0); }}
+                        className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-r border-gray-200 last:border-r-0 ${
+                            statusFilter === status.value
+                                ? status.active
+                                : `${status.bg} ${status.text} hover:opacity-50`
+                        }`}
+                    >
+                        {status.label}
+                    </button>
+                ))}
+            </div>
+
             {orders.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
                     <p className="text-sm">No orders yet</p>
@@ -85,13 +147,13 @@ const AdminOrders = () => {
                                 onClick={() => navigate(`/admin/orders/${order.id}`)}
                                 className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
                                 <td className="px-4 py-3">
-                                    <p className="text-sm font-semibold text-black">#{order.id}</p>
+                                    <p className="text-sm font-semibold text-black">{order.orderCode}</p>
                                     <p className="text-xs text-gray-400">
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </p>
                                 </td>
                                 <td className="px-4 py-3 text-sm text-black">
-                                    User #{order.userId}
+                                    {order.customerFullName}
                                 </td>
                                 <td className="px-4 py-3 text-sm text-black">
                                     {order.orderItems.length} items
@@ -121,6 +183,26 @@ const AdminOrders = () => {
                         ))}
                         </tbody>
                     </table>
+
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 p-4 border-t border-gray-200">
+                            <button
+                                onClick={() => setPage(p => Math.max(0, p - 1))}
+                                disabled={page === 0}
+                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
+                            >
+                                Prev
+                            </button>
+                            <span className="text-sm text-gray-500">{page + 1} / {totalPages}</span>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                disabled={page === totalPages - 1}
+                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

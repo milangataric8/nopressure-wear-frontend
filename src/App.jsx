@@ -26,6 +26,7 @@ import Footer from './components/common/Footer';
 import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
 import OAuth2CallbackPage from './pages/OAuth2CallbackPage';
 import AdminEmployees from "./pages/admin/AdminEmployees.jsx";
+import AdminBanners from "./pages/admin/AdminBanners.jsx";
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -99,6 +100,9 @@ function App() {
                     } />
                     <Route path="/admin/orders/:orderId" element={
                         <ProtectedRoute adminOnly employeeAllowed><OrderDetailPage /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/banners" element={
+                        <ProtectedRoute adminOnly employeeAllowed><AdminBanners /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

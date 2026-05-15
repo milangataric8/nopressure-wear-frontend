@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const isAdmin = () => user?.role === 'ADMIN';
-    const isEmployee = () => user?.role === 'Employee';
+    const isEmployee = () => user?.role === 'EMPLOYEE';
     const isAuthenticated = () => !!token;
 
     return (

@@ -17,22 +17,31 @@ const AdminCategories = () => {
         description: '',
         parentId: '',
     });
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await getCategories();
-            setCategories(response.data);
+            const params = { page, size: 10 };
+            if (searchQuery) {
+                params.search = searchQuery;
+            }
+            const response = await getCategories({ page, size: 10, search: searchQuery });
+            setCategories(response.data.content);
+            setTotalPages(response.data.totalPages);
         } catch (e) {
             toast.error('Failed to load categories, error: ' + e.message || 'Unknown error');
         } finally {
             setLoading(false);
         }
-    }, []);
+    });
 
     useEffect(() => {
         fetchCategories();
-    }, [fetchCategories]);
+    }, [page, searchQuery]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -116,6 +125,37 @@ const AdminCategories = () => {
                     {showForm ? 'Cancel' : '+ New Product'}
                 </button>
             </div>
+
+            {/* Search */}
+            {!showForm && (
+                <form
+                    onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
+                    className="flex gap-3 mb-6"
+                >
+                    <input
+                        type="text"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="Search categories by name..."
+                        className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
+                    >
+                        Search
+                    </button>
+                    {searchQuery && (
+                        <button
+                            type="button"
+                            onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
+                            className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                        >
+                            Clear
+                        </button>
+                    )}
+                </form>
+            )}
 
             {/* Form */}
             {showForm && (
@@ -246,6 +286,26 @@ const AdminCategories = () => {
                         ))}
                         </tbody>
                     </table>
+
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 p-4 border-t border-gray-200">
+                            <button
+                                onClick={() => setPage(p => Math.max(0, p - 1))}
+                                disabled={page === 0}
+                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
+                            >
+                                Prev
+                            </button>
+                            <span className="text-sm text-gray-500">{page + 1} / {totalPages}</span>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                disabled={page === totalPages - 1}
+                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

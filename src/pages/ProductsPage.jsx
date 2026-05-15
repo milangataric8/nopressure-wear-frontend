@@ -33,6 +33,7 @@ const ProductsPage = () => {
     const [appliedMaxPrice, setAppliedMaxPrice] = useState('');
     const [showFilters, setShowFilters] = useState(true);
     const [searchParams] = useSearchParams();
+    const [expandedCategories, setExpandedCategories] = useState([]);
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -87,9 +88,9 @@ const ProductsPage = () => {
     const fetchCategories = useCallback(async () => {
         try {
             const response = await getCategories();
-            setCategories(response.data);
+            setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log('Failed to load categories, error: ' + e.message + '');
+            console.log('Failed to load categories: ' + e.message, {});
         }
     }, []);
 
@@ -107,6 +108,14 @@ const ProductsPage = () => {
             setSelectedCategory(parseInt(categoryFromUrl));
         }
     }, [searchParams]);
+
+    const toggleExpanded = (categoryId) => {
+        setExpandedCategories(prev =>
+            prev.includes(categoryId)
+                ? prev.filter(id => id !== categoryId)
+                : [...prev, categoryId]
+        );
+    };
 
     useEffect(() => {
         const searchFromUrl = searchParams.get('search');
@@ -164,26 +173,27 @@ const ProductsPage = () => {
                     <div className="w-56 flex-shrink-0">
                         {/* Categories */}
                         <div className="mb-8">
-                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    Categories
-                                </h3>
-                                <div className="space-y-1">
-                                    <button
-                                        onClick={() => handleCategoryClick('')}
-                                        className={`block w-full text-left text-sm py-1.5 transition-colors ${
-                                            selectedCategory === ''
-                                                ? 'font-semibold text-black'
-                                                : 'text-gray-500 hover:text-black'
-                                        }`}
-                                    >
-                                        All
-                                    </button>
+                            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                Categories
+                            </h3>
+                            <div className="space-y-1">
+                                <button
+                                    onClick={() => handleCategoryClick('')}
+                                    className={`block w-full text-left text-sm py-1.5 transition-colors ${
+                                        selectedCategory === ''
+                                            ? 'font-semibold text-black'
+                                            : 'text-gray-500 hover:text-black'
+                                    }`}
+                                >
+                                    All
+                                </button>
 
-                                    {rootCategories.map(cat => (
-                                        <div key={cat.id}>
+                                {rootCategories.map(cat => (
+                                    <div key={cat.id}>
+                                        <div className="flex items-center justify-between">
                                             <button
                                                 onClick={() => handleCategoryClick(cat.id)}
-                                                className={`block w-full text-left text-sm py-1.5 transition-colors ${
+                                                className={`text-sm py-1.5 transition-colors flex-1 text-left ${
                                                     selectedCategory === cat.id
                                                         ? 'font-semibold text-black'
                                                         : 'text-gray-500 hover:text-black'
@@ -192,24 +202,39 @@ const ProductsPage = () => {
                                                 {cat.name}
                                             </button>
 
-                                            {/* Subcategories */}
-                                            {getSubcategories(cat.id).map(sub => (
+                                            {/* Expand dugme ako ima podkategorija */}
+                                            {getSubcategories(cat.id).length > 0 && (
                                                 <button
-                                                    key={sub.id}
-                                                    onClick={() => handleCategoryClick(sub.id)}
-                                                    className={`block w-full text-left text-sm py-1.5 pl-4 transition-colors ${
-                                                        selectedCategory === sub.id
-                                                            ? 'font-semibold text-black'
-                                                            : 'text-gray-400 hover:text-black'
-                                                    }`}
+                                                    onClick={() => toggleExpanded(cat.id)}
+                                                    className="text-gray-400 hover:text-black transition-colors px-1"
                                                 >
-                                                    {sub.name}
+                                                    {expandedCategories.includes(cat.id) ? '−' : '+'}
                                                 </button>
-                                            ))}
+                                            )}
                                         </div>
-                                    ))}
-                                </div>
+
+                                        {/* Podkategorije — prikazuju se samo kada je expanded */}
+                                        {expandedCategories.includes(cat.id) && (
+                                            <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
+                                                {getSubcategories(cat.id).map(sub => (
+                                                    <button
+                                                        key={sub.id}
+                                                        onClick={() => handleCategoryClick(sub.id)}
+                                                        className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                            selectedCategory === sub.id
+                                                                ? 'font-semibold text-black'
+                                                                : 'text-gray-400 hover:text-black'
+                                                        }`}
+                                                    >
+                                                        {sub.name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
+                        </div>
 
                         {/* Price filter */}
                         <div className="mb-8">
@@ -346,7 +371,11 @@ const ProductsPage = () => {
                     ) : (
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
                             {products.map(product => (
-                                <div key={product.id} className="group cursor-pointer">
+                                <Link
+                                    key={product.id}
+                                    to={`/products/${product.id}`}
+                                    className="group cursor-pointer block"
+                                >
                                     <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                         {product.imageUrl ? (
                                             <img
@@ -365,8 +394,51 @@ const ProductsPage = () => {
                                         <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                             {product.name}
                                         </h3>
+                                        {/* Color variants */}
+                                        {(product.colorVariants?.length > 0 || product.colorHex) && (
+                                            <div className="flex gap-1 mt-2 flex-wrap">
+                                                {/* Current product */}
+                                                {product.colorHex && (
+                                                    <div
+                                                        className="w-8 h-8 border-2 border-transparent hover:border-black overflow-hidden flex-shrink-0"
+                                                        title={product.colorName}
+                                                    >
+                                                        {product.imageUrl ? (
+                                                            <img
+                                                                src={getImageUrl(product.imageUrl)}
+                                                                alt={product.colorName || ''}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Variants */}
+                                                {product.colorVariants?.map(variant => (
+                                                    <button
+                                                        key={variant.variantId}
+                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/products/${variant.variantId}`); }}
+                                                        className="w-8 h-8 border-2 border-transparent hover:border-black transition-colors overflow-hidden flex-shrink-0"
+                                                        title={variant.colorName}
+                                                    >
+                                                        {variant.imageUrl ? (
+                                                            <img
+                                                                src={getImageUrl(variant.imageUrl)}
+                                                                alt={variant.colorName || ''}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-bold text-black">
+                                            <span className="text-md font-bold text-black">
                                                 ${product.price}
                                             </span>
                                             <span className={`text-xs ${
@@ -375,14 +447,8 @@ const ProductsPage = () => {
                                                 {product.stockQuantity > 0 ? 'In Stock' : 'Sold Out'}
                                             </span>
                                         </div>
-                                        <Link
-                                            to={`/products/${product.id}`}
-                                            className="mt-2 block text-center text-xs font-semibold uppercase tracking-wide bg-black text-white py-2 hover:bg-gray-800 transition-colors"
-                                        >
-                                            View Product
-                                        </Link>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}

@@ -14,3 +14,5 @@ export const deleteProduct = (id) => axiosInstance.delete(`/products/${id}`);
 export const activateDeactivateProduct = (id) => axiosInstance.patch(`/products/${id}/toggle`);
 export const getProductsByCategories = (categoryIds, params) =>
     axiosInstance.get('/products/by-categories', { params: { categoryIds, ...params } });
+export const addProductImage = (productId, data) => axiosInstance.post(`/products/${productId}/images`, data);
+export const deleteProductImage = (imageId) => axiosInstance.delete(`/products/images/${imageId}`);

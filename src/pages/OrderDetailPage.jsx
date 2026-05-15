@@ -120,7 +120,7 @@ const OrderDetailPage = () => {
                 </div>
             </div>
 
-            {/* Status tracker — ne prikazuj ako je CANCELLED */}
+            {/* Status tracker — don't show status CANCELLED */}
             {order.status !== 'CANCELLED' && (
                 <div className="border border-gray-200 p-8 mb-8">
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-6">

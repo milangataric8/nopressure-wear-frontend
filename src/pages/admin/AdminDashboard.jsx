@@ -85,6 +85,17 @@ const AdminDashboard = () => {
                         Manage hero banners and carousel
                     </p>
                 </Link>
+                <Link
+                    to="/admin/customers"
+                    className="border border-gray-200 p-8 hover:border-black transition-colors group"
+                >
+                    <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
+                        Customers
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                        View and manage customers
+                    </p>
+                </Link>
             </div>
         </div>
     );

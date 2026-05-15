@@ -202,7 +202,7 @@ const ProductsPage = () => {
                                                 {cat.name}
                                             </button>
 
-                                            {/* Expand dugme ako ima podkategorija */}
+                                            {/* Expand button for subcategories */}
                                             {getSubcategories(cat.id).length > 0 && (
                                                 <button
                                                     onClick={() => toggleExpanded(cat.id)}
@@ -213,7 +213,7 @@ const ProductsPage = () => {
                                             )}
                                         </div>
 
-                                        {/* Podkategorije — prikazuju se samo kada je expanded */}
+                                        {/* Subcategories displayed in dropdown list */}
                                         {expandedCategories.includes(cat.id) && (
                                             <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
                                                 {getSubcategories(cat.id).map(sub => (

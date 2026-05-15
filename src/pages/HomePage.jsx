@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
@@ -6,6 +7,7 @@ import {getImageUrl} from "../utils/imageUtils.js";
 import HeroBanner from "../components/common/HeroBanner.jsx";
 
 const HomePage = () => {
+    const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -126,10 +128,9 @@ const HomePage = () => {
 
                                             {/* Variants */}
                                             {product.colorVariants?.map(variant => (
-                                                <Link
+                                                <button
                                                     key={variant.variantId}
-                                                    to={`/products/${variant.variantId}`}
-                                                    onClick={(e) => e.stopPropagation()}
+                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/products/${variant.variantId}`); }}
                                                     className="w-8 h-8 border-2 border-transparent hover:border-black transition-colors overflow-hidden flex-shrink-0"
                                                     title={variant.colorName}
                                                 >
@@ -142,7 +143,7 @@ const HomePage = () => {
                                                     ) : (
                                                         <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />
                                                     )}
-                                                </Link>
+                                                </button>
                                             ))}
                                         </div>
                                     )}

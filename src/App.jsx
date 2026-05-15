@@ -27,6 +27,8 @@ import AdminCoupons from "./pages/admin/AdminCoupons.jsx";
 import OAuth2CallbackPage from './pages/OAuth2CallbackPage';
 import AdminEmployees from "./pages/admin/AdminEmployees.jsx";
 import AdminBanners from "./pages/admin/AdminBanners.jsx";
+import AdminCustomers from './pages/admin/AdminCustomers';
+import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -103,6 +105,12 @@ function App() {
                     } />
                     <Route path="/admin/banners" element={
                         <ProtectedRoute adminOnly employeeAllowed><AdminBanners /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/customers" element={
+                        <ProtectedRoute adminOnly employeeAllowed><AdminCustomers /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/customers/:customerId" element={
+                        <ProtectedRoute adminOnly employeeAllowed><AdminCustomerDetail /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

@@ -38,6 +38,7 @@ const AdminProducts = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [categoryFilter, setCategoryFilter] = useState(null);
+    const [removeBg, setRemoveBg] = useState(false);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -168,11 +169,15 @@ const AdminProducts = () => {
         if (!file) return;
         e.target.value = '';
         try {
-            const response = await uploadImage(file);
+            const response = await uploadImage(file, removeBg);
             setFormData(prev => ({ ...prev, imageUrl: response.data.url }));
-            toast.success('Main image uploaded');
+            if (response.data.warning) {
+                toast.warning('Image uploaded but background removal failed');
+            } else {
+                toast.success(removeBg ? 'Image uploaded with background removed' : 'Main image uploaded');
+            }
         } catch (e) {
-            toast.error('Failed to upload image, error: ' + e.message);
+            toast.error('Failed to upload image, error: ' + e.data.message);
         }
     };
 
@@ -182,7 +187,7 @@ const AdminProducts = () => {
         e.target.value = '';
 
         try {
-            const uploadResponse = await uploadImage(file);
+            const uploadResponse = await uploadImage(file, removeBg);
             const url = uploadResponse.data.url;
 
             if (editingProduct) {
@@ -426,6 +431,19 @@ const AdminProducts = () => {
                         {/* Main Image */}
                         <div className="md:col-span-2">
                             <label className={labelClass}>Main Image</label>
+                            <div className="flex items-center gap-3 mb-2">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={removeBg}
+                                        onChange={(e) => setRemoveBg(e.target.checked)}
+                                        className="w-3.5 h-3.5"
+                                    />
+                                    <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                        Remove background
+                                    </span>
+                                </label>
+                            </div>
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
                                     Upload Main Image

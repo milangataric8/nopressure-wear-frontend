@@ -29,6 +29,7 @@ import AdminEmployees from "./pages/admin/AdminEmployees.jsx";
 import AdminBanners from "./pages/admin/AdminBanners.jsx";
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
+import AdminSettings from './pages/admin/AdminSettings';
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -111,6 +112,9 @@ function App() {
                     } />
                     <Route path="/admin/customers/:customerId" element={
                         <ProtectedRoute adminOnly employeeAllowed><AdminCustomerDetail /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/settings" element={
+                        <ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

@@ -5,6 +5,7 @@ import { getCart } from '../../api/cartApi';
 import { getOrders } from '../../api/orderApi';
 import { getCategories } from '../../api/categoryApi';
 import { getImageUrl } from '../../utils/imageUtils';
+import {getSettingsMap} from "../../api/settingsApi.js";
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount} = useAuth();
@@ -14,6 +15,8 @@ const Navbar = () => {
     const [categories, setCategories] = useState([]);
     const [cart, setCart] = useState(null);
     const [orders, setOrders] = useState([]);
+    const [storeName, setStoreName] = useState('WEBSHOP');
+    const [logoUrl, setLogoUrl] = useState('');
     const dropdownRef = useRef(null);
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
@@ -40,6 +43,30 @@ const Navbar = () => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        import('../../api/settingsApi').then(({ getSettingsMap }) => {
+            getSettingsMap().then(r => {
+                if (r.data.store_name) setStoreName(r.data.store_name);
+            }).catch(() => {});
+        });
+    }, []);
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            if (r.data.store_name) setStoreName(r.data.store_name);
+            if (r.data.store_logo_url) setLogoUrl(r.data.store_logo_url);
+        }).catch(() => {});
+
+        const handler = () => {
+            getSettingsMap().then(r => {
+                if (r.data.store_name) setStoreName(r.data.store_name);
+                if (r.data.store_logo_url) setLogoUrl(r.data.store_logo_url);
+            }).catch(() => {});
+        };
+        window.addEventListener('settings-updated', handler);
+        return () => window.removeEventListener('settings-updated', handler);
     }, []);
 
     const handleLogout = () => {
@@ -102,8 +129,20 @@ const Navbar = () => {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex items-center justify-between h-16 relative">
                         {/* Logo */}
-                        <Link to="/" className="text-xl font-black tracking-tight text-black uppercase">
-                            WebShop
+                        <Link to="/" className="flex items-center">
+                            {logoUrl ? (
+                                <img
+                                    src={logoUrl.startsWith('http')
+                                        ? logoUrl
+                                        : `${import.meta.env.VITE_API_URL}${logoUrl}`}
+                                    alt={storeName}
+                                    className="h-15 object-contain"
+                                />
+                            ) : (
+                                <span className="text-xl font-black tracking-tight text-black uppercase">
+                                    {storeName}
+                                </span>
+                            )}
                         </Link>
 
                         {/* Center links */}
@@ -284,6 +323,15 @@ const Navbar = () => {
                                             >
                                                 Customers
                                             </Link>
+                                            {isAdmin() && (
+                                                <Link
+                                                    to="/admin/settings"
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                                                >
+                                                    Settings
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>

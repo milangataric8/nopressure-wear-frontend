@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getCart } from '../../api/cartApi';
 import { getOrders } from '../../api/orderApi';
-import { getCategories } from '../../api/categoryApi';
+import { getActiveCategories } from '../../api/categoryApi';
 import { getImageUrl } from '../../utils/imageUtils';
-import {getSettingsMap} from "../../api/settingsApi.js";
+import { getSettingsMap } from "../../api/settingsApi.js";
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount} = useAuth();
@@ -23,7 +23,29 @@ const Navbar = () => {
     const getSubcategories = (parentId) => (categories || []).filter(cat => cat.parentId === parentId);
 
     useEffect(() => {
-        getCategories().then(r => setCategories(r.data.content)).catch(() => {});
+        const loadCategories = () => {
+            getActiveCategories()
+                .then(r => setCategories(r.data))
+                .catch(() => {});
+        };
+
+        const loadSettings = () => {
+            getSettingsMap().then(r => {
+                if (r.data.store_name) setStoreName(r.data.store_name);
+                if (r.data.store_logo_url) setLogoUrl(r.data.store_logo_url);
+            }).catch(() => {});
+        };
+
+        loadCategories();
+        loadSettings();
+
+        window.addEventListener('categories-updated', loadCategories);
+        window.addEventListener('settings-updated', loadSettings);
+
+        return () => {
+            window.removeEventListener('categories-updated', loadCategories);
+            window.removeEventListener('settings-updated', loadSettings);
+        };
     }, []);
 
     useEffect(() => {
@@ -43,30 +65,6 @@ const Navbar = () => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    useEffect(() => {
-        import('../../api/settingsApi').then(({ getSettingsMap }) => {
-            getSettingsMap().then(r => {
-                if (r.data.store_name) setStoreName(r.data.store_name);
-            }).catch(() => {});
-        });
-    }, []);
-
-    useEffect(() => {
-        getSettingsMap().then(r => {
-            if (r.data.store_name) setStoreName(r.data.store_name);
-            if (r.data.store_logo_url) setLogoUrl(r.data.store_logo_url);
-        }).catch(() => {});
-
-        const handler = () => {
-            getSettingsMap().then(r => {
-                if (r.data.store_name) setStoreName(r.data.store_name);
-                if (r.data.store_logo_url) setLogoUrl(r.data.store_logo_url);
-            }).catch(() => {});
-        };
-        window.addEventListener('settings-updated', handler);
-        return () => window.removeEventListener('settings-updated', handler);
     }, []);
 
     const handleLogout = () => {
@@ -162,38 +160,40 @@ const Navbar = () => {
                                 </Link>
 
                                 {activeDropdown === 'products' && (
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white border border-gray-200 shadow-lg z-50 p-6 min-w-96">
-                                        <div className="grid grid-cols-3 gap-6 mb-4">
-                                            {rootCategories.map(cat => (
-                                                <div key={cat.id}>
-                                                    <Link
-                                                        to={`/products?category=${cat.id}`}
-                                                        onClick={() => setActiveDropdown(null)}
-                                                        className="text-xs font-black uppercase tracking-wide text-black hover:underline block mb-2"
-                                                    >
-                                                        {cat.name}
-                                                    </Link>
-                                                    {getSubcategories(cat.id).map(sub => (
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50">
+                                        <div className="bg-white border border-gray-200 shadow-lg p-6 w-auto">
+                                            <div className="flex gap-8 mb-4">
+                                                {rootCategories.map(cat => (
+                                                    <div key={cat.id} className="flex-shrink-0">
                                                         <Link
-                                                            key={sub.id}
-                                                            to={`/products?category=${sub.id}`}
+                                                            to={`/products?category=${cat.id}`}
                                                             onClick={() => setActiveDropdown(null)}
-                                                            className="block text-xs text-gray-500 hover:text-black transition-colors py-0.5"
+                                                            className="text-xs font-black uppercase tracking-wide text-black hover:underline block mb-2 whitespace-nowrap"
                                                         >
-                                                            {sub.name}
+                                                            {cat.name}
                                                         </Link>
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="border-t border-gray-200 mt-0 pt-2">
-                                            <Link
-                                                to="/products"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="text-xs font-semibold uppercase tracking-wide text-black hover:underline"
-                                            >
-                                                View All Products →
-                                            </Link>
+                                                        {getSubcategories(cat.id).map(sub => (
+                                                            <Link
+                                                                key={sub.id}
+                                                                to={`/products?category=${sub.id}`}
+                                                                onClick={() => setActiveDropdown(null)}
+                                                                className="block text-xs text-gray-500 hover:text-black transition-colors py-0.5 whitespace-nowrap"
+                                                            >
+                                                                {sub.name}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="border-t border-gray-200 pt-2">
+                                                <Link
+                                                    to="/products"
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="text-xs font-semibold uppercase tracking-wide text-black hover:underline whitespace-nowrap"
+                                                >
+                                                    View All Products →
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                 )}

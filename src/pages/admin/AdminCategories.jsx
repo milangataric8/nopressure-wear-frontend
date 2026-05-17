@@ -1,10 +1,11 @@
+import axiosInstance from "../../api/axiosInstance.js";
+
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
     getCategories,
     createCategory,
-    updateCategory,
-    deleteCategory
+    updateCategory
 } from '../../api/categoryApi';
 
 const AdminCategories = () => {
@@ -21,15 +22,17 @@ const AdminCategories = () => {
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+    const [activeFilter, setActiveFilter] = useState(null);
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
         try {
             const params = { page, size: 10 };
-            if (searchQuery) {
-                params.search = searchQuery;
-            }
-            const response = await getCategories({ page, size: 10, search: searchQuery });
+
+            if (searchQuery) params.search = searchQuery;
+            if (activeFilter !== null) params.active = activeFilter;
+
+            const response = await getCategories(params);
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
@@ -41,7 +44,7 @@ const AdminCategories = () => {
 
     useEffect(() => {
         fetchCategories();
-    }, [page, searchQuery]);
+    }, [page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -82,14 +85,13 @@ const AdminCategories = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this category?')) return;
+    const handleToggle = async (id) => {
         try {
-            await deleteCategory(id);
-            toast.success('Category deleted');
+            await axiosInstance.patch(`/categories/${id}/toggle`);
             fetchCategories();
+            localStorage.setItem('categories-updated', Date.now().toString());
         } catch (e) {
-            toast.error('Failed to delete category, error: ' + e.message || 'Unknown error');
+            toast.error('Failed to toggle category, error: ' + e.message);
         }
     };
 
@@ -128,33 +130,60 @@ const AdminCategories = () => {
 
             {/* Search */}
             {!showForm && (
-                <form
-                    onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
-                    className="flex gap-3 mb-6"
-                >
-                    <input
-                        type="text"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Search categories by name..."
-                        className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
-                    />
-                    <button
-                        type="submit"
-                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
-                    >
-                        Search
-                    </button>
-                    {searchQuery && (
+                <div className="flex items-center justify-between mb-6 gap-4">
+                    {/* Active/Inactive filter — left 50% */}
+                    <div className="flex w-1/2">
                         <button
-                            type="button"
-                            onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
-                            className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                            onClick={() => { setActiveFilter(prev => prev === true ? null : true); setPage(0); }}
+                            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                activeFilter === true
+                                    ? 'bg-green-600 text-white border-green-600'
+                                    : 'bg-white text-gray-500 border-gray-300 hover:border-green-600 hover:text-green-600'
+                            }`}
                         >
-                            Clear
+                            Active
                         </button>
-                    )}
-                </form>
+                        <button
+                            onClick={() => { setActiveFilter(activeFilter === false ? null : false); setPage(0); }}
+                            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border-t border-b border-r transition-colors ${
+                                activeFilter === false
+                                    ? 'bg-red-500 text-white border-red-500'
+                                    : 'bg-white text-gray-500 border-gray-300 hover:border-red-500 hover:text-red-500'
+                            }`}
+                        >
+                            Inactive
+                        </button>
+                    </div>
+
+                    {/* Search — right 50% */}
+                    <form
+                        onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
+                        className="flex w-1/2"
+                    >
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="Search products by name..."
+                            className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                        />
+                        <button
+                            type="submit"
+                            className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
+                        >
+                            Search
+                        </button>
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
+                                className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                            >
+                                ×
+                            </button>
+                        )}
+                    </form>
+                </div>
             )}
 
             {/* Form */}
@@ -267,6 +296,15 @@ const AdminCategories = () => {
                                     }
                                 </td>
                                 <td className="px-4 py-3">
+                                        <span className={`text-xs font-semibold uppercase px-2 py-1 ${
+                                            category.active
+                                                ? 'bg-green-100 text-green-700'
+                                                : 'bg-red-100 text-red-700'
+                                        }`}>
+                                            {category.active ? 'Active' : 'Inactive'}
+                                        </span>
+                                </td>
+                                <td className="px-4 py-3">
                                     <div className="flex items-center gap-3">
                                         <button
                                             onClick={() => handleEdit(category)}
@@ -275,10 +313,10 @@ const AdminCategories = () => {
                                             Edit
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(category.id)}
-                                            className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
+                                            onClick={() => handleToggle(category.id)}
+                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            Delete
+                                            {category.active ? 'Deactivate' : 'Activate'}
                                         </button>
                                     </div>
                                 </td>

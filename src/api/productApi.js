@@ -10,7 +10,6 @@ export const searchProducts = (query, params) =>
     axiosInstance.get('/products/search', { params: { query, ...params } });
 export const createProduct = (data) => axiosInstance.post('/products', data);
 export const updateProduct = (id, data) => axiosInstance.put(`/products/${id}`, data);
-export const deleteProduct = (id) => axiosInstance.delete(`/products/${id}`);
 export const activateDeactivateProduct = (id) => axiosInstance.patch(`/products/${id}/toggle`);
 export const getProductsByCategories = (categoryIds, params) =>
     axiosInstance.get('/products/by-categories', { params: { categoryIds, ...params } });

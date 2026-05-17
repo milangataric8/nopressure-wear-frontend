@@ -5,7 +5,6 @@ import {
     getProducts,
     createProduct,
     updateProduct,
-    deleteProduct,
     activateDeactivateProduct,
     getProductById,
     addProductImage,
@@ -39,13 +38,17 @@ const AdminProducts = () => {
     const [searchInput, setSearchInput] = useState('');
     const [categoryFilter, setCategoryFilter] = useState(null);
     const [removeBg, setRemoveBg] = useState(false);
+    const [activeFilter, setActiveFilter] = useState(null);
 
     const fetchProducts = async () => {
         setLoading(true);
         try {
             const params = { page, size: 10 };
+
             if (searchQuery && searchQuery.trim() !== '') params.search = searchQuery;
             if (categoryFilter) params.categoryId = categoryFilter;
+            if (activeFilter !== null) params.active = activeFilter;
+
             const response = await getProducts(params);
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -68,7 +71,7 @@ const AdminProducts = () => {
     useEffect(() => {
         fetchProducts();
         fetchCategories();
-    }, [page, searchQuery, categoryFilter]);
+    }, [page, searchQuery, categoryFilter, activeFilter]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -124,17 +127,6 @@ const AdminProducts = () => {
         });
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this product?')) return;
-        try {
-            await deleteProduct(id);
-            toast.success('Product deleted');
-            fetchProducts();
-        } catch (e) {
-            toast.error('Failed to delete product, error: ' + e.message);
-        }
     };
 
     const handleToggle = async (id) => {
@@ -233,6 +225,7 @@ const AdminProducts = () => {
             toast.error('Failed to upload video, error: ' + e.message);
         }
     };
+
     const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
@@ -260,49 +253,66 @@ const AdminProducts = () => {
 
             {/* Search */}
             {!showForm && (
-                <form
-                    onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
-                    className="flex gap-3 mb-6"
-                >
-                    <input
-                        type="text"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="Search products by name or SKU"
-                        className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
-                    />
-                    <button
-                        type="submit"
-                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
-                    >
-                        Search
-                    </button>
-                    {searchQuery && (
+                <div className="flex items-center justify-between mb-6 gap-4">
+                    {/* Active/Inactive filter — left 50% */}
+                    <div className="flex w-1/2">
                         <button
-                            type="button"
-                            onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
-                            className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                            onClick={() => { setActiveFilter(prev => prev === true ? null : true); setPage(0); }}
+                            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                activeFilter === true
+                                    ? 'bg-green-600 text-white border-green-600'
+                                    : 'bg-white text-gray-500 border-gray-300 hover:border-green-600 hover:text-green-600'
+                            }`}
                         >
-                            Clear
+                            Active
                         </button>
-                    )}
-                </form>
+                        <button
+                            onClick={() => { setActiveFilter(activeFilter === false ? null : false); setPage(0); }}
+                            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border-t border-b border-r transition-colors ${
+                                activeFilter === false
+                                    ? 'bg-red-500 text-white border-red-500'
+                                    : 'bg-white text-gray-500 border-gray-300 hover:border-red-500 hover:text-red-500'
+                            }`}
+                        >
+                            Inactive
+                        </button>
+                    </div>
+
+                    {/* Search — right 50% */}
+                    <form
+                        onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
+                        className="flex w-1/2"
+                    >
+                        <input
+                            type="text"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                            placeholder="Search products by name or SKU..."
+                            className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                        />
+                        <button
+                            type="submit"
+                            className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
+                        >
+                            Search
+                        </button>
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
+                                className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
+                            >
+                                ×
+                            </button>
+                        )}
+                    </form>
+                </div>
             )}
 
             {!showForm && (
                 <div className="mb-6 border border-gray-200">
                     {/* Root categories */}
                     <div className="flex border-b border-gray-200">
-                        <button
-                            onClick={() => { setCategoryFilter(null); setPage(0); }}
-                            className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-r border-gray-200 ${
-                                categoryFilter === null
-                                    ? 'bg-black text-white'
-                                    : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
-                            }`}
-                        >
-                            All
-                        </button>
                         {categories.filter(cat => !cat.parentId).map(cat => {
                             const subcats = categories.filter(c => c.parentId === cat.id);
                             const isSelected = categoryFilter === cat.id || subcats.some(s => s.id === categoryFilter);
@@ -310,7 +320,10 @@ const AdminProducts = () => {
                             return (
                                 <div key={cat.id} className="flex-1 relative border-r border-gray-200 last:border-r-0">
                                     <button
-                                        onClick={() => { setCategoryFilter(cat.id); setPage(0); }}
+                                        onClick={() => {
+                                            setCategoryFilter(isSelected ? null : cat.id);
+                                            setPage(0);
+                                        }}
                                         className={`w-full py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
                                             isSelected
                                                 ? 'bg-gray-800 text-white'
@@ -329,7 +342,10 @@ const AdminProducts = () => {
                                             {subcats.map(sub => (
                                                 <button
                                                     key={sub.id}
-                                                    onClick={() => { setCategoryFilter(sub.id); setPage(0); }}
+                                                    onClick={() => {
+                                                        setCategoryFilter(prev => prev === sub.id ? cat.id : sub.id);
+                                                        setPage(0);
+                                                    }}
                                                     className={`w-full py-2 text-xs uppercase tracking-wide transition-colors border-b border-gray-100 last:border-b-0 ${
                                                         categoryFilter === sub.id
                                                             ? 'bg-gray-100 text-black font-semibold'
@@ -651,12 +667,6 @@ const AdminProducts = () => {
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
                                             {product.active ? 'Deactivate' : 'Activate'}
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); handleDelete(product.id); }}
-                                            className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
-                                        >
-                                            Delete
                                         </button>
                                     </div>
                                 </td>

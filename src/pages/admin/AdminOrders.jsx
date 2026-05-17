@@ -80,7 +80,7 @@ const AdminOrders = () => {
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder="Search orders by order code or user name..."
+                    placeholder="Search orders by order code or customer name..."
                     className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button
@@ -103,20 +103,22 @@ const AdminOrders = () => {
             {/* Status filter */}
             <div className="flex border border-gray-200 mb-6">
                 {[
-                    { label: 'All', value: '', bg: 'bg-white', text: 'text-gray-600', active: 'bg-gray-200 text-black' },
-                    { label: 'Pending', value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-200 text-yellow-800' },
-                    { label: 'Confirmed', value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-200 text-blue-800' },
-                    { label: 'Shipped', value: 'SHIPPED', bg: 'bg-purple-50', text: 'text-purple-700', active: 'bg-purple-200 text-purple-800' },
-                    { label: 'Delivered', value: 'DELIVERED', bg: 'bg-green-50', text: 'text-green-700', active: 'bg-green-200 text-green-800' },
-                    { label: 'Cancelled', value: 'CANCELLED', bg: 'bg-red-50', text: 'text-red-700', active: 'bg-red-200 text-red-800' },
+                    { label: 'Pending', value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-100 text-yellow-800' },
+                    { label: 'Confirmed', value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-100 text-blue-800' },
+                    { label: 'Shipped', value: 'SHIPPED', bg: 'bg-purple-50', text: 'text-purple-700', active: 'bg-purple-100 text-purple-800' },
+                    { label: 'Delivered', value: 'DELIVERED', bg: 'bg-green-50', text: 'text-green-700', active: 'bg-green-100 text-green-800' },
+                    { label: 'Cancelled', value: 'CANCELLED', bg: 'bg-red-50', text: 'text-red-700', active: 'bg-red-100 text-red-800' },
                 ].map(status => (
                     <button
                         key={status.value}
-                        onClick={() => { setStatusFilter(status.value); setPage(0); }}
+                        onClick={() => {
+                            setStatusFilter(prev => prev === status.value ? '' : status.value);
+                            setPage(0);
+                        }}
                         className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-r border-gray-200 last:border-r-0 ${
                             statusFilter === status.value
                                 ? status.active
-                                : `${status.bg} ${status.text} hover:opacity-50`
+                                : `${status.bg} ${status.text} hover:opacity-80`
                         }`}
                     >
                         {status.label}

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getSettings, updateSettings } from '../../api/settingsApi';
 import {uploadImage} from "../../api/uploadApi.js";
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 
 const AdminSettings = () => {
     const [settings, setSettings] = useState([]);
@@ -85,7 +86,7 @@ const AdminSettings = () => {
                         <div className="space-y-4">
                             {section.keys.map(key => {
                                 const setting = settings.find(s => s.key === key);
-                                if (!settings) return null;
+                                if (!setting) return null;
 
                                 return (
                                     <div key={setting.id} className="flex items-center gap-4">

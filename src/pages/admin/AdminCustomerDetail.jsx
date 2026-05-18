@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 const AdminCustomerDetail = () => {
     const { customerId } = useParams();
@@ -97,13 +98,8 @@ const AdminCustomerDetail = () => {
                             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
                                 Status
                             </p>
-                            <span className={`text-xs font-semibold uppercase px-2 py-1 ${
-                                customer.active
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
-                            }`}>
-                                {customer.active ? 'Active' : 'Inactive'}
-                            </span>
+
+                            <StatusBadge active={customer.active} />
                         </div>
                     </div>
                 </div>

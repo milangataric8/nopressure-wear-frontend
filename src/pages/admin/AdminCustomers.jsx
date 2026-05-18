@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 const AdminCustomers = () => {
     const navigate = useNavigate();
@@ -109,13 +110,7 @@ const AdminCustomers = () => {
                                     })}
                                 </td>
                                 <td className="px-4 py-3">
-                                        <span className={`text-xs font-semibold uppercase px-2 py-1 ${
-                                            customer.active
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-red-100 text-red-700'
-                                        }`}>
-                                            {customer.active ? 'Active' : 'Inactive'}
-                                        </span>
+                                    <StatusBadge active={customer.active} />
                                 </td>
                             </tr>
                         ))}

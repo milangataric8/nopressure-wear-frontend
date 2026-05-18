@@ -7,6 +7,7 @@ import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
+import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 const AdminBanners = () => {
     const [banners, setBanners] = useState([]);
@@ -349,13 +350,9 @@ const AdminBanners = () => {
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-1">
                                     <h3 className="text-sm font-semibold text-black">{banner.title}</h3>
-                                    <span className={`text-xs font-semibold uppercase px-2 py-0.5 ${
-                                        banner.active
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-red-100 text-red-700'
-                                    }`}>
-                                        {banner.active ? 'Active' : 'Inactive'}
-                                    </span>
+
+                                    <StatusBadge active={banner.active} />
+
                                     <span className="text-xs text-gray-400 uppercase">{banner.mediaType}</span>
                                 </div>
                                 {banner.subtitle && (

@@ -3,6 +3,8 @@ import axiosInstance from '../../api/axiosInstance';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Pagination from "../../components/common/Pagination.jsx";
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 
 const AdminCustomerDetail = () => {
     const { customerId } = useParams();
@@ -62,13 +64,8 @@ const AdminCustomerDetail = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-            </div>
-        );
-    }
+    {loading && <LoadingSpinner />}
+    {loading && <LoadingSpinner height="h-32" />}
 
     if (!customer) return null;
 
@@ -148,11 +145,11 @@ const AdminCustomerDetail = () => {
                     Orders
                 </h2>
 
-                {ordersLoading ? (
-                    <div className="flex justify-center items-center h-32">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-                    </div>
-                ) : orders.length === 0 ? (
+                {ordersLoading && <LoadingSpinner />}
+                {
+                    ordersLoading && <LoadingSpinner height="h-32" />
+                }
+                { orders.length === 0 ? (
                     <div className="border border-gray-200 p-12 text-center">
                         <p className="text-sm text-gray-400">No orders yet</p>
                     </div>
@@ -203,25 +200,7 @@ const AdminCustomerDetail = () => {
                             </tbody>
                         </table>
 
-                        {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-4 p-4 border-t border-gray-200">
-                                <button
-                                    onClick={() => setPage(p => Math.max(0, p - 1))}
-                                    disabled={page === 0}
-                                    className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                                >
-                                    Prev
-                                </button>
-                                <span className="text-sm text-gray-500">{page + 1} / {totalPages}</span>
-                                <button
-                                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                                    disabled={page === totalPages - 1}
-                                    className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        )}
+                        <Pagination page={page} totalPages={totalPages} setPage={setPage} />
                     </div>
                 )}
             </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import axiosInstance from '../api/axiosInstance';
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 const AddressPage = () => {
     const { user } = useAuth();
@@ -199,11 +200,11 @@ const AddressPage = () => {
             )}
 
             {/* Address list */}
-            {loading ? (
-                <div className="flex justify-center items-center h-32">
-                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-                </div>
-            ) : addresses.length === 0 ? (
+            {loading && <LoadingSpinner />}
+            {
+                loading && <LoadingSpinner height="h-32" />
+            }
+            { addresses.length === 0 ? (
                 <div className="border border-gray-200 p-12 text-center">
                     <p className="text-sm text-gray-400 mb-4">No addresses saved yet</p>
                     <button

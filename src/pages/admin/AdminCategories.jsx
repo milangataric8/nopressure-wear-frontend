@@ -8,6 +8,8 @@ import {
     updateCategory
 } from '../../api/categoryApi';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
+import Pagination from "../../components/common/Pagination.jsx";
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 
 const AdminCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -213,11 +215,11 @@ const AdminCategories = () => {
             )}
 
             {/* Categories table */}
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-                </div>
-            ) : categories.length === 0 ? (
+            {loading && <LoadingSpinner />}
+            {
+                loading && <LoadingSpinner height="h-32" />
+            }
+            { categories.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
                     <p className="text-sm">No categories yet</p>
                 </div>
@@ -281,25 +283,7 @@ const AdminCategories = () => {
                         </tbody>
                     </table>
 
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-4 p-4 border-t border-gray-200">
-                            <button
-                                onClick={() => setPage(p => Math.max(0, p - 1))}
-                                disabled={page === 0}
-                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                            >
-                                Prev
-                            </button>
-                            <span className="text-sm text-gray-500">{page + 1} / {totalPages}</span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                                disabled={page === totalPages - 1}
-                                className="text-sm font-medium px-4 py-1.5 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
                 </div>
             )}
         </div>

@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import axiosInstance from '../api/axiosInstance';
 import { Link } from 'react-router-dom';
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 const ProfilePage = () => {
     const { user, loginUser, token } = useAuth();
@@ -80,13 +81,8 @@ const ProfilePage = () => {
     const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-            </div>
-        );
-    }
+    {loading && <LoadingSpinner />}
+    {loading && <LoadingSpinner height="h-32" />}
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">

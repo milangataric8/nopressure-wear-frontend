@@ -64,13 +64,8 @@ const AdminSettings = () => {
 
     const inputClass = "w-full border border-gray-300 px-3 py-2 text-sm text-black focus:outline-none focus:border-black transition-colors";
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-black border-t-transparent"></div>
-            </div>
-        );
-    }
+    {loading && <LoadingSpinner />}
+    {loading && <LoadingSpinner height="h-32" />}
 
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">

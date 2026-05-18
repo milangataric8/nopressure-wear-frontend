@@ -11,6 +11,7 @@ import {
 import { getCategories } from '../api/categoryApi';
 import { getImageUrl } from '../utils/imageUtils';
 import Skeleton from '../components/common/Skeleton';
+import Pagination from "../components/common/Pagination.jsx";
 
 const ProductsPage = () => {
     const [products, setProducts] = useState([]);
@@ -453,28 +454,7 @@ const ProductsPage = () => {
                         </div>
                     )}
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-4 mt-12">
-                            <button
-                                onClick={() => setPage(p => Math.max(0, p - 1))}
-                                disabled={page === 0}
-                                className="text-sm font-medium px-6 py-2 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                            >
-                                Prev
-                            </button>
-                            <span className="text-sm text-gray-500">
-                                {page + 1} / {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                                disabled={page === totalPages - 1}
-                                className="text-sm font-medium px-6 py-2 border border-black hover:bg-black hover:text-white transition-colors disabled:opacity-30"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
                 </div>
             </div>
         </div>

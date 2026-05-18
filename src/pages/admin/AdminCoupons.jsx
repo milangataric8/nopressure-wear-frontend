@@ -6,6 +6,7 @@ import {getCoupons} from "../../api/couponApi.js";
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 
 const AdminCoupons = () => {
     const [coupons, setCoupons] = useState([]);
@@ -100,20 +101,12 @@ const AdminCoupons = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
-            <div className="flex items-center justify-between mb-10">
-                <div>
-                    <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                        Coupons
-                    </h1>
-                    <p className="text-sm text-gray-500">Manage discount coupons</p>
-                </div>
-                <button
-                    onClick={() => showForm ? setShowForm(false) : setShowForm(true)}
-                    className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
-                >
-                    {showForm ? 'Cancel' : '+ New Coupon'}
-                </button>
-            </div>
+            <AdminPageHeader
+                title="Coupons"
+                subtitle="Manage discount coupons"
+                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
+            />
 
             {!showForm && (
                 <AdminSearchFilter

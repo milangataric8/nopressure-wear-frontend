@@ -58,7 +58,7 @@ const AdminProducts = () => {
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load products, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load products');
         } finally {
             setLoading(false);
         }
@@ -113,8 +113,8 @@ const AdminProducts = () => {
             setPendingImages([]);
             resetForm();
             fetchProducts();
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save product');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to save product');
         }
     };
 
@@ -139,7 +139,7 @@ const AdminProducts = () => {
             await activateDeactivateProduct(id);
             fetchProducts();
         } catch (e) {
-            toast.error('Failed to toggle product, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to toggle product')
         }
     };
 
@@ -174,7 +174,7 @@ const AdminProducts = () => {
                 toast.success(removeBg ? 'Image uploaded with background removed' : 'Main image uploaded');
             }
         } catch (e) {
-            toast.error('Failed to upload image, error: ' + e.data.message);
+            toast.error(e.response?.data?.message || 'Failed to upload image');
         }
     };
 
@@ -201,7 +201,7 @@ const AdminProducts = () => {
                 setPendingImages(prev => [...prev, url]);
             }
         } catch (e) {
-            toast.error('Failed to add image, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to add image');
         }
     };
 
@@ -214,7 +214,7 @@ const AdminProducts = () => {
                 images: prev.images.filter(img => img.id !== imageId)
             }));
         } catch (e) {
-            toast.error('Failed to delete image, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to delete image');
         }
     };
 
@@ -227,7 +227,7 @@ const AdminProducts = () => {
             setFormData(prev => ({ ...prev, videoUrl: response.data.url }));
             toast.success('Video uploaded');
         } catch (e) {
-            toast.error('Failed to upload video, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to upload video');
         }
     };
 

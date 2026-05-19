@@ -33,7 +33,7 @@ const AdminCustomers = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error('Failed to load customers, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load customers');
         } finally {
             setLoading(false);
         }

@@ -41,7 +41,7 @@ const AdminCategories = () => {
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load categories, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to load categories');
         } finally {
             setLoading(false);
         }
@@ -96,7 +96,7 @@ const AdminCategories = () => {
             fetchCategories();
             localStorage.setItem('categories-updated', Date.now().toString());
         } catch (e) {
-            toast.error('Failed to toggle category, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to toggle category');
         }
     };
 

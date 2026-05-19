@@ -80,7 +80,7 @@ const ProductsPage = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error('Failed to load products, error: ' + e.message, {});
+            toast.error(e.response?.data?.message || 'Failed to load products');
         } finally {
             setLoading(false);
         }

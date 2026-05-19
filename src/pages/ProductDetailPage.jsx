@@ -5,6 +5,7 @@ import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
 import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from '../utils/imageUtils';
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -27,7 +28,7 @@ const ProductDetailPage = () => {
                 setSelectedImage(response.data.imageUrl);
             }
         } catch (e) {
-            toast.error('Product not found, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Product not found');
             navigate('/products');
         } finally {
             setLoading(false);

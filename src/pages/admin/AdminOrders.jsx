@@ -25,7 +25,7 @@ const AdminOrders = () => {
             setOrders(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load orders, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load orders');
         } finally {
             setLoading(false);
         }
@@ -41,7 +41,7 @@ const AdminOrders = () => {
             toast.success('Order status updated');
             fetchAllOrders();
         } catch (e) {
-            toast.error('Failed to update status, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to update status');
         }
     };
 

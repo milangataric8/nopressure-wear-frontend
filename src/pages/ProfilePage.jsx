@@ -1,7 +1,8 @@
+import axiosInstance from '../api/axiosInstance';
+
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
-import axiosInstance from '../api/axiosInstance';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
@@ -15,6 +16,7 @@ const ProfilePage = () => {
         lastName: '',
         email: '',
     });
+
     const fetchUserData = useCallback(async () => {
         setLoading(true);
         try {
@@ -25,11 +27,8 @@ const ProfilePage = () => {
                 lastName: u.lastName,
                 email: u.email,
             });
-        } catch (error) {
-            console.log('Full error:', error);
-            console.log('Status:', error.response?.status);
-            console.log('User ID:', user.id);
-            toast.error('Failed to load profile, error: ' + error.message);
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to load profile');
         } finally {
             setLoading(false);
         }
@@ -40,7 +39,7 @@ const ProfilePage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error('Failed to load addresses, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to load addresses');
         }
     }, [user.id]);
 
@@ -72,8 +71,8 @@ const ProfilePage = () => {
             }, token);
             toast.success('Profile updated');
             setProfileData(prev => ({ ...prev, password: '' }));
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update profile');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to update profile');
         } finally {
             setSaving(false);
         }

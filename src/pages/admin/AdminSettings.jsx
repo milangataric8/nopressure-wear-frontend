@@ -36,7 +36,7 @@ const AdminSettings = () => {
             const response = await getSettings();
             setSettings(response.data);
         } catch (e) {
-            toast.error('Failed to load settings, error: ' + e.data.message);
+            toast.error(e.response?.data?.message || 'Failed to load settings');
         } finally {
             setLoading(false);
         }
@@ -59,7 +59,7 @@ const AdminSettings = () => {
             fetchSettings();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error('Failed to update setting, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to update settings');
         }
     };
 

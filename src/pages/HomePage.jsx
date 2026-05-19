@@ -5,6 +5,7 @@ import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import {getImageUrl} from "../utils/imageUtils.js";
 import HeroBanner from "../components/common/HeroBanner.jsx";
+import {toast} from "react-toastify";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -15,8 +16,8 @@ const HomePage = () => {
         try {
             const response = await getActiveProducts({ page: 0, size: 4 });
             setFeaturedProducts(response.data.content);
-        } catch (error) {
-            console.log('Failed to load featured products: ' + error);
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to load featured products');
         }
     }, []);
 
@@ -24,8 +25,8 @@ const HomePage = () => {
         try {
             const response = await getCategories();
             setCategories(response.data);
-        } catch (error) {
-            console.log('Failed to load categories, error: ' + error);
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to load categories');
         }
     }, []);
 

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import {getOrderById, getOrderByIdAdmin, updateOrderStatus} from '../api/orderApi';
 import { useAuth } from '../hooks/useAuth';
 import {getImageUrl} from "../utils/imageUtils.js";
+import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();
@@ -24,7 +25,7 @@ const OrderDetailPage = () => {
             }
             setOrder(response.data);
         } catch (e) {
-            toast.error('Failed to load order, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to load order');
             navigate(isStaff ? '/admin/orders' : '/orders');
         } finally {
             setLoading(false);
@@ -41,7 +42,7 @@ const OrderDetailPage = () => {
             toast.success('Status updated');
             fetchOrder();
         } catch (e) {
-            toast.error('Failed to update status, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to update status');
         }
     };
 

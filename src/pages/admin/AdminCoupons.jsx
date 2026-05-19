@@ -39,7 +39,7 @@ const AdminCoupons = () => {
             setCoupons(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load coupons, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load coupons');
         } finally {
             setLoading(false);
         }
@@ -84,7 +84,7 @@ const AdminCoupons = () => {
             toast.success('Coupon deleted');
             fetchCoupons();
         } catch (e) {
-            toast.error('Failed to delete coupon, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to delete coupon');
         }
     };
 
@@ -93,7 +93,7 @@ const AdminCoupons = () => {
             await axiosInstance.patch(`/coupons/${id}/toggle`);
             fetchCoupons();
         } catch (e) {
-            toast.error('Failed to toggle coupon, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to toggle coupon');
         }
     };
 

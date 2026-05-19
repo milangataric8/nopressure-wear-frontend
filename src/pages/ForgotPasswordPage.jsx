@@ -1,7 +1,8 @@
+import axiosInstance from '../api/axiosInstance';
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axiosInstance from '../api/axiosInstance';
 
 const ForgotPasswordPage = () => {
     const [email, setEmail] = useState('');

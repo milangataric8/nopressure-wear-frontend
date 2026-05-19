@@ -1,7 +1,8 @@
+import axiosInstance from '../api/axiosInstance';
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import axiosInstance from '../api/axiosInstance';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
 

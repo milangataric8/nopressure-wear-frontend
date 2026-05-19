@@ -23,7 +23,7 @@ const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
             onImageUploaded(response.data.url);
             toast.success('Image uploaded');
         } catch (e) {
-            toast.error('Failed to upload image, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to upload image');
         } finally {
             setUploading(false);
         }

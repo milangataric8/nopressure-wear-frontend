@@ -23,7 +23,7 @@ const AdminCustomerDetail = () => {
             const response = await axiosInstance.get(`/users/${customerId}`);
             setCustomer(response.data);
         } catch (e) {
-            toast.error('Failed to load customer, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load customer');
             navigate('/admin/customers');
         } finally {
             setLoading(false);
@@ -40,7 +40,7 @@ const AdminCustomerDetail = () => {
             setTotalPages(response.data.totalPages);
             setTotalOrders(response.data.totalElements);
         } catch (e) {
-            toast.error('Failed to load orders, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load orders');
         } finally {
             setOrdersLoading(false);
         }

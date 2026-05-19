@@ -43,7 +43,7 @@ const AdminBanners = () => {
             setBanners(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load banners, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to load banners');
         } finally {
             setLoading(false);
         }
@@ -73,7 +73,7 @@ const AdminBanners = () => {
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
             toast.success('File uploaded');
         } catch (e) {
-            toast.error('Failed to upload file, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to upload file');
         } finally {
             setUploading(false);
         }
@@ -118,7 +118,7 @@ const AdminBanners = () => {
             toast.success('Banner deleted');
             fetchBanners();
         } catch (e) {
-            toast.error('Failed to delete banner, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to delete banner');
         }
     };
 
@@ -127,7 +127,7 @@ const AdminBanners = () => {
             await toggleBanner(id);
             fetchBanners();
         } catch (e) {
-            toast.error('Failed to toggle banner, error: ' + e.message);
+            toast.error(e.response?.data?.message || 'Failed to toggle banner');
         }
     };
 

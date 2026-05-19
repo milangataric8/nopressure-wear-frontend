@@ -46,7 +46,7 @@ const AdminEmployees = () => {
             setEmployees(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error('Failed to load employees, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to load employees');
         } finally {
             setLoading(false);
         }
@@ -86,7 +86,7 @@ const AdminEmployees = () => {
             toast.success('Employee deleted');
             fetchEmployees();
         } catch (e) {
-            toast.error('Failed to delete employee, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to delete employee');
         }
     };
 
@@ -99,7 +99,7 @@ const AdminEmployees = () => {
             }
             fetchEmployees();
         } catch (e) {
-            toast.error('Failed to update employee status, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to update employee status');
         }
     };
 
@@ -124,8 +124,8 @@ const AdminEmployees = () => {
             setShowEditForm(false);
             setEditingEmployee(null);
             fetchEmployees();
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update employee');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to update employee');
         }
     };
 
@@ -272,18 +272,6 @@ const AdminEmployees = () => {
                                 onChange={(e) => setEditFormData({ ...editFormData, [e.target.name]: e.target.value })}
                                 className={inputClass}
                                 required
-                            />
-                        </div>
-
-                        <div>
-                            <label className={labelClass}>New Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={editFormData.password}
-                                onChange={(e) => setEditFormData({ ...editFormData, [e.target.name]: e.target.value })}
-                                className={inputClass}
-                                placeholder="Leave blank to keep current"
                             />
                         </div>
 

@@ -1,8 +1,9 @@
+import axiosInstance from '../api/axiosInstance';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
-import axiosInstance from '../api/axiosInstance';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 
 const AddressPage = () => {
@@ -24,8 +25,8 @@ const AddressPage = () => {
         try {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
-        } catch (_) {
-            toast.error('Failed to load addresses');
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to load addresses');
         } finally {
             setLoading(false);
         }
@@ -81,7 +82,7 @@ const AddressPage = () => {
             toast.success('Address deleted');
             fetchAddresses();
         } catch (e) {
-            toast.error('Failed to delete address, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to delete address');
         }
     };
 

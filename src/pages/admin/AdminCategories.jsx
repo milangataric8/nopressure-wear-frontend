@@ -28,6 +28,9 @@ const AdminCategories = () => {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [activeFilter, setActiveFilter] = useState(null);
+    const [expandedCategories, setExpandedCategories] = useState([]);
+
+    const isSearching = searchQuery && searchQuery.trim() !== '';
 
     const fetchCategories = useCallback(async () => {
         setLoading(true);
@@ -127,7 +130,7 @@ const AdminCategories = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search products by name or description..."
+                    searchPlaceholder="Search category by name..."
                 />
             )}
 
@@ -215,52 +218,113 @@ const AdminCategories = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Name</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Description</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Parent</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Subcategories</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Category</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {categories.map(category => (
-                            <tr key={category.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="px-4 py-3">
-                                    <p className="text-sm font-semibold text-black">{category.name}</p>
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                    {category.description || '—'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                    {category.parentName || '—'}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                    {category.subcategories?.length > 0
-                                        ? category.subcategories.map(s => s.name).join(', ')
-                                        : '—'
-                                    }
-                                </td>
-                                <td className="px-4 py-3">
-                                    <StatusBadge active={category.active} />
-                                </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => handleEdit(category)}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleToggle(category.id)}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                        >
-                                            {category.active ? 'Deactivate' : 'Activate'}
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
+                        {isSearching ? (
+                            // Flat list when searching
+                            categories.map(cat => (
+                                <tr key={cat.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-semibold text-black">{cat.name}</p>
+                                            {cat.parentId && (
+                                                <span className="text-xs text-gray-400">
+                                                    ({categories.find(c => c.id === cat.parentId)?.name || 'Subcategory'})
+                                                </span>
+                                            )}
+                                        </div>
+                                        {cat.description && (
+                                            <p className="text-xs text-gray-400">{cat.description}</p>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <StatusBadge active={cat.active} />
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => handleEdit(cat)}
+                                                className="text-xs text-gray-500 hover:text-black underline"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleToggle(cat.id)}
+                                                className="text-xs text-gray-500 hover:text-black underline"
+                                            >
+                                                {cat.active ? 'Deactivate' : 'Activate'}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            // Grouped list when not searching
+                            categories.filter(cat => !cat.parentId).map(cat => {
+                                const subcategories = categories.filter(c => c.parentId === cat.id);
+                                const isExpanded = expandedCategories.includes(cat.id);
+
+                                return (
+                                    <>
+                                        <tr key={cat.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm font-semibold text-black">{cat.name}</p>
+                                                    {subcategories.length > 0 && (
+                                                        <button
+                                                            onClick={() => setExpandedCategories(prev =>
+                                                                prev.includes(cat.id)
+                                                                    ? prev.filter(id => id !== cat.id)
+                                                                    : [...prev, cat.id]
+                                                            )}
+                                                            className="text-gray-400 hover:text-black transition-colors"
+                                                        >
+                                                            {isExpanded ? '▾' : '▸'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                {cat.description && (
+                                                    <p className="text-xs text-gray-400">{cat.description}</p>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3"><StatusBadge active={cat.active} /></td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <button onClick={() => handleEdit(cat)} className="text-xs text-gray-500 hover:text-black underline">Edit</button>
+                                                    <button onClick={() => handleToggle(cat.id)} className="text-xs text-gray-500 hover:text-black underline">
+                                                        {cat.active ? 'Deactivate' : 'Activate'}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        {isExpanded && subcategories.map(sub => (
+                                            <tr key={sub.id} className="border-b border-gray-100 bg-gray-50">
+                                                <td className="px-4 py-2 pl-10">
+                                                    <p className="text-xs text-gray-600">{sub.name}</p>
+                                                    {sub.description && (
+                                                        <p className="text-xs text-gray-400">{sub.description}</p>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-2"><StatusBadge active={sub.active} /></td>
+                                                <td className="px-4 py-2">
+                                                    <div className="flex items-center gap-3">
+                                                        <button onClick={() => handleEdit(sub)} className="text-xs text-gray-500 hover:text-black underline">Edit</button>
+                                                        <button onClick={() => handleToggle(sub.id)} className="text-xs text-gray-500 hover:text-black underline">
+                                                            {sub.active ? 'Deactivate' : 'Activate'}
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </>
+                                );
+                            })
+                        )}
                         </tbody>
                     </table>
 

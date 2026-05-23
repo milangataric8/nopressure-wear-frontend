@@ -18,6 +18,8 @@ const Navbar = () => {
     const [storeName, setStoreName] = useState('WEBSHOP');
     const [logoUrl, setLogoUrl] = useState('');
     const dropdownRef = useRef(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
     const getSubcategories = (parentId) => (categories || []).filter(cat => cat.parentId === parentId);
@@ -93,7 +95,7 @@ const Navbar = () => {
     };
 
     return (
-        <div ref={dropdownRef}>
+        <div ref={dropdownRef} className="fixed top-0 left-0 right-0 z-50">
             {/* Top mini navbar */}
             <div className="bg-gray-100 border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-end gap-6">
@@ -123,7 +125,7 @@ const Navbar = () => {
             </div>
 
             {/* Main navbar */}
-            <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+            <nav className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex items-center justify-between h-16 relative">
                         {/* Logo */}
@@ -144,7 +146,7 @@ const Navbar = () => {
                         </Link>
 
                         {/* Center links */}
-                        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-8">
+                        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
 
                             {/* Products */}
                             <div
@@ -338,10 +340,10 @@ const Navbar = () => {
                             )}
                         </div>
 
-                        {/* Search + Cart — right side */}
-                        <div className="flex items-center gap-3">
-                            {/* Search */}
-                            <form onSubmit={handleSearch} className="flex items-stretch">
+                        {/* Mobile menu button + search + cart */}
+                        <div className="flex items-center gap-2">
+                            {/* Search — desktop */}
+                            <form onSubmit={handleSearch} className="hidden md:flex items-stretch">
                                 <div className="relative flex items-center">
                                     <input
                                         type="text"
@@ -353,10 +355,7 @@ const Navbar = () => {
                                     {searchInput && (
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                setSearchInput('');
-                                                navigate('/products');
-                                            }}
+                                            onClick={() => { setSearchInput(''); navigate('/products'); }}
                                             className="absolute right-1 text-gray-400 hover:text-black transition-colors text-lg leading-none"
                                         >
                                             ×
@@ -374,7 +373,51 @@ const Navbar = () => {
                                 </button>
                             </form>
 
-                            {/* Cart icon */}
+                            {/* Mobile search */}
+                            <div className="relative md:hidden flex items-center">
+                                {mobileSearchOpen && (
+                                    <form
+                                        onSubmit={(e) => { handleSearch(e); setMobileSearchOpen(false); }}
+                                        className="absolute right-8 flex items-center"
+                                        style={{ width: '200px' }}
+                                    >
+                                        <input
+                                            type="text"
+                                            value={searchInput}
+                                            onChange={(e) => setSearchInput(e.target.value)}
+                                            placeholder="Search..."
+                                            className="w-full border border-gray-300 px-3 h-8 text-sm focus:outline-none focus:border-black transition-colors"
+                                            autoFocus
+                                        />
+                                        {searchInput && (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setSearchInput(''); setMobileSearchOpen(false); navigate('/products'); }}
+                                                className="absolute right-1 text-gray-400 hover:text-black text-lg leading-none"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </form>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        if (mobileSearchOpen && searchInput) {
+                                            navigate(`/products?search=${searchInput.trim()}`);
+                                            setSearchInput('');
+                                        }
+                                        setMobileSearchOpen(!mobileSearchOpen);
+                                    }}
+                                    className="text-gray-600 hover:text-black transition-colors p-1"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8"/>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Cart */}
                             {isAuthenticated() && (
                                 <div
                                     className="relative"
@@ -435,7 +478,75 @@ const Navbar = () => {
                                     )}
                                 </div>
                             )}
+
+                            {/* Mobile hamburger */}
+                            <button
+                                className="md:hidden p-2 text-gray-600 hover:text-black"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            >
+                                {mobileMenuOpen ? (
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"/>
+                                        <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                ) : (
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <line x1="3" y1="6" x2="21" y2="6"/>
+                                        <line x1="3" y1="12" x2="21" y2="12"/>
+                                        <line x1="3" y1="18" x2="21" y2="18"/>
+                                    </svg>
+                                )}
+                            </button>
                         </div>
+
+                        {/* Mobile menu */}
+                        {mobileMenuOpen && (
+                            <div className="md:hidden border-t border-gray-200 py-4 space-y-3">
+                                {/* Search */}
+                                <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">
+                                    <input
+                                        type="text"
+                                        value={searchInput}
+                                        onChange={(e) => setSearchInput(e.target.value)}
+                                        placeholder="Search..."
+                                        className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                    />
+                                    <button type="submit" className="bg-black text-white px-3 flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                            <circle cx="11" cy="11" r="8"/>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                {/* Links */}
+                                <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Products</Link>
+                                {isAuthenticated() && (
+                                    <>
+                                        <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Orders</Link>
+                                        <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Cart</Link>
+                                    </>
+                                )}
+
+                                {(isAdmin() || isEmployee()) && (
+                                    <div className="border-t border-gray-200 pt-3">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Admin</p>
+                                        <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Products</Link>
+                                        <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Categories</Link>
+                                        <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Orders</Link>
+                                        <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Coupons</Link>
+                                        <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Customers</Link>
+                                        <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Banners</Link>
+                                        {isAdmin() && (
+                                            <>
+                                                <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Employees</Link>
+                                                <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Settings</Link>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </nav>

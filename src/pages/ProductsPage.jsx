@@ -1,13 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import {Link, useNavigate, useSearchParams} from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {
-    getActiveProducts,
-    searchProducts,
-    getProductsByCategory,
-    getProductsByCategories,
-    getProductsByPriceRange
-} from '../api/productApi';
+import { searchActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import { getImageUrl } from '../utils/imageUtils';
 import Skeleton from '../components/common/Skeleton';
@@ -35,6 +29,7 @@ const ProductsPage = () => {
     const [showFilters, setShowFilters] = useState(true);
     const [searchParams] = useSearchParams();
     const [expandedCategories, setExpandedCategories] = useState([]);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -42,39 +37,22 @@ const ProductsPage = () => {
     const getSubcategories = (parentId) =>
         categories.filter(cat => cat.parentId === parentId);
 
-    const isParentCategory = (categoryId) =>
-        categories.some(cat => cat.parentId === categoryId);
-
-    const getCategoryIds = (categoryId) => {
-        const subcats = getSubcategories(categoryId);
-        return [categoryId, ...subcats.map(s => s.id)];
-    };
-
     const fetchProducts = useCallback(async () => {
         if (categories.length === 0) return;
         setLoading(true);
         try {
-            let response;
             const params = {
                 page,
                 size: 12,
                 sort: `${sortBy},${sortDir}`
             };
 
-            if (searchQuery) {
-                response = await searchProducts(searchQuery, params);
-            } else if (appliedMinPrice !== '' && appliedMaxPrice !== '') {
-                response = await getProductsByPriceRange(appliedMinPrice, appliedMaxPrice, params);
-            } else if (selectedCategory) {
-                if (isParentCategory(selectedCategory)) {
-                    const categoryIds = getCategoryIds(selectedCategory);
-                    response = await getProductsByCategories(categoryIds, params);
-                } else {
-                    response = await getProductsByCategory(selectedCategory, params);
-                }
-            } else {
-                response = await getActiveProducts(params);
-            }
+            if (searchQuery) params.search = searchQuery;
+            if (selectedCategory) params.categoryId = selectedCategory;
+            if (appliedMinPrice !== '') params.minPrice = appliedMinPrice;
+            if (appliedMaxPrice !== '') params.maxPrice = appliedMaxPrice;
+
+            const response = await searchActiveProducts(params);
 
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -110,6 +88,16 @@ const ProductsPage = () => {
         }
     }, [searchParams]);
 
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (isMobile) setShowFilters(false);
+    }, [isMobile]);
+
     const toggleExpanded = (categoryId) => {
         setExpandedCategories(prev =>
             prev.includes(categoryId)
@@ -132,12 +120,13 @@ const ProductsPage = () => {
             setPage(0);
         }
 
-        if (searchFromUrl) {
+        if (searchFromUrl !== null) {
             setSearchInput(searchFromUrl);
             setSearchQuery(searchFromUrl);
             resetFilters();
+            return;
         }
-        if (categoryFromUrl) {
+        if (categoryFromUrl !== null) {
             setSelectedCategory(parseInt(categoryFromUrl));
         }
     }, [searchParams]);
@@ -147,10 +136,6 @@ const ProductsPage = () => {
         setSearchQuery('');
         setSearchInput('');
         setPage(0);
-        setAppliedMinPrice('');
-        setAppliedMaxPrice('');
-        setMinPrice('');
-        setMaxPrice('');
         navigate('/products');
     };
 
@@ -168,72 +153,64 @@ const ProductsPage = () => {
                 </span>
             </div>
 
-            <div className="flex gap-8">
-                {/* Filter panel — left side */}
+            <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-8`}>
                 {showFilters && (
-                    <div className="w-56 flex-shrink-0">
+                    <div className={isMobile ? 'w-full' : 'w-56 flex-shrink-0'}>
                         {/* Categories */}
                         <div className="mb-8">
                             <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
                                 Categories
                             </h3>
                             <div className="space-y-1">
-                                <button
-                                    onClick={() => handleCategoryClick('')}
-                                    className={`block w-full text-left text-sm py-1.5 transition-colors ${
-                                        selectedCategory === ''
-                                            ? 'font-semibold text-black'
-                                            : 'text-gray-500 hover:text-black'
-                                    }`}
-                                >
-                                    All
-                                </button>
-
-                                {rootCategories.map(cat => (
-                                    <div key={cat.id}>
-                                        <div className="flex items-center justify-between">
-                                            <button
-                                                onClick={() => handleCategoryClick(cat.id)}
-                                                className={`text-sm py-1.5 transition-colors flex-1 text-left ${
-                                                    selectedCategory === cat.id
-                                                        ? 'font-semibold text-black'
-                                                        : 'text-gray-500 hover:text-black'
-                                                }`}
-                                            >
-                                                {cat.name}
-                                            </button>
-
-                                            {/* Expand button for subcategories */}
-                                            {getSubcategories(cat.id).length > 0 && (
+                                {/* Root categories */}
+                                {rootCategories.map(cat => {
+                                    const subcats = getSubcategories(cat.id);
+                                    return (
+                                        <div key={cat.id}>
+                                            <div className="flex items-center justify-between">
                                                 <button
-                                                    onClick={() => toggleExpanded(cat.id)}
-                                                    className="text-gray-400 hover:text-black transition-colors px-1"
+                                                    onClick={() => handleCategoryClick(selectedCategory === cat.id ? '' : cat.id)}
+                                                    className={`text-sm py-1.5 transition-colors flex-1 text-left ${
+                                                        selectedCategory === cat.id
+                                                            ? 'font-semibold text-black'
+                                                            : 'text-gray-500 hover:text-black'
+                                                    }`}
                                                 >
-                                                    {expandedCategories.includes(cat.id) ? '−' : '+'}
+                                                    {cat.name}
                                                 </button>
+
+                                                {/* Expand toggle — only if has subcategories */}
+                                                {subcats.length > 0 && (
+                                                    <button
+                                                        onClick={() => toggleExpanded(cat.id)}
+                                                        className="text-gray-400 hover:text-black transition-colors px-1"
+                                                    >
+                                                        {expandedCategories.includes(cat.id) ? '−' : '+'}
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Subcategories */}
+                                            {expandedCategories.includes(cat.id) && (
+                                                <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
+                                                    {subcats.map(sub => (
+                                                        <button
+                                                            key={sub.id}
+                                                            onClick={() => handleCategoryClick(selectedCategory === sub.id ? '' : sub.id)}
+                                                            className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                                selectedCategory === sub.id
+                                                                    ? 'font-semibold text-black'
+                                                                    : 'text-gray-400 hover:text-black'
+                                                            }`}
+                                                        >
+                                                            {sub.name}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
-
-                                        {/* Subcategories displayed in dropdown list */}
-                                        {expandedCategories.includes(cat.id) && (
-                                            <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
-                                                {getSubcategories(cat.id).map(sub => (
-                                                    <button
-                                                        key={sub.id}
-                                                        onClick={() => handleCategoryClick(sub.id)}
-                                                        className={`block w-full text-left text-sm py-1 transition-colors ${
-                                                            selectedCategory === sub.id
-                                                                ? 'font-semibold text-black'
-                                                                : 'text-gray-400 hover:text-black'
-                                                        }`}
-                                                    >
-                                                        {sub.name}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -261,13 +238,14 @@ const ProductsPage = () => {
                             </div>
                             <button
                                 onClick={() => {
-                                    setAppliedMinPrice(minPrice);
-                                    setAppliedMaxPrice(maxPrice);
+                                    if (appliedMinPrice !== '' || appliedMaxPrice !== '') {
+                                        setAppliedMinPrice('');
+                                        setAppliedMaxPrice('');
+                                    } else {
+                                        setAppliedMinPrice(minPrice);
+                                        setAppliedMaxPrice(maxPrice);
+                                    }
                                     setPage(0);
-                                    setSelectedCategory('');
-                                    setSearchQuery('');
-                                    setSearchInput('');
-                                    navigate('/products');
                                 }}
                                 className="w-full bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
                             >

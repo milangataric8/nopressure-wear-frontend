@@ -133,8 +133,8 @@ const AdminOrders = () => {
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Order</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Customer</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Items</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Customer</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Items</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Total</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Update Status</th>
@@ -151,11 +151,11 @@ const AdminOrders = () => {
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </p>
                                 </td>
-                                <td className="px-4 py-3 text-sm text-black">
+                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {order.customerFullName}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-black">
-                                    {order.orderItems.length} items
+                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
+                                    {order.orderItems?.length || 0} items
                                 </td>
                                 <td className="px-4 py-3 text-sm font-bold text-black">
                                     ${order.totalAmount.toFixed(2)}

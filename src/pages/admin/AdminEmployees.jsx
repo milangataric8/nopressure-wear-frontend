@@ -295,10 +295,10 @@ const AdminEmployees = () => {
             )}
 
             {/* Employees table */}
-            ({loading && <LoadingSpinner />}
+            {loading && <LoadingSpinner />}
             {
                 loading && <LoadingSpinner height="h-32" />
-            }) :
+            }
             { employees.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
                     <p className="text-sm">No employees yet</p>
@@ -307,29 +307,29 @@ const AdminEmployees = () => {
                 <div className="border border-gray-200">
                     <table className="w-full">
                         <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Name</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Email</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
-                        </tr>
+                            <tr className="border-b border-gray-200 bg-gray-50">
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Name</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Email</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Status</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
                         {employees.map(employee => (
                             <tr key={employee.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-3">
                                     <p className="text-sm font-semibold text-black">
                                         {employee.firstName} {employee.lastName}
                                     </p>
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
+                                <td className="px-3 py-3 text-sm text-gray-500">
                                     {employee.email}
                                 </td>
-                                <td className="px-4 py-3">
+                                <td className="px-3 py-3">
                                     <StatusBadge active={employee.active} />
                                 </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
+                                <td className="px-3 py-3">
+                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
                                         <button
                                             onClick={() => handleEdit(employee)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"

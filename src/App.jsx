@@ -51,7 +51,7 @@ function App() {
     return (
         <>
             <Navbar />
-            <div className="pt-4">
+            <div className="pt-16 md:pt-24">
                 <Routes>
                     <Route path="*" element={<NotFoundPage />} />
                     <Route path="/" element={<HomePage />} />

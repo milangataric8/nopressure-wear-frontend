@@ -559,13 +559,13 @@ const AdminProducts = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Image</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Product</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">SKU</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Price</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Stock</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Image</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Product</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">SKU</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Price</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Stock</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Status</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -575,8 +575,8 @@ const AdminProducts = () => {
                                 onClick={() => navigate(`/products/${product.id}`)}
                                 className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
                             >
-                                <td className="px-4 py-3">
-                                    <div className="w-16 h-16 border-2 border-transparent hover:border-black transition-colors overflow-hidden block">
+                                <td className="px-3 py-3">
+                                    <div className="w-13 h-13 border-2 border-transparent transition-colors overflow-hidden block">
                                         {product.imageUrl ? (
                                             <img
                                                 src={getImageUrl(product.imageUrl)}
@@ -591,20 +591,18 @@ const AdminProducts = () => {
                                         )}
                                     </div>
                                 </td>
-                                <td className="px-4 py-3">
-                                    <div>
-                                        <p className="text-sm font-semibold text-black">{product.name}</p>
-                                        <p className="text-xs text-gray-400">{product.categoryName || 'No category'}</p>
-                                    </div>
+                                <td className="px-3 py-3">
+                                    <p className="text-xs font-semibold text-black">{product.name}</p>
+                                    <p className="text-xs text-gray-400">{product.categoryName || 'No category'}</p>
                                 </td>
-                                <td className="px-4 py-3 text-xs text-gray-500">{product.sku}</td>
-                                <td className="px-4 py-3 text-sm font-semibold text-black">${product.price}</td>
-                                <td className="px-4 py-3 text-sm text-black">{product.stockQuantity}</td>
-                                <td className="px-4 py-3">
+                                <td className="hidden md:table-cell px-3 py-3 text-xs text-gray-500">{product.sku}</td>
+                                <td className="px-3 py-3 text-xs font-semibold text-black">${product.price}</td>
+                                <td className="hidden md:table-cell px-3 py-3 text-xs text-black">{product.stockQuantity}</td>
+                                <td className="px-3 py-3">
                                     <StatusBadge active={product.active} />
                                 </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
+                                <td className="px-3 py-3">
+                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleEdit(product); }}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"

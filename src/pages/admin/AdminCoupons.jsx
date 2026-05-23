@@ -222,9 +222,9 @@ const AdminCoupons = () => {
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Code</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Type</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Type</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Value</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Usage</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Usage</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Expires</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
@@ -234,13 +234,13 @@ const AdminCoupons = () => {
                         {coupons.map(coupon => (
                             <tr key={coupon.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                                 <td className="px-4 py-3 text-sm font-bold text-black">{coupon.code}</td>
-                                <td className="px-4 py-3 text-xs text-gray-500">{coupon.discountType}</td>
+                                <td className="hidden md:table-cell px-4 py-3 text-xs text-gray-500">{coupon.discountType}</td>
                                 <td className="px-4 py-3 text-sm font-semibold text-black">
                                     {coupon.discountType === 'PERCENTAGE'
                                         ? `${coupon.discountValue}%`
                                         : `$${coupon.discountValue}`}
                                 </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
+                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {coupon.usageCount} / {coupon.usageLimit}
                                 </td>
                                 <td className="px-4 py-3 text-xs text-gray-500">

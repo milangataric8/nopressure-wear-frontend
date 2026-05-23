@@ -353,7 +353,7 @@ const AdminBanners = () => {
 
                                     <StatusBadge active={banner.active} />
 
-                                    <span className="text-xs text-gray-400 uppercase">{banner.mediaType}</span>
+                                    <span className="hidden md:table-cell text-xs text-gray-400 uppercase">{banner.mediaType}</span>
                                 </div>
                                 {banner.subtitle && (
                                     <p className="text-xs text-gray-500 mb-1">{banner.subtitle}</p>

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { searchActiveProducts } from '../api/productApi';
+import {getProductFilters, searchActiveProducts} from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import { getImageUrl } from '../utils/imageUtils';
 import Skeleton from '../components/common/Skeleton';
@@ -30,6 +30,10 @@ const ProductsPage = () => {
     const [searchParams] = useSearchParams();
     const [expandedCategories, setExpandedCategories] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [selectedBrand, setSelectedBrand] = useState('');
+    const [selectedColor, setSelectedColor] = useState('');
+    const [availableBrands, setAvailableBrands] = useState([]);
+    const [availableColors, setAvailableColors] = useState([]);
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -51,6 +55,8 @@ const ProductsPage = () => {
             if (selectedCategory) params.categoryId = selectedCategory;
             if (appliedMinPrice !== '') params.minPrice = appliedMinPrice;
             if (appliedMaxPrice !== '') params.maxPrice = appliedMaxPrice;
+            if (selectedBrand) params.brand = selectedBrand;
+            if (selectedColor) params.colorName = selectedColor;
 
             const response = await searchActiveProducts(params);
 
@@ -62,7 +68,7 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, categories]);
+    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -130,6 +136,13 @@ const ProductsPage = () => {
             setSelectedCategory(parseInt(categoryFromUrl));
         }
     }, [searchParams]);
+
+    useEffect(() => {
+        getProductFilters().then(r => {
+            setAvailableBrands(r.data.brands || []);
+            setAvailableColors(r.data.colors || []);
+        }).catch(() => {});
+    }, []);
 
     const handleCategoryClick = (categoryId) => {
         setSelectedCategory(categoryId);
@@ -213,6 +226,69 @@ const ProductsPage = () => {
                                 })}
                             </div>
                         </div>
+
+                        {/* Color filter */}
+                        {availableColors.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                                    Color
+                                </h3>
+                                <div className="flex gap-2 flex-wrap">
+                                    {availableColors.map(color => (
+                                        <button
+                                            key={color.colorName}
+                                            onClick={() => {
+                                                setSelectedColor(prev => prev === color.colorName ? '' : color.colorName);
+                                                setPage(0);
+                                            }}
+                                            className={`w-7 h-7 rounded-full border-1 border-gray-300 hover:border-gray-500 transition-colors tooltip-container`}
+                                            style={{ backgroundColor: color.colorHex }}
+                                            title={color.colorName}
+                                        >
+                                            {selectedColor === color.colorName && (
+                                                <span className="flex items-center justify-center h-full">
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                                                        <polyline points="20 6 9 17 4 12"/>
+                                                    </svg>
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                                {selectedColor && (
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Selected: <span className="font-medium text-black">{selectedColor}</span>
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Brand filter */}
+                        {availableBrands.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                                    Brand
+                                </h3>
+                                <div className="space-y-1">
+                                    {availableBrands.map(brand => (
+                                        <button
+                                            key={brand}
+                                            onClick={() => {
+                                                setSelectedBrand(prev => prev === brand ? '' : brand);
+                                                setPage(0);
+                                            }}
+                                            className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                selectedBrand === brand
+                                                    ? 'font-semibold text-black'
+                                                    : 'text-gray-500 hover:text-black'
+                                            }`}
+                                        >
+                                            {brand}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Price filter */}
                         <div className="mb-8">

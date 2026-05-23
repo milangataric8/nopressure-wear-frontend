@@ -12,6 +12,7 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import React from 'react';
 
 const AdminCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -269,7 +270,7 @@ const AdminCategories = () => {
                                 const isExpanded = expandedCategories.includes(cat.id);
 
                                 return (
-                                    <>
+                                    <React.Fragment key={cat.id}>
                                         <tr key={cat.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-2">
@@ -321,7 +322,7 @@ const AdminCategories = () => {
                                                 </td>
                                             </tr>
                                         ))}
-                                    </>
+                                    </React.Fragment>
                                 );
                             })
                         )}

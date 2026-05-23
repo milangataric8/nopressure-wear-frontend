@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import { toast } from 'react-toastify';
 import {
     getProducts,
@@ -8,7 +8,8 @@ import {
     activateDeactivateProduct,
     getProductById,
     addProductImage,
-    deleteProductImage
+    deleteProductImage,
+    getProductFilters
 } from '../../api/productApi';
 import { getCategories } from '../../api/categoryApi';
 import { getImageUrl } from "../../utils/imageUtils.js";
@@ -44,8 +45,32 @@ const AdminProducts = () => {
     const [categoryFilter, setCategoryFilter] = useState(null);
     const [removeBg, setRemoveBg] = useState(false);
     const [activeFilter, setActiveFilter] = useState(null);
+    const [brandFilter, setBrandFilter] = useState('');
+    const [colorFilter, setColorFilter] = useState('');
+    const [availableBrands, setAvailableBrands] = useState([]);
+    const [availableColors, setAvailableColors] = useState([]);
+    const COLOR_PALETTE = [
+        { name: 'White', hex: '#FFFFFF' },
+        { name: 'Black', hex: '#000000' },
+        { name: 'Gray', hex: '#808080' },
+        { name: 'Silver', hex: '#C0C0C0' },
+        { name: 'Red', hex: '#FF0000' },
+        { name: 'Blue', hex: '#0000FF' },
+        { name: 'Navy', hex: '#000080' },
+        { name: 'Green', hex: '#008000' },
+        { name: 'Yellow', hex: '#FFFF00' },
+        { name: 'Orange', hex: '#FF8C00' },
+        { name: 'Purple', hex: '#800080' },
+        { name: 'Pink', hex: '#FFC0CB' },
+        { name: 'Gold', hex: '#FFD700' },
+        { name: 'Brown', hex: '#8B4513' },
+        { name: 'Beige', hex: '#F5F5DC' },
+        { name: 'Midnight Blue', hex: '#191970' },
+        { name: 'Space Gray', hex: '#4A4A4A' },
+        { name: 'Rose Gold', hex: '#B76E79' },
+    ];
 
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
             const params = { page, size: 10 };
@@ -53,6 +78,10 @@ const AdminProducts = () => {
             if (searchQuery && searchQuery.trim() !== '') params.search = searchQuery;
             if (categoryFilter) params.categoryId = categoryFilter;
             if (activeFilter !== null) params.active = activeFilter;
+            if (brandFilter) params.brand = brandFilter;
+            if (colorFilter) params.colorName = colorFilter;
+
+            console.log('Fetching products with params:', params);
 
             const response = await getProducts(params);
             setProducts(response.data.content);
@@ -62,7 +91,7 @@ const AdminProducts = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, searchQuery, categoryFilter, activeFilter, brandFilter, colorFilter]);
 
     const fetchCategories = async () => {
         try {
@@ -75,8 +104,18 @@ const AdminProducts = () => {
 
     useEffect(() => {
         fetchProducts();
+    }, [page, searchQuery, categoryFilter, activeFilter, brandFilter, colorFilter])
+
+    useEffect(() => {
         fetchCategories();
-    }, [page, searchQuery, categoryFilter, activeFilter]);
+    }, []);
+
+    useEffect(() => {
+        getProductFilters().then(r => {
+            setAvailableBrands(r.data.brands || []);
+            setAvailableColors(r.data.colors || []);
+        }).catch(() => {});
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -129,6 +168,9 @@ const AdminProducts = () => {
             imageUrl: product.imageUrl || '',
             videoUrl: product.videoUrl || '',
             categoryId: product.categoryId || '',
+            colorName: product.colorName || '',
+            colorHex: product.colorHex || '#000000',
+            brand: product.brand || '',
         });
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -154,6 +196,7 @@ const AdminProducts = () => {
             videoUrl: '',
             colorName: '',
             colorHex: '#000000',
+            brand: '',
             categoryId: '',
         });
         setEditingProduct(null);
@@ -264,6 +307,53 @@ const AdminProducts = () => {
                 />
             )}
 
+            <div className="flex items-center justify-between mb-6 gap-2 md:gap-4">
+                <div className="flex w-1/3">
+                    {!showForm && availableColors.length > 0 && (
+                        <div className="flex gap-2 mb-4 flex-wrap items-center">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">Colors:</span>
+                            {availableColors.map(color => (
+                                <button
+                                    key={color.colorName}
+                                    onClick={() => { setColorFilter(prev => prev === color.colorName ? '' : color.colorName); setPage(0); }}
+                                    className={`w-6 h-6 rounded-full border border-gray-300 hover:border-gray-500 transition-colors`}
+                                    style={{ backgroundColor: color.colorHex }}
+                                    title={color.colorName}
+                                >
+                                    {colorFilter === color.colorName && (
+                                        <span className="flex items-center justify-center h-full">
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div className="flex w-10/12">
+                    {!showForm && availableBrands.length > 0 && (
+                        <div className="flex gap-2 mb-4 flex-wrap">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">Brands:</span>
+                            {availableBrands.map(brand => (
+                                <button
+                                    key={brand}
+                                    onClick={() => { setBrandFilter(prev => prev === brand ? '' : brand); setPage(0); }}
+                                    className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                        brandFilter === brand
+                                            ? 'bg-black text-white border-black'
+                                            : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'
+                                    }`}
+                                >
+                                    {brand}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {!showForm && (
                 <div className="mb-6 border border-gray-200">
                     {/* Root categories */}
@@ -326,7 +416,6 @@ const AdminProducts = () => {
                     </h2>
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Name */}
                         <div>
                             <label className={labelClass}>Name</label>
                             <input
@@ -340,7 +429,6 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        {/* SKU */}
                         <div>
                             <label className={labelClass}>SKU</label>
                             <input
@@ -354,7 +442,6 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        {/* Price */}
                         <div>
                             <label className={labelClass}>Price</label>
                             <input
@@ -369,7 +456,6 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        {/* Stock */}
                         <div>
                             <label className={labelClass}>Stock Quantity</label>
                             <input
@@ -383,7 +469,6 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        {/* Category */}
                         <div>
                             <label className={labelClass}>Category</label>
                             <select
@@ -399,7 +484,77 @@ const AdminProducts = () => {
                             </select>
                         </div>
 
-                        {/* Main Image */}
+                        <div>
+                            <label className={labelClass}>Brand</label>
+                            <input
+                                type="text"
+                                name="brand"
+                                value={formData.brand}
+                                onChange={handleChange}
+                                className={inputClass}
+                                placeholder="Apple, Samsung..."
+                            />
+                        </div>
+
+                        {/* Color */}
+                        <div className="md:col-span-2 flex justify-center">
+                            <label className={labelClass}>Color</label>
+                        </div>
+                        <div className="md:col-span-2 flex justify-center">
+                            <div className="flex gap-3 rounded-4xl">
+                                {COLOR_PALETTE.map(color => (
+                                    <button
+                                        key={color.name}
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({
+                                            ...prev,
+                                            colorName: color.name,
+                                            colorHex: color.hex
+                                        }))}
+                                        className={`w-10 h-10 rounded-full border-2 transition-colors ${
+                                            formData.colorName === color.name
+                                                ? 'border-black'
+                                                : 'border-gray-200 hover:border-gray-400'
+                                        }`}
+                                        style={{ backgroundColor: color.hex }}
+                                        title={color.name}
+                                    >
+                                        {formData.colorName === color.name && (
+                                            <span className="flex items-center justify-center h-full">
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                                     stroke={
+                                                        ['#FFFFFF', '#FFFF00', '#FFD700', '#FFC0CB', '#F5F5DC', '#C0C0C0']
+                                                         .includes(color.hex) ? 'black' : 'white'
+                                                    }
+                                                     strokeWidth="4">
+                                                    <polyline points="20 6 9 17 4 12"/>
+                                                </svg>
+                                            </span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="md:col-span-2 flex justify-center">
+                            {formData.colorName && (
+                                <div className="flex items-center gap-3">
+                                    <div
+                                        className="w-8 h-8 rounded-full border border-gray-300"
+                                        style={{ backgroundColor: formData.colorHex }}
+                                    />
+                                    <span className="text-sm text-black font-medium">{formData.colorName}</span>
+                                    <span className="text-xs text-gray-400">{formData.colorHex}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, colorName: '', colorHex: '#000000' }))}
+                                        className="text-xs text-red-400 hover:text-red-600 underline ml-2"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="md:col-span-2">
                             <label className={labelClass}>Main Image</label>
                             <div className="flex items-center gap-3 mb-2">
@@ -435,7 +590,6 @@ const AdminProducts = () => {
                             )}
                         </div>
 
-                        {/* Additional Images */}
                         <div className="md:col-span-2">
                             <label className={labelClass}>Additional Images (max 5)</label>
                             <div className="flex gap-2 flex-wrap mb-3">
@@ -488,7 +642,6 @@ const AdminProducts = () => {
                             </label>
                         </div>
 
-                        {/* Video */}
                         <div className="md:col-span-2">
                             <label className={labelClass}>Product Video (optional)</label>
                             {formData.videoUrl && (
@@ -516,7 +669,6 @@ const AdminProducts = () => {
                             </label>
                         </div>
 
-                        {/* Description */}
                         <div className="md:col-span-2">
                             <label className={labelClass}>Description</label>
                             <textarea
@@ -529,7 +681,6 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        {/* Submit */}
                         <div className="md:col-span-2 flex gap-3">
                             <button
                                 type="submit"

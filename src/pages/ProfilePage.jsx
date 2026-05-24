@@ -5,6 +5,11 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { getSavedCards, createSetupIntent, deleteCard } from '../api/paymentApi';
+import AddCardForm from "../components/common/AddCardForm.jsx";
 
 const ProfilePage = () => {
     const { user, loginUser, token } = useAuth();
@@ -16,6 +21,10 @@ const ProfilePage = () => {
         lastName: '',
         email: '',
     });
+    const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+    const [savedCards, setSavedCards] = useState([]);
+    const [showAddCard, setShowAddCard] = useState(false);
+    const [setupClientSecret, setSetupClientSecret] = useState(null);
 
     const fetchUserData = useCallback(async () => {
         setLoading(true);
@@ -47,6 +56,43 @@ const ProfilePage = () => {
         fetchUserData();
         fetchAddresses();
     }, [fetchUserData, fetchAddresses]);
+
+    useEffect(() => {
+        if (user?.id) {
+            getSavedCards(user.id)
+                .then(r => setSavedCards(r.data))
+                .catch(() => {});
+        }
+    }, [user?.id]);
+
+    const handleAddCard = async () => {
+        try {
+            const response = await createSetupIntent(user.id);
+            setSetupClientSecret(response.data.clientSecret);
+            setShowAddCard(true);
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to initialize card setup');
+        }
+    };
+
+    const handleCardAdded = () => {
+        setShowAddCard(false);
+        setSetupClientSecret(null);
+        getSavedCards(user.id)
+            .then(r => setSavedCards(r.data))
+            .catch(() => {});
+    };
+
+    const handleDeleteCard = async (paymentMethodId) => {
+        if (!window.confirm('Remove this card?')) return;
+        try {
+            await deleteCard(paymentMethodId);
+            toast.success('Card removed');
+            setSavedCards(prev => prev.filter(c => c.id !== paymentMethodId));
+        } catch (e) {
+            toast.error(e.response?.data?.message || 'Failed to remove card');
+        }
+    };
 
     const handleProfileChange = (e) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -210,6 +256,77 @@ const ProfilePage = () => {
                                 Manage Addresses
                             </Link>
                         </div>
+                    )}
+                </div>
+
+                {/* Saved Cards */}
+                <div className="border border-gray-200 p-6 mt-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-xs font-black uppercase tracking-wide text-black">
+                            Payment Methods
+                        </h3>
+                        {!showAddCard && (
+                            <button
+                                onClick={handleAddCard}
+                                className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
+                            >
+                                + Add Card
+                            </button>
+                        )}
+                    </div>
+
+                    {savedCards.length === 0 && !showAddCard ? (
+                        <p className="text-sm text-gray-400">No saved payment methods</p>
+                    ) : (
+                        <div className="space-y-3">
+                            {savedCards.map(card => (
+                                <div key={card.id} className="flex items-center justify-between border border-gray-100 p-3">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-gray-100 px-3 py-1.5">
+                            <span className="text-xs font-semibold uppercase text-gray-600">
+                                {card.brand}
+                            </span>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-black">
+                                                •••• •••• •••• {card.last4}
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                Expires {card.expMonth}/{card.expYear}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteCard(card.id)}
+                                        className="text-xs text-red-400 hover:text-red-600 underline"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {showAddCard && setupClientSecret && (
+                        <Elements
+                            stripe={stripePromise}
+                            options={{
+                                clientSecret: setupClientSecret,
+                                appearance: {
+                                    theme: 'stripe',
+                                    variables: {
+                                        colorPrimary: '#000000',
+                                        fontFamily: 'system-ui, sans-serif',
+                                    },
+                                },
+                            }}
+                            key={setupClientSecret}
+                        >
+                            <AddCardForm
+                                onSuccess={handleCardAdded}
+                                onCancel={() => { setShowAddCard(false); setSetupClientSecret(null); }}
+                            />
+                        </Elements>
                     )}
                 </div>
             </div>

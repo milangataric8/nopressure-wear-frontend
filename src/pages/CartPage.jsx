@@ -7,16 +7,36 @@ import { useAuth } from '../hooks/useAuth';
 import { validateCoupon } from '../api/couponApi';
 import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import CheckoutForm from '../components/common/CheckoutForm';
+import { createPaymentIntent } from '../api/paymentApi';
+import { getAddressByUser, createAddress } from '../api/addressApi';
 
 const CartPage = () => {
     const { user, setCartCount } = useAuth();
-    const navigate = useNavigate();
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
     const [checkingOut, setCheckingOut] = useState(false);
     const [couponCode, setCouponCode] = useState('');
     const [couponData, setCouponData] = useState(null);
     const [applyingCoupon, setApplyingCoupon] = useState(false);
+    const [clientSecret, setClientSecret] = useState(null);
+    const [showPayment, setShowPayment] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState(null);
+    const navigate = useNavigate();
+    const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+    const [addresses, setAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [showNewAddress, setShowNewAddress] = useState(false);
+    const [saveAddress, setSaveAddress] = useState(false);
+    const [isMainAddress, setIsMainAddress] = useState(false);
+    const [newAddress, setNewAddress] = useState({
+        street: '',
+        city: '',
+        postalCode: '',
+        country: '',
+    });
 
     const fetchCart = async () => {
         try {
@@ -33,6 +53,14 @@ const CartPage = () => {
     useEffect(() => {
         fetchCart();
     }, []);
+
+    useEffect(() => {
+        if (user?.id) {
+            getAddressByUser(user.id)
+                .then(r => setAddresses(r.data))
+                .catch(() => {});
+        }
+    }, [user?.id]);
 
     const handleUpdateQuantity = async (cartItemId, productId, quantity) => {
         if (quantity < 1) return;
@@ -66,17 +94,64 @@ const CartPage = () => {
         }
     };
 
-    const handleCheckout = async () => {
-        setCheckingOut(true);
+    const saveAddressIfNeeded = async () => {
+        if (saveAddress && newAddress.street) {
+            try {
+                await createAddress(user.id, {
+                    ...newAddress,
+                    isMain: isMainAddress,
+                });
+            } catch (error) {
+                console.log(error.response?.data?.message || 'Failed to save address');
+            }
+        }
+    };
+
+    const handlePaymentSuccess = async () => {
         try {
-            await checkout(user.id, couponData?.code);
+            await saveAddressIfNeeded();
+            await checkout(user.id, couponData?.code, 'CARD');
             setCartCount(0);
-            toast.success('Order placed!');
+            toast.success('Payment successful! Order placed.');
             navigate('/orders');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Checkout failed');
+            toast.error(error.response?.data?.message || 'Failed to place order');
+        }
+    };
+
+    const handleCashOnDelivery = async () => {
+        if (!selectedAddress) {
+            toast.error('Please select a shipping address');
+            return;
+        }
+        setCheckingOut(true);
+        try {
+            await saveAddressIfNeeded();
+            await checkout(user.id, couponData?.code, 'COD');
+            setCartCount(0);
+            toast.success('Order placed! You will pay on delivery.');
+            navigate('/orders');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to place order');
         } finally {
             setCheckingOut(false);
+        }
+    };
+
+    const handleProceedToPayment = async () => {
+        if (!selectedAddress) {
+            toast.error('Please select a shipping address');
+            return;
+        }
+        try {
+            const response = await createPaymentIntent(
+                user.id,
+                couponData?.code || null
+            );
+            setClientSecret(response.data.clientSecret);
+            setShowPayment(true);
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to initialize payment');
         }
     };
 
@@ -235,13 +310,220 @@ const CartPage = () => {
                             </div>
                         </div>
 
-                        <button
-                            onClick={handleCheckout}
-                            disabled={checkingOut}
-                            className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-50"
-                        >
-                            {checkingOut ? 'Processing...' : 'Checkout'}
-                        </button>
+                        {/* Shipping Address */}
+                        <div className="border border-gray-200 p-6 mb-6">
+                            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                Shipping Address
+                            </h3>
+
+                            {/* Existing addresses */}
+                            {addresses.length > 0 && (
+                                <div className="space-y-3 mb-4">
+                                    {addresses.map(address => (
+                                        <button
+                                            key={address.id}
+                                            onClick={() => { setSelectedAddress(address); setShowNewAddress(false); }}
+                                            className={`w-full text-left p-3 border transition-colors ${
+                                                selectedAddress?.id === address.id
+                                                    ? 'border-black bg-gray-50'
+                                                    : 'border-gray-200 hover:border-gray-400'
+                                            }`}
+                                        >
+                                            <p className="text-sm font-medium text-black">{address.street}</p>
+                                            <p className="text-xs text-gray-500">{address.city}, {address.postalCode}</p>
+                                            <p className="text-xs text-gray-500">{address.country}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Add new address */}
+                            {!showNewAddress ? (
+                                <button
+                                    onClick={() => { setShowNewAddress(true); setSelectedAddress(null); }}
+                                    className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
+                                >
+                                    + Add New Address
+                                </button>
+                            ) : (
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        value={newAddress.street}
+                                        onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
+                                        placeholder="Street address"
+                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                                    />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input
+                                            type="text"
+                                            value={newAddress.city}
+                                            onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
+                                            placeholder="City"
+                                            className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={newAddress.postalCode}
+                                            onChange={(e) => setNewAddress(prev => ({ ...prev, postalCode: e.target.value }))}
+                                            placeholder="Postal code"
+                                            className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                                        />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={newAddress.country}
+                                        onChange={(e) => setNewAddress(prev => ({ ...prev, country: e.target.value }))}
+                                        placeholder="Country"
+                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                                    />
+
+                                    {/* Save options */}
+                                    <div className="space-y-2 pt-2">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={saveAddress}
+                                                onChange={(e) => setSaveAddress(e.target.checked)}
+                                                className="w-3.5 h-3.5"
+                                            />
+                                            <span className="text-xs text-gray-500">Save this address for future orders</span>
+                                        </label>
+                                        {saveAddress && (
+                                            <label className="flex items-center gap-2 cursor-pointer ml-5">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isMainAddress}
+                                                    onChange={(e) => setIsMainAddress(e.target.checked)}
+                                                    className="w-3.5 h-3.5"
+                                                />
+                                                <span className="text-xs text-gray-500">Set as main address</span>
+                                            </label>
+                                        )}
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedAddress(newAddress);
+                                                setShowNewAddress(false);
+                                            }}
+                                            className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
+                                        >
+                                            Use This Address
+                                        </button>
+                                        <button
+                                            onClick={() => { setShowNewAddress(false); setNewAddress({ street: '', city: '', postalCode: '', country: '' }); }}
+                                            className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-50 transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Selected address display */}
+                            {selectedAddress && !showNewAddress && (
+                                <div className="mt-4 p-3 bg-gray-50 border border-gray-200">
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Shipping to:</p>
+                                    <p className="text-sm font-medium text-black">{selectedAddress.street}</p>
+                                    <p className="text-xs text-gray-500">{selectedAddress.city}, {selectedAddress.postalCode}</p>
+                                    <p className="text-xs text-gray-500">{selectedAddress.country}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Payment method selection */}
+                        {!showPayment ? (
+                            <div>
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                    Payment Method
+                                </h3>
+                                <div className="space-y-3 mb-6">
+                                    <button
+                                        onClick={() => setPaymentMethod('card')}
+                                        className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
+                                            paymentMethod === 'card'
+                                                ? 'border-black bg-gray-50'
+                                                : 'border-gray-200 hover:border-gray-400'
+                                        }`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                            <line x1="1" y1="10" x2="23" y2="10"/>
+                                        </svg>
+                                        <div>
+                                            <p className="text-sm font-semibold text-black">Pay with Card</p>
+                                            <p className="text-xs text-gray-400">Visa, Mastercard, Amex</p>
+                                        </div>
+                                    </button>
+
+                                    <button
+                                        onClick={() => setPaymentMethod('cod')}
+                                        className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
+                                            paymentMethod === 'cod'
+                                                ? 'border-black bg-gray-50'
+                                                : 'border-gray-200 hover:border-gray-400'
+                                        }`}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                        </svg>
+                                        <div>
+                                            <p className="text-sm font-semibold text-black">Cash on Delivery</p>
+                                            <p className="text-xs text-gray-400">Pay when you receive your order</p>
+                                        </div>
+                                    </button>
+                                </div>
+
+                                {paymentMethod === 'card' && (
+                                    <button
+                                        onClick={handleProceedToPayment}
+                                        disabled={!cart || cart.items.length === 0}
+                                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
+                                    >
+                                        Proceed to Payment
+                                    </button>
+                                )}
+
+                                {paymentMethod === 'cod' && (
+                                    <button
+                                        onClick={handleCashOnDelivery}
+                                        disabled={!cart || cart.items.length === 0 || checkingOut}
+                                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
+                                    >
+                                        {checkingOut ? 'Placing Order...' : 'Place Order'}
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                {clientSecret && (
+                                    <Elements
+                                        stripe={stripePromise}
+                                        options={{
+                                            clientSecret,
+                                            appearance: {
+                                                theme: 'stripe',
+                                                variables: {
+                                                    colorPrimary: '#000000',
+                                                    fontFamily: 'system-ui, sans-serif',
+                                                },
+                                            },
+                                        }}
+                                        key={clientSecret}
+                                    >
+                                        <CheckoutForm onSuccess={handlePaymentSuccess} />
+                                    </Elements>
+                                )}
+                                <button
+                                    onClick={() => { setShowPayment(false); setClientSecret(null); }}
+                                    className="w-full mt-3 border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors"
+                                >
+                                    ← Back to Cart
+                                </button>
+                            </>
+                        )}
 
                         <button
                             onClick={() => navigate('/products')}

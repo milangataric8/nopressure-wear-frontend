@@ -246,6 +246,7 @@ const OrderDetailPage = () => {
                             </div>
                         </div>
                     </div>
+
                     {/* Customer info */}
                     <div className="border border-gray-200 p-6 mt-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
@@ -279,6 +280,29 @@ const OrderDetailPage = () => {
                         ) : (
                             <p className="text-xs text-gray-400">No shipping address provided</p>
                         )}
+                    </div>
+
+                    {/* Payment info */}
+                    <div className="border border-gray-200 p-6 mt-4">
+                        <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                            Payment
+                        </h3>
+                        <div className="space-y-2">
+                            <div className="flex justify-between text-xs">
+                                <span className="text-gray-500">Method</span>
+                                <span className="font-medium">
+                                    {order.paymentMethod === 'CARD' ? 'Credit Card' : 'Cash on Delivery'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                                <span className="text-gray-500">Status</span>
+                                <span className={`font-semibold uppercase ${
+                                    order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'
+                                }`}>
+                                    {order.paymentStatus}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

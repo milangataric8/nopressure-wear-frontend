@@ -14,6 +14,7 @@ import {
 import { getCategories } from '../../api/categoryApi';
 import { getImageUrl } from "../../utils/imageUtils.js";
 import { uploadImage, uploadVideo } from '../../api/uploadApi';
+import { addProductAttribute, deleteProductAttribute } from '../../api/productAttributeApi.js';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
@@ -29,16 +30,6 @@ const AdminProducts = () => {
     const [editingProduct, setEditingProduct] = useState(null);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        price: '',
-        stockQuantity: '',
-        sku: '',
-        imageUrl: '',
-        videoUrl: '',
-        categoryId: '',
-    });
     const [pendingImages, setPendingImages] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
@@ -49,6 +40,18 @@ const AdminProducts = () => {
     const [colorFilter, setColorFilter] = useState('');
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
+    const [newAttrKey, setNewAttrKey] = useState('');
+    const [newAttrValue, setNewAttrValue] = useState('');
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        price: '',
+        stockQuantity: '',
+        sku: '',
+        imageUrl: '',
+        videoUrl: '',
+        categoryId: '',
+    });
     const COLOR_PALETTE = [
         { name: 'White', hex: '#FFFFFF' },
         { name: 'Black', hex: '#000000' },
@@ -80,8 +83,6 @@ const AdminProducts = () => {
             if (activeFilter !== null) params.active = activeFilter;
             if (brandFilter) params.brand = brandFilter;
             if (colorFilter) params.colorName = colorFilter;
-
-            console.log('Fetching products with params:', params);
 
             const response = await getProducts(params);
             setProducts(response.data.content);
@@ -554,6 +555,88 @@ const AdminProducts = () => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Product Attributes — only when editing */}
+                        {editingProduct && (
+                            <div className="md:col-span-2">
+                                <label className={labelClass}>Custom Attributes</label>
+
+                                {/* Existing attributes */}
+                                <div className="flex gap-2 flex-wrap mb-3">
+                                    {editingProduct.attributes?.map(attr => (
+                                        <div key={attr.id} className="flex items-center gap-2 border border-gray-200 px-3 py-1.5">
+                                            <span className="text-xs text-gray-500">{attr.key}:</span>
+                                            <span className="text-xs font-medium text-black">{attr.value}</span>
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    try {
+                                                        await deleteProductAttribute(attr.id);
+                                                        toast.success('Attribute removed');
+                                                        const updated = await getProductById(editingProduct.id);
+                                                        setEditingProduct(updated.data);
+                                                    } catch (e) {
+                                                        toast.error(e.response?.data?.message || 'Failed to remove attribute');
+                                                    }
+                                                }}
+                                                className="text-red-400 hover:text-red-600 text-xs"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Add new attribute */}
+                                <div className="flex gap-2 items-end">
+                                    <div className="flex-1">
+                                        <label className="block text-xs text-gray-500 mb-1">Key</label>
+                                        <input
+                                            type="text"
+                                            value={newAttrKey}
+                                            onChange={(e) => setNewAttrKey(e.target.value)}
+                                            className={inputClass}
+                                            placeholder="e.g. material"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="block text-xs text-gray-500 mb-1">Value</label>
+                                        <input
+                                            type="text"
+                                            value={newAttrValue}
+                                            onChange={(e) => setNewAttrValue(e.target.value)}
+                                            className={inputClass}
+                                            placeholder="e.g. Silicone"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!newAttrKey || !newAttrValue) {
+                                                toast.error('Fill in both fields');
+                                                return;
+                                            }
+                                            try {
+                                                await addProductAttribute(editingProduct.id, {
+                                                    key: newAttrKey,
+                                                    value: newAttrValue
+                                                });
+                                                toast.success('Attribute added');
+                                                setNewAttrKey('');
+                                                setNewAttrValue('');
+                                                const updated = await getProductById(editingProduct.id);
+                                                setEditingProduct(updated.data);
+                                            } catch (e) {
+                                                toast.error(e.response?.data?.message || 'Failed to add attribute');
+                                            }
+                                        }}
+                                        className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="md:col-span-2">
                             <label className={labelClass}>Main Image</label>

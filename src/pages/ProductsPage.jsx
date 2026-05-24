@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import {getProductFilters, searchActiveProducts} from '../api/productApi';
+import { getProductFilters, searchActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import { getImageUrl } from '../utils/imageUtils';
+import { getVisibleFilters } from '../api/filterApi';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
 
@@ -34,6 +35,9 @@ const ProductsPage = () => {
     const [selectedColor, setSelectedColor] = useState('');
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
+    const [filterConfig, setFilterConfig] = useState([]);
+    const [dynamicFilters, setDynamicFilters] = useState({});
+    const [selectedAttributes, setSelectedAttributes] = useState({});
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -58,6 +62,13 @@ const ProductsPage = () => {
             if (selectedBrand) params.brand = selectedBrand;
             if (selectedColor) params.colorName = selectedColor;
 
+            Object.entries(selectedAttributes).forEach(([key, value]) => {
+                if (value) params[`attr_${key}`] = value;
+            });
+
+            // In fetchProducts, after building params
+            console.log('Final params:', JSON.stringify(params));
+
             const response = await searchActiveProducts(params);
 
             setProducts(response.data.content);
@@ -68,7 +79,7 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories]);
+    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories, selectedAttributes]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -144,6 +155,31 @@ const ProductsPage = () => {
         }).catch(() => {});
     }, []);
 
+    useEffect(() => {
+        getVisibleFilters().then(r => {
+            setFilterConfig(r.data);
+        }).catch((e) => console.log('Filter error:', e));
+
+        const handler = () => {
+            getVisibleFilters().then(r => setFilterConfig(r.data)).catch(() => {});
+        };
+        window.addEventListener('settings-updated', handler);
+        return () => window.removeEventListener('settings-updated', handler);
+    }, []);
+
+    const isFilterVisible = (fieldName) => {
+        if (filterConfig.length === 0) return false;
+        return filterConfig.some(f => f.fieldName.toLowerCase() === fieldName.toLowerCase());
+    };
+
+    useEffect(() => {
+        getProductFilters().then(r => {
+            setAvailableBrands(r.data.brands || []);
+            setAvailableColors(r.data.colors || []);
+            setDynamicFilters(r.data.attributes || {});
+        }).catch((e) => console.log('Filter error:', e));
+    }, []);
+
     const handleCategoryClick = (categoryId) => {
         setSelectedCategory(categoryId);
         setSearchQuery('');
@@ -170,65 +206,67 @@ const ProductsPage = () => {
                 {showFilters && (
                     <div className={isMobile ? 'w-full' : 'w-56 flex-shrink-0'}>
                         {/* Categories */}
-                        <div className="mb-8">
-                            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                Categories
-                            </h3>
-                            <div className="space-y-1">
-                                {/* Root categories */}
-                                {rootCategories.map(cat => {
-                                    const subcats = getSubcategories(cat.id);
-                                    return (
-                                        <div key={cat.id}>
-                                            <div className="flex items-center justify-between">
-                                                <button
-                                                    onClick={() => handleCategoryClick(selectedCategory === cat.id ? '' : cat.id)}
-                                                    className={`text-sm py-1.5 transition-colors flex-1 text-left ${
-                                                        selectedCategory === cat.id
-                                                            ? 'font-semibold text-black'
-                                                            : 'text-gray-500 hover:text-black'
-                                                    }`}
-                                                >
-                                                    {cat.name}
-                                                </button>
-
-                                                {/* Expand toggle — only if has subcategories */}
-                                                {subcats.length > 0 && (
+                        {isFilterVisible('category') && (
+                            <div className="mb-8">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                    Categories
+                                </h3>
+                                <div className="space-y-1">
+                                    {/* Root categories */}
+                                    {rootCategories.map(cat => {
+                                        const subcats = getSubcategories(cat.id);
+                                        return (
+                                            <div key={cat.id}>
+                                                <div className="flex items-center justify-between">
                                                     <button
-                                                        onClick={() => toggleExpanded(cat.id)}
-                                                        className="text-gray-400 hover:text-black transition-colors px-1"
+                                                        onClick={() => handleCategoryClick(selectedCategory === cat.id ? '' : cat.id)}
+                                                        className={`text-sm py-1.5 transition-colors flex-1 text-left ${
+                                                            selectedCategory === cat.id
+                                                                ? 'font-semibold text-black'
+                                                                : 'text-gray-500 hover:text-black'
+                                                        }`}
                                                     >
-                                                        {expandedCategories.includes(cat.id) ? '−' : '+'}
+                                                        {cat.name}
                                                     </button>
+
+                                                    {/* Expand toggle — only if has subcategories */}
+                                                    {subcats.length > 0 && (
+                                                        <button
+                                                            onClick={() => toggleExpanded(cat.id)}
+                                                            className="text-gray-400 hover:text-black transition-colors px-1"
+                                                        >
+                                                            {expandedCategories.includes(cat.id) ? '−' : '+'}
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* Subcategories */}
+                                                {expandedCategories.includes(cat.id) && (
+                                                    <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
+                                                        {subcats.map(sub => (
+                                                            <button
+                                                                key={sub.id}
+                                                                onClick={() => handleCategoryClick(selectedCategory === sub.id ? '' : sub.id)}
+                                                                className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                                    selectedCategory === sub.id
+                                                                        ? 'font-semibold text-black'
+                                                                        : 'text-gray-400 hover:text-black'
+                                                                }`}
+                                                            >
+                                                                {sub.name}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 )}
                                             </div>
-
-                                            {/* Subcategories */}
-                                            {expandedCategories.includes(cat.id) && (
-                                                <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mt-1 mb-1">
-                                                    {subcats.map(sub => (
-                                                        <button
-                                                            key={sub.id}
-                                                            onClick={() => handleCategoryClick(selectedCategory === sub.id ? '' : sub.id)}
-                                                            className={`block w-full text-left text-sm py-1 transition-colors ${
-                                                                selectedCategory === sub.id
-                                                                    ? 'font-semibold text-black'
-                                                                    : 'text-gray-400 hover:text-black'
-                                                            }`}
-                                                        >
-                                                            {sub.name}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Color filter */}
-                        {availableColors.length > 0 && (
+                        {isFilterVisible('colorName') && availableColors.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
                                     Color
@@ -264,7 +302,7 @@ const ProductsPage = () => {
                         )}
 
                         {/* Brand filter */}
-                        {availableBrands.length > 0 && (
+                        {isFilterVisible('brand') && availableBrands.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
                                     Brand
@@ -290,62 +328,100 @@ const ProductsPage = () => {
                             </div>
                         )}
 
+                        {/* Dynamic attribute filters */}
+                        {Object.entries(dynamicFilters).map(([key, values]) => {
+                            const filterFieldName = `attr_${key.toLowerCase()}`;
+                            if (!isFilterVisible(filterFieldName)) return null;
+                            const displayName = filterConfig.find(f => f.fieldName === filterFieldName)?.displayName || key;
+
+                            return (
+                                <div key={key} className="mb-6">
+                                    <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                                        {displayName}
+                                    </h3>
+                                    <div className="space-y-1">
+                                        {values.map(value => (
+                                            <button
+                                                key={value}
+                                                onClick={() => {
+                                                    setSelectedAttributes(prev => ({
+                                                        ...prev,
+                                                        [key]: prev[key] === value ? '' : value
+                                                    }));
+                                                    setPage(0);
+                                                }}
+                                                className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                    selectedAttributes[key] === value
+                                                        ? 'font-semibold text-black'
+                                                        : 'text-gray-500 hover:text-black'
+                                                }`}
+                                            >
+                                                {value}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
                         {/* Price filter */}
-                        <div className="mb-8">
-                            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                Price
-                            </h3>
-                            <div className="flex items-center gap-2 mb-3">
-                                <input
-                                    type="number"
-                                    value={minPrice}
-                                    onChange={(e) => setMinPrice(e.target.value)}
-                                    placeholder="Min"
-                                    className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
-                                />
-                                <span className="text-gray-400 text-sm">—</span>
-                                <input
-                                    type="number"
-                                    value={maxPrice}
-                                    onChange={(e) => setMaxPrice(e.target.value)}
-                                    placeholder="Max"
-                                    className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
-                                />
-                            </div>
-                            <button
-                                onClick={() => {
-                                    if (appliedMinPrice !== '' || appliedMaxPrice !== '') {
-                                        setAppliedMinPrice('');
-                                        setAppliedMaxPrice('');
-                                    } else {
-                                        setAppliedMinPrice(minPrice);
-                                        setAppliedMaxPrice(maxPrice);
-                                    }
-                                    setPage(0);
-                                }}
-                                className="w-full bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
-                            >
-                                Apply
-                            </button>
-                            {(selectedCategory !== '' || appliedMinPrice !== '' || searchQuery !== '') && (
+                        {isFilterVisible('price') && (
+                            <div className="mb-8">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                    Price
+                                </h3>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <input
+                                        type="number"
+                                        value={minPrice}
+                                        onChange={(e) => setMinPrice(e.target.value)}
+                                        placeholder="Min"
+                                        className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
+                                    />
+                                    <span className="text-gray-400 text-sm">—</span>
+                                    <input
+                                        type="number"
+                                        value={maxPrice}
+                                        onChange={(e) => setMaxPrice(e.target.value)}
+                                        placeholder="Max"
+                                        className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
+                                    />
+                                </div>
                                 <button
                                     onClick={() => {
-                                        setSelectedCategory('');
-                                        setMinPrice('');
-                                        setMaxPrice('');
-                                        setAppliedMinPrice('');
-                                        setAppliedMaxPrice('');
-                                        setSearchQuery('');
-                                        setSearchInput('');
+                                        if (appliedMinPrice !== '' || appliedMaxPrice !== '') {
+                                            setAppliedMinPrice('');
+                                            setAppliedMaxPrice('');
+                                        } else {
+                                            setAppliedMinPrice(minPrice);
+                                            setAppliedMaxPrice(maxPrice);
+                                        }
                                         setPage(0);
-                                        navigate('/products');
                                     }}
-                                    className="w-full mt-2 border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
+                                    className="w-full bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
                                 >
-                                    Clear All
+                                    Apply
                                 </button>
-                            )}
-                        </div>
+                                {(selectedCategory !== '' || appliedMinPrice !== '' || searchQuery !== '') && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedCategory('');
+                                            setMinPrice('');
+                                            setMaxPrice('');
+                                            setAppliedMinPrice('');
+                                            setAppliedMaxPrice('');
+                                            setSearchQuery('');
+                                            setSearchInput('');
+                                            setPage(0);
+                                            navigate('/products');
+                                        }}
+                                        className="w-full mt-2 border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
 

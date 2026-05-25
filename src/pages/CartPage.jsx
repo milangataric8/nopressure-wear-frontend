@@ -12,6 +12,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../components/common/CheckoutForm';
 import { createPaymentIntent } from '../api/paymentApi';
 import { getAddressByUser, createAddress } from '../api/addressApi';
+import { getSettingsMap } from '../api/settingsApi';
 
 const CartPage = () => {
     const { user, setCartCount } = useAuth();
@@ -31,6 +32,8 @@ const CartPage = () => {
     const [showNewAddress, setShowNewAddress] = useState(false);
     const [saveAddress, setSaveAddress] = useState(false);
     const [isMainAddress, setIsMainAddress] = useState(false);
+    const [cardEnabled, setCardEnabled] = useState(true);
+    const [codEnabled, setCodEnabled] = useState(true);
     const [newAddress, setNewAddress] = useState({
         street: '',
         city: '',
@@ -61,6 +64,18 @@ const CartPage = () => {
                 .catch(() => {});
         }
     }, [user?.id]);
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            setCardEnabled(r.data.payment_card_enabled !== 'false');
+            setCodEnabled(r.data.payment_cod_enabled !== 'false');
+        }).catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (cardEnabled && !codEnabled) setPaymentMethod('card');
+        if (!cardEnabled && codEnabled) setPaymentMethod('cod');
+    }, [cardEnabled, codEnabled]);
 
     const handleUpdateQuantity = async (cartItemId, productId, quantity) => {
         if (quantity < 1) return;
@@ -440,40 +455,48 @@ const CartPage = () => {
                                     Payment Method
                                 </h3>
                                 <div className="space-y-3 mb-6">
-                                    <button
-                                        onClick={() => setPaymentMethod('card')}
-                                        className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
-                                            paymentMethod === 'card'
-                                                ? 'border-black bg-gray-50'
-                                                : 'border-gray-200 hover:border-gray-400'
-                                        }`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                            <line x1="1" y1="10" x2="23" y2="10"/>
-                                        </svg>
-                                        <div>
-                                            <p className="text-sm font-semibold text-black">Pay with Card</p>
-                                            <p className="text-xs text-gray-400">Visa, Mastercard, Amex</p>
-                                        </div>
-                                    </button>
+                                    {cardEnabled && (
+                                        <button
+                                            onClick={() => setPaymentMethod('card')}
+                                            className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
+                                                paymentMethod === 'card'
+                                                    ? 'border-black bg-gray-50'
+                                                    : 'border-gray-200 hover:border-gray-400'
+                                            }`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                                <line x1="1" y1="10" x2="23" y2="10"/>
+                                            </svg>
+                                            <div>
+                                                <p className="text-sm font-semibold text-black">Pay with Card</p>
+                                                <p className="text-xs text-gray-400">Visa, Mastercard, Amex</p>
+                                            </div>
+                                        </button>
+                                    )}
 
-                                    <button
-                                        onClick={() => setPaymentMethod('cod')}
-                                        className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
-                                            paymentMethod === 'cod'
-                                                ? 'border-black bg-gray-50'
-                                                : 'border-gray-200 hover:border-gray-400'
-                                        }`}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                                        </svg>
-                                        <div>
-                                            <p className="text-sm font-semibold text-black">Cash on Delivery</p>
-                                            <p className="text-xs text-gray-400">Pay when you receive your order</p>
-                                        </div>
-                                    </button>
+                                    {codEnabled && (
+                                        <button
+                                            onClick={() => setPaymentMethod('cod')}
+                                            className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
+                                                paymentMethod === 'cod'
+                                                    ? 'border-black bg-gray-50'
+                                                    : 'border-gray-200 hover:border-gray-400'
+                                            }`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                            </svg>
+                                            <div>
+                                                <p className="text-sm font-semibold text-black">Cash on Delivery</p>
+                                                <p className="text-xs text-gray-400">Pay when you receive your order</p>
+                                            </div>
+                                        </button>
+                                    )}
+
+                                    {!cardEnabled && !codEnabled && (
+                                        <p className="text-sm text-red-500">No payment methods available. Please contact support.</p>
+                                    )}
                                 </div>
 
                                 {paymentMethod === 'card' && (

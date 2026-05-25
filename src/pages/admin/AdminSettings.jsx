@@ -32,6 +32,10 @@ const AdminSettings = () => {
         {
             title: 'Contact',
             keys: ['footer_email', 'footer_phone']
+        },
+        {
+            title: 'Payment',
+            keys: ['payment_card_enabled', 'payment_cod_enabled']
         }
     ];
 
@@ -135,105 +139,132 @@ const AdminSettings = () => {
                                             </p>
                                         </div>
 
-                                    {setting.key === 'store_logo_url' ? (
-                                            <div className="flex-1 flex items-center gap-4">
-                                                {setting.value && (
-                                                    <img
-                                                        src={setting.value.startsWith('http')
-                                                            ? setting.value
-                                                            : `${import.meta.env.VITE_API_URL}${setting.value}`}
-                                                        alt="Logo"
-                                                        className="h-8 object-contain"
-                                                    />
-                                                )}
-                                                <div className="flex flex-col gap-2">
-                                                    <label className="flex items-center gap-2 cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={removeBg}
-                                                            onChange={(e) => setRemoveBg(e.target.checked)}
-                                                            className="w-3.5 h-3.5"
-                                                        />
-                                                        <span className="text-xs text-gray-500 uppercase tracking-wide">
-                                                            Remove background
-                                                        </span>
-                                                    </label>
-                                                    <label className="cursor-pointer">
-                                                        <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
-                                                            {setting.value ? 'Change Logo' : 'Upload Logo'}
-                                                        </div>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            className="hidden"
-                                                            onChange={async (e) => {
-                                                                const file = e.target.files[0];
-                                                                if (!file) return;
-                                                                e.target.value = '';
-                                                                try {
-                                                                    const response = await uploadImage(file, removeBg);
-                                                                    await updateSettings(setting.id, response.data.url);
-                                                                    toast.success('Logo updated');
-                                                                    fetchSettings();
-                                                                    window.dispatchEvent(new Event('settings-updated'));
-                                                                } catch (e) {
-                                                                    toast.error('Failed to upload logo, error: ' + e.message);
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                </div>
-                                                {setting.value && (
-                                                    <button
-                                                        onClick={async () => {
-                                                            await updateSettings(setting.id, '');
-                                                            toast.success('Logo removed');
+                                        {/* Boolean toggle for payment settings */}
+                                        {(setting.key === 'payment_card_enabled' || setting.key === 'payment_cod_enabled') ? (
+                                            <div className="flex-1 flex items-center gap-3">
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            const newValue = setting.value === 'true' ? 'false' : 'true';
+                                                            await updateSettings(setting.id, newValue);
+                                                            toast.success(`${setting.label} ${newValue === 'true' ? 'enabled' : 'disabled'}`);
                                                             fetchSettings();
                                                             window.dispatchEvent(new Event('settings-updated'));
-                                                        }}
-                                                        className="text-xs text-red-400 hover:text-red-600 underline"
+                                                        } catch (e) {
+                                                            toast.error(e.response?.data?.message || 'Failed to update setting');
+                                                        }
+                                                    }}
+                                                    className={`w-10 h-5 rounded-full transition-colors relative ${
+                                                        setting.value === 'true' ? 'bg-black' : 'bg-gray-300'
+                                                    }`}
+                                                >
+                                                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                                                        setting.value === 'true' ? 'left-5' : 'left-0.5'
+                                                    }`} />
+                                                </button>
+                                                <span className="text-sm text-gray-500">
+                                                    {setting.value === 'true' ? 'Enabled' : 'Disabled'}
+                                                </span>
+                                            </div>
+                                        ) : setting.key === 'store_logo_url' ? (
+                                                <div className="flex-1 flex items-center gap-4">
+                                                    {setting.value && (
+                                                        <img
+                                                            src={setting.value.startsWith('http')
+                                                                ? setting.value
+                                                                : `${import.meta.env.VITE_API_URL}${setting.value}`}
+                                                            alt="Logo"
+                                                            className="h-8 object-contain"
+                                                        />
+                                                    )}
+                                                    <div className="flex flex-col gap-2">
+                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={removeBg}
+                                                                onChange={(e) => setRemoveBg(e.target.checked)}
+                                                                className="w-3.5 h-3.5"
+                                                            />
+                                                            <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                                                Remove background
+                                                            </span>
+                                                        </label>
+                                                        <label className="cursor-pointer">
+                                                            <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
+                                                                {setting.value ? 'Change Logo' : 'Upload Logo'}
+                                                            </div>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={async (e) => {
+                                                                    const file = e.target.files[0];
+                                                                    if (!file) return;
+                                                                    e.target.value = '';
+                                                                    try {
+                                                                        const response = await uploadImage(file, removeBg);
+                                                                        await updateSettings(setting.id, response.data.url);
+                                                                        toast.success('Logo updated');
+                                                                        fetchSettings();
+                                                                        window.dispatchEvent(new Event('settings-updated'));
+                                                                    } catch (e) {
+                                                                        toast.error('Failed to upload logo, error: ' + e.message);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                    {setting.value && (
+                                                        <button
+                                                            onClick={async () => {
+                                                                await updateSettings(setting.id, '');
+                                                                toast.success('Logo removed');
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            }}
+                                                            className="text-xs text-red-400 hover:text-red-600 underline"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ) : editing === setting.id ? (
+                                                <div className="flex-1 flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        value={editValue}
+                                                        onChange={(e) => setEditValue(e.target.value)}
+                                                        className={inputClass}
+                                                        autoFocus
+                                                    />
+                                                    <button
+                                                        onClick={() => handleSave(setting.id)}
+                                                        className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
                                                     >
-                                                        Remove
+                                                        Save
                                                     </button>
-                                                )}
-                                            </div>
-                                        ) : editing === setting.id ? (
-                                            <div className="flex-1 flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={editValue}
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    className={inputClass}
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    onClick={() => handleSave(setting.id)}
-                                                    className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
-                                                >
-                                                    Save
-                                                </button>
-                                                <button
-                                                    onClick={() => setEditing(null)}
-                                                    className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex-1 flex items-center justify-between">
-                                                <p className="text-sm text-black">
-                                                    {setting.value ||
-                                                        <span className="text-gray-400 italic">Not set</span>}
-                                                </p>
-                                                <button
-                                                    onClick={() => handleEdit(setting)}
-                                                    className="text-xs text-gray-500 hover:text-black transition-colors underline ml-4"
-                                                >
-                                                    Edit
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
+                                                    <button
+                                                        onClick={() => setEditing(null)}
+                                                        className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 flex items-center justify-between">
+                                                    <p className="text-sm text-black">
+                                                        {setting.value ||
+                                                            <span className="text-gray-400 italic">Not set</span>}
+                                                    </p>
+                                                    <button
+                                                        onClick={() => handleEdit(setting)}
+                                                        className="text-xs text-gray-500 hover:text-black transition-colors underline ml-4"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                 );
                             })}
                         </div>
@@ -285,8 +316,8 @@ const AdminSettings = () => {
                                                     toast.success('Filter deleted');
                                                     fetchFilters();
                                                     window.dispatchEvent(new Event('settings-updated'));
-                                                } catch (_) {
-                                                    toast.error('Failed to delete filter');
+                                                } catch (e) {
+                                                    toast.error(e.response?.data?.message || 'Failed to delete filter');
                                                 }
                                             }}
                                             className="text-xs text-red-400 hover:text-red-600 underline"

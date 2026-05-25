@@ -1,1 +1,113 @@
 @import "tailwindcss";
+
+/* Custom Toast Styles */
+.Toastify__toast-container--top-center {
+    top: 50% !important;
+    transform: translateX(-50%) translateY(-50%) !important;
+}
+
+.Toastify__toast {
+    border-radius: 0 !important;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
+    padding: 16px 20px !important;
+    min-width: 320px !important;
+}
+
+.Toastify__toast--success {
+    background: #ffffff !important;
+    border-left: 3px solid #000000 !important;
+    color: #111111 !important;
+}
+
+.Toastify__toast--error {
+    background: #ffffff !important;
+    border-left: 3px solid #8c0b0b !important;
+    color: #111111 !important;
+}
+
+.Toastify__toast--warning {
+    background: #ffffff !important;
+    border-left: 3px solid #cf7207 !important;
+    color: #111111 !important;
+}
+
+.Toastify__toast--info {
+    background: #ffffff !important;
+    border-left: 3px solid #154dca !important;
+    color: #111111 !important;
+}
+
+.Toastify__toast-body {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: uppercase !important;
+}
+
+.Toastify__progress-bar {
+    background: #000000 !important;
+    height: 2px !important;
+}
+
+.Toastify__progress-bar--error {
+    background: #970e0e !important;
+}
+
+.Toastify__progress-bar--warning {
+    background: #cf7207 !important;
+}
+
+.Toastify__progress-bar--info {
+    background: #154dca !important;
+}
+
+.Toastify__close-button {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+.Toastify__close-button:hover {
+    color: #111111 !important;
+}
+
+/* Success icon — currently uses default green, change to black */
+.Toastify__toast--success .Toastify__toast-icon svg {
+    fill: #000000 !important;
+}
+
+/* Error icon — change to red */
+.Toastify__toast--error .Toastify__toast-icon svg {
+    fill: #970e0e !important;
+}
+
+/* Warning icon — change to amber */
+.Toastify__toast--warning .Toastify__toast-icon svg {
+    fill: #cf7207 !important;
+}
+
+/* Info icon — change to blue */
+.Toastify__toast--info .Toastify__toast-icon svg {
+    fill: #154dca !important;
+}
+
+.Toastify__toast--success .Toastify__toast-icon svg {
+    fill: #000000 !important;
+    color: #000000 !important;
+}
+
+.Toastify__toast--error .Toastify__toast-icon svg {
+    fill: #970e0e !important;
+    color: #970e0e !important;
+}
+
+.Toastify__toast--warning .Toastify__toast-icon svg {
+    fill: #cf7207 !important;
+    color: #cf7207 !important;
+}
+
+.Toastify__toast--info .Toastify__toast-icon svg {
+    fill: #154dca !important;
+    color: #154dca !important;
+}

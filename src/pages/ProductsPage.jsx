@@ -7,8 +7,10 @@ import { getImageUrl } from '../utils/imageUtils';
 import { getVisibleFilters } from '../api/filterApi';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
+import { useTranslation } from 'react-i18next';
 
 const ProductsPage = () => {
+    const { t } = useTranslation();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -194,11 +196,11 @@ const ProductsPage = () => {
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-4xl font-black uppercase tracking-tight text-black">
                     {selectedCategory
-                        ? categories.find(c => c.id === selectedCategory)?.name || 'Products'
-                        : 'All Products'}
+                        ? categories.find(c => c.id === selectedCategory)?.name || t('product.allProducts')
+                        : t('product.allProducts')}
                 </h1>
                 <span className="text-sm text-gray-400">
-                    {totalElements} {totalElements === 1 ? 'product' : 'products'}
+                    {totalElements} {totalElements === 1 ? t('product.product') : t('product.products')}
                 </span>
             </div>
 
@@ -209,7 +211,7 @@ const ProductsPage = () => {
                         {isFilterVisible('category') && (
                             <div className="mb-8">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    Categories
+                                    {t('product.categories')}
                                 </h3>
                                 <div className="space-y-1">
                                     {/* Root categories */}
@@ -269,7 +271,7 @@ const ProductsPage = () => {
                         {isFilterVisible('colorName') && availableColors.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                                    Color
+                                    {t('product.color')}
                                 </h3>
                                 <div className="flex gap-2 flex-wrap">
                                     {availableColors.map(color => (
@@ -295,7 +297,7 @@ const ProductsPage = () => {
                                 </div>
                                 {selectedColor && (
                                     <p className="text-xs text-gray-500 mt-2">
-                                        Selected: <span className="font-medium text-black">{selectedColor}</span>
+                                        {t('product.selected')}: <span className="font-medium text-black">{selectedColor}</span>
                                     </p>
                                 )}
                             </div>
@@ -305,7 +307,7 @@ const ProductsPage = () => {
                         {isFilterVisible('brand') && availableBrands.length > 0 && (
                             <div className="mb-6">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                                    Brand
+                                    {t('product.brand')}
                                 </h3>
                                 <div className="space-y-1">
                                     {availableBrands.map(brand => (
@@ -400,7 +402,7 @@ const ProductsPage = () => {
                                     }}
                                     className="w-full bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
                                 >
-                                    Apply
+                                    {t('common.apply')}
                                 </button>
                                 {(selectedCategory !== '' || appliedMinPrice !== '' || searchQuery !== '') && (
                                     <button
@@ -417,7 +419,7 @@ const ProductsPage = () => {
                                         }}
                                         className="w-full mt-2 border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
                                     >
-                                        Clear All
+                                        {t('common.clearAll')}
                                     </button>
                                 )}
                             </div>
@@ -433,22 +435,22 @@ const ProductsPage = () => {
                             onClick={() => setShowFilters(!showFilters)}
                             className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
                         >
-                            {showFilters ? '← Hide Filters' : '→ Show Filters'}
+                            {showFilters ? t('product.hideFilters') : t('product.showFilters')}
                         </button>
 
                         <div className="flex items-center gap-4">
                             <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                Sort by
+                                {t('product.sortBy')}
                             </span>
                             <select
                                 value={sortBy}
                                 onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
                                 className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
                             >
-                                <option value="name">Name</option>
-                                <option value="price">Price</option>
-                                <option value="createdAt">Newest</option>
-                                <option value="stockQuantity">Stock</option>
+                                <option value="name">{t('product.name')}</option>
+                                <option value="price">{t('product.price')}</option>
+                                <option value="createdAt">{t('product.newest')}</option>
+                                <option value="stockQuantity">{t('product.stock')}</option>
                             </select>
                             <div className="flex items-center gap-1">
                                 <button
@@ -497,7 +499,7 @@ const ProductsPage = () => {
                         </div>
                     ) : products.length === 0 ? (
                         <div className="text-center text-gray-400 h-64 flex items-center justify-center">
-                            <p className="text-sm">No products found</p>
+                            <p className="text-sm">{t('product.noProducts')}</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
@@ -575,7 +577,7 @@ const ProductsPage = () => {
                                             <span className={`text-xs ${
                                                 product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                                             }`}>
-                                                {product.stockQuantity > 0 ? 'In Stock' : 'Sold Out'}
+                                                {product.stockQuantity > 0 ? t('product.inStock') : t('product.soldOut')}
                                             </span>
                                         </div>
                                     </div>

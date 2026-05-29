@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const AdminSearchFilter = ({
                                searchInput,
                                setSearchInput,
@@ -8,6 +10,7 @@ const AdminSearchFilter = ({
                                setPage,
                                searchPlaceholder = 'Search...'
                            }) => {
+    const { t } = useTranslation();
     return (
         <div className="flex items-center justify-between mb-6 gap-2 md:gap-4">
             {/* Active/Inactive filter */}
@@ -20,7 +23,7 @@ const AdminSearchFilter = ({
                             : 'bg-white text-gray-500 border-gray-300 hover:border-green-600 hover:text-green-600'
                     }`}
                 >
-                    Active
+                    {t('admin.active')}
                 </button>
                 <button
                     onClick={() => { setActiveFilter(prev => prev === false ? null : false); setPage(0); }}
@@ -30,7 +33,7 @@ const AdminSearchFilter = ({
                             : 'bg-white text-gray-500 border-gray-300 hover:border-red-600 hover:text-red-600'
                     }`}
                 >
-                    Inactive
+                    {t('admin.inactive')}
                 </button>
             </div>
 

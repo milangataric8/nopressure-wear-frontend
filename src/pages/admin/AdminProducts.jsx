@@ -20,8 +20,10 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminProducts = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -134,7 +136,7 @@ const AdminProducts = () => {
 
             if (editingProduct) {
                 await updateProduct(editingProduct.id, payload);
-                toast.success('Product updated');
+                toast.success(t('messages.productUpdated'));
             } else {
                 const response = await createProduct(payload);
                 const savedProduct = response.data;
@@ -147,7 +149,7 @@ const AdminProducts = () => {
                     });
                 }
 
-                toast.success('Product created');
+                toast.success(t('messages.productCreated'));
             }
 
             setPendingImages([]);
@@ -283,7 +285,7 @@ const AdminProducts = () => {
             <AdminPageHeader
                 title="Products"
                 subtitle="Manage your product catalog"
-                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newProduct')}
                 onButtonClick={() => {
                         if (showForm) {
                             resetForm();
@@ -413,7 +415,7 @@ const AdminProducts = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingProduct ? 'Edit Product' : 'New Product'}
+                        {editingProduct ? t('admin.edit') : t('admin.newProduct')}
                     </h2>
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -769,14 +771,14 @@ const AdminProducts = () => {
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
-                                {editingProduct ? 'Update Product' : 'Create Product'}
+                                {editingProduct ? t('common.update') : t('common.create')}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -793,13 +795,13 @@ const AdminProducts = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Image</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Product</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">SKU</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Price</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Stock</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Actions</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.image')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('product.product')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.sku')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('product.price')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('product.stock')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('order.status')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -841,13 +843,13 @@ const AdminProducts = () => {
                                             onClick={(e) => { e.stopPropagation(); handleEdit(product); }}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            Edit
+                                            {t('admin.edit')}
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleToggle(product.id); }}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            {product.active ? 'Deactivate' : 'Activate'}
+                                            {product.active ? t('admin.deactivate') : t('admin.activate')}
                                         </button>
                                     </div>
                                 </td>

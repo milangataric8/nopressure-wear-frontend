@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveBanners } from '../../api/bannerApi';
 import { getImageUrl } from '../../utils/imageUtils';
+import { useTranslation } from 'react-i18next';
 
 const HeroBanner = () => {
+    const { t } = useTranslation();
     const [banners, setBanners] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -40,7 +42,7 @@ const HeroBanner = () => {
                         to="/products"
                         className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-4 hover:bg-gray-800 transition-colors inline-block"
                     >
-                        Shop Now
+                        {t('product.shopNow')}
                     </Link>
                 </div>
             </div>

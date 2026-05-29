@@ -7,8 +7,10 @@ import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminCustomers = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -48,7 +50,7 @@ const AdminCustomers = () => {
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                        Customers
+                        {t('admin.customers')}
                     </h1>
                     <p className="text-sm text-gray-500">
                         {totalElements} customer{totalElements !== 1 ? 's' : ''} total
@@ -81,10 +83,10 @@ const AdminCustomers = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Name</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Email</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Joined</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('product.name')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('auth.email')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.joined')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
                         </tr>
                         </thead>
                         <tbody>

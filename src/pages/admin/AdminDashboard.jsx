@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
+import { useTranslation } from 'react-i18next';
 
 const AdminDashboard = () => {
+    const { t } = useTranslation();
     const { isAdmin } = useAuth();
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                Admin Dashboard
+                {t('admin.dashboard')}
             </h1>
-            <p className="text-gray-500 text-sm mb-10">Manage your store</p>
+            <p className="text-gray-500 text-sm mb-10">{t('admin.manageStore')}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Link
@@ -17,10 +19,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Products
+                        {t('admin.products')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Create, edit and manage your product catalog
+                        {t('admin.manageProducts')}
                     </p>
                 </Link>
 
@@ -29,10 +31,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Orders
+                        {t('admin.orders')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        View and manage customer orders
+                        {t('admin.manageOrders')}
                     </p>
                 </Link>
 
@@ -41,10 +43,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Categories
+                        {t('admin.categories')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Manage product categories
+                        {t('admin.manageCategories')}
                     </p>
                 </Link>
 
@@ -53,10 +55,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Coupons
+                        {t('admin.coupons')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Create and manage discount coupons
+                        {t('admin.manageCoupons')}
                     </p>
                 </Link>
 
@@ -66,10 +68,10 @@ const AdminDashboard = () => {
                         className="border border-gray-200 p-8 hover:border-black transition-colors group"
                     >
                         <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                            Employees
+                            {t('admin.employees')}
                         </h2>
                         <p className="text-sm text-gray-500">
-                            Manage store employees
+                            {t('admin.manageEmployees')}
                         </p>
                     </Link>
                 )}
@@ -79,10 +81,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Banners
+                        {t('admin.banners')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        Manage hero banners and carousel
+                        {t('admin.manageBanners')}
                     </p>
                 </Link>
                 <Link
@@ -90,10 +92,10 @@ const AdminDashboard = () => {
                     className="border border-gray-200 p-8 hover:border-black transition-colors group"
                 >
                     <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                        Customers
+                        {t('admin.customers')}
                     </h2>
                     <p className="text-sm text-gray-500">
-                        View and manage customers
+                        {t('admin.manageCustomers')}
                     </p>
                 </Link>
                 {isAdmin() && (
@@ -102,10 +104,10 @@ const AdminDashboard = () => {
                         className="border border-gray-200 p-8 hover:border-black transition-colors group"
                     >
                         <h2 className="text-lg font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
-                            Settings
+                            {t('admin.settings')}
                         </h2>
                         <p className="text-sm text-gray-500">
-                            Manage store name, contact and location
+                            {t('admin.manageSettings')}
                         </p>
                     </Link>
                 )}

@@ -5,8 +5,10 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
+import { useTranslation } from 'react-i18next';
 
 const ResetPasswordPage = () => {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ newPassword: '', confirmPassword: '' });
@@ -31,12 +33,12 @@ const ResetPasswordPage = () => {
         e.preventDefault();
 
         if (!isPasswordValid(formData.newPassword)) {
-            toast.error('Password does not meet requirements');
+            toast.error(t('messages.passwordNotMeet'));
             return;
         }
 
         if (formData.newPassword !== formData.confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error(t('auth.passwordsNoMatch'));
             return;
         }
 
@@ -46,7 +48,7 @@ const ResetPasswordPage = () => {
                 token,
                 newPassword: formData.newPassword,
             });
-            toast.success('Password reset successfully');
+            toast.success(t('messages.passwordChanged'));
             navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to reset password');
@@ -66,7 +68,7 @@ const ResetPasswordPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
-                            New Password
+                            {t('profile.newPassword')}
                         </label>
                         <input
                             type="password"
@@ -84,7 +86,7 @@ const ResetPasswordPage = () => {
                     {/* Confirm Password */}
                     <div>
                         <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
-                            Confirm New Password
+                            {t('profile.confirmNewPassword')}
                         </label>
                         <input
                             type="password"
@@ -96,10 +98,10 @@ const ResetPasswordPage = () => {
                             required
                         />
                         {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
-                            <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                            <p className="text-xs text-red-500 mt-1">{t('auth.passwordsNoMatch')}</p>
                         )}
                         {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                            <p className="text-xs text-green-600 mt-1">✓ Passwords match</p>
+                            <p className="text-xs text-green-600 mt-1">✓ {t('auth.passwordsMatch')}</p>
                         )}
                     </div>
 
@@ -114,7 +116,7 @@ const ResetPasswordPage = () => {
 
                 <p className="text-sm text-gray-500 mt-6 text-center">
                     <Link to="/login" className="text-black font-semibold hover:underline">
-                        Back to Sign In
+                        {t('auth.signIn')}
                     </Link>
                 </p>
             </div>

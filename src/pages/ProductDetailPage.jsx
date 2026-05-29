@@ -6,8 +6,10 @@ import { addToCart } from '../api/cartApi';
 import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { useTranslation } from 'react-i18next';
 
 const ProductDetailPage = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated, setCartCount, cartCount } = useAuth();
@@ -41,7 +43,7 @@ const ProductDetailPage = () => {
 
     const handleAddToCart = async () => {
         if (!isAuthenticated()) {
-            toast.info('Please sign in first');
+            toast.info(t('messages.signInFirst'));
             navigate('/login');
             return;
         }
@@ -49,7 +51,7 @@ const ProductDetailPage = () => {
         try {
             await addToCart(user.id, { productId: product.id, quantity });
             setCartCount(cartCount + quantity);
-            toast.success('Added to cart');
+            toast.success(t('messages.addedToCart'));
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to add to cart');
         } finally {
@@ -73,7 +75,7 @@ const ProductDetailPage = () => {
                 onClick={() => navigate('/products')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"
             >
-                ← Back to Products
+                {t('product.backToProducts')}
             </button>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
@@ -139,7 +141,7 @@ const ProductDetailPage = () => {
                         {product.name}
                     </h1>
                     <p className="text-xs text-gray-400 mb-6">
-                        Product Code: {product.sku}
+                        {t('product.productCode')}: {product.sku}
                     </p>
 
                     <p className="text-sm text-gray-600 leading-relaxed mb-8">
@@ -155,7 +157,7 @@ const ProductDetailPage = () => {
                         }`}>
                             {product.stockQuantity > 0
                                 ? `${product.stockQuantity} in stock`
-                                : 'Sold Out'}
+                                : t('product.soldOut')}
                         </span>
                     </div>
 
@@ -163,7 +165,7 @@ const ProductDetailPage = () => {
                     {product.colorVariants && product.colorVariants.length > 0 && (
                         <div className="mb-6">
                             <p className="text-xs font-semibold uppercase tracking-wide text-black mb-3">
-                                Available Colors
+                                {t('product.availableColors')}
                             </p>
                             <div className="flex gap-2 flex-wrap">
                                 {/* Current product */}
@@ -211,7 +213,7 @@ const ProductDetailPage = () => {
                     {product.stockQuantity > 0 && (
                         <div className="flex items-center gap-6 mb-6">
                             <span className="text-xs font-semibold uppercase tracking-wide text-black">
-                                Quantity
+                                {t('product.quantity')}
                             </span>
                             <div className="flex items-center border border-gray-300">
                                 <button
@@ -238,7 +240,7 @@ const ProductDetailPage = () => {
                         disabled={product.stockQuantity === 0 || addingToCart}
                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                     >
-                        {addingToCart ? 'Adding...' : 'Add to Cart'}
+                        {addingToCart ? t('product.adding') : t('product.addToCart')}
                     </button>
                 </div>
             </div>

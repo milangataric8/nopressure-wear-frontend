@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { getCart, updateCartItem, removeCartItem, clearCart } from '../api/cartApi';
 import { checkout } from '../api/orderApi';
@@ -15,6 +16,7 @@ import { getAddressByUser, createAddress } from '../api/addressApi';
 import { getSettingsMap } from '../api/settingsApi';
 
 const CartPage = () => {
+    const { t } = useTranslation();
     const { user, setCartCount } = useAuth();
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ const CartPage = () => {
             await saveAddressIfNeeded();
             await checkout(user.id, couponData?.code, 'CARD');
             setCartCount(0);
-            toast.success('Payment successful! Order placed.');
+            toast.success(t('messages.paymentSuccess'));
             navigate('/orders');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to place order');
@@ -136,7 +138,7 @@ const CartPage = () => {
 
     const handleCashOnDelivery = async () => {
         if (!selectedAddress) {
-            toast.error('Please select a shipping address');
+            toast.error(t('cart.selectAddress'));
             return;
         }
         setCheckingOut(true);
@@ -144,7 +146,7 @@ const CartPage = () => {
             await saveAddressIfNeeded();
             await checkout(user.id, couponData?.code, 'COD');
             setCartCount(0);
-            toast.success('Order placed! You will pay on delivery.');
+            toast.success(t('messages.codSuccess'));
             navigate('/orders');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to place order');
@@ -155,7 +157,7 @@ const CartPage = () => {
 
     const handleProceedToPayment = async () => {
         if (!selectedAddress) {
-            toast.error('Please select a shipping address');
+            toast.error(t('cart.selectAddress'));
             return;
         }
         try {
@@ -214,13 +216,13 @@ const CartPage = () => {
     if (!cart || cart.items.length === 0) {
         return (
             <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">Your Bag</h2>
-                <p className="text-gray-500 mb-8">Your bag is empty</p>
+                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">{t('cart.title')}</h2>
+                <p className="text-gray-500 mb-8">{t('cart.empty')}</p>
                 <button
                     onClick={() => navigate('/products')}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors"
                 >
-                    Shop Now
+                    {t('cart.continueShopping')}
                 </button>
             </div>
         );
@@ -228,7 +230,7 @@ const CartPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
-            <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-10">Your Bag</h1>
+            <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-10">{t('cart.title')}</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Cart items */}
@@ -288,7 +290,7 @@ const CartPage = () => {
                                         onClick={() => handleRemoveItem(item.id)}
                                         className="text-xs text-gray-400 hover:text-black transition-colors underline"
                                     >
-                                        Remove
+                                        {t('common.remove')}
                                     </button>
                                 </div>
                             </div>
@@ -307,20 +309,20 @@ const CartPage = () => {
                 <div className="lg:col-span-1">
                     <div className="border border-gray-200 p-6">
                         <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                            Order Summary
+                            {t('cart.orderSummary')}
                         </h2>
 
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Subtotal</span>
+                                <span className="text-gray-500">{t('cart.subtotal')}</span>
                                 <span className="font-medium">${cart.totalAmount.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Delivery</span>
-                                <span className="font-medium text-green-600">Free</span>
+                                <span className="text-gray-500">{t('cart.delivery')}</span>
+                                <span className="font-medium text-green-600">{t('cart.free')}</span>
                             </div>
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
-                                <span className="font-semibold text-black">Total</span>
+                                <span className="font-semibold text-black">{t('cart.total')}</span>
                                 <span className="font-bold text-black">${cart.totalAmount.toFixed(2)}</span>
                             </div>
                         </div>
@@ -328,7 +330,7 @@ const CartPage = () => {
                         {/* Shipping Address */}
                         <div className="border border-gray-200 p-6 mb-6">
                             <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                Shipping Address
+                                {t('cart.shippingAddress')}
                             </h3>
 
                             {/* Existing addresses */}
@@ -358,7 +360,7 @@ const CartPage = () => {
                                     onClick={() => { setShowNewAddress(true); setSelectedAddress(null); }}
                                     className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
                                 >
-                                    + Add New Address
+                                    {t('cart.addNewAddress')}
                                 </button>
                             ) : (
                                 <div className="space-y-3">
@@ -366,7 +368,7 @@ const CartPage = () => {
                                         type="text"
                                         value={newAddress.street}
                                         onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
-                                        placeholder="Street address"
+                                        placeholder={t('cart.street')}
                                         className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                                     />
                                     <div className="grid grid-cols-2 gap-3">
@@ -374,14 +376,14 @@ const CartPage = () => {
                                             type="text"
                                             value={newAddress.city}
                                             onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
-                                            placeholder="City"
+                                            placeholder={t('cart.city')}
                                             className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                                         />
                                         <input
                                             type="text"
                                             value={newAddress.postalCode}
                                             onChange={(e) => setNewAddress(prev => ({ ...prev, postalCode: e.target.value }))}
-                                            placeholder="Postal code"
+                                            placeholder={t('cart.postalCode')}
                                             className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                                         />
                                     </div>
@@ -389,7 +391,7 @@ const CartPage = () => {
                                         type="text"
                                         value={newAddress.country}
                                         onChange={(e) => setNewAddress(prev => ({ ...prev, country: e.target.value }))}
-                                        placeholder="Country"
+                                        placeholder={t('cart.country')}
                                         className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                                     />
 
@@ -402,7 +404,7 @@ const CartPage = () => {
                                                 onChange={(e) => setSaveAddress(e.target.checked)}
                                                 className="w-3.5 h-3.5"
                                             />
-                                            <span className="text-xs text-gray-500">Save this address for future orders</span>
+                                            <span className="text-xs text-gray-500">{t('cart.saveAddress')}</span>
                                         </label>
                                         {saveAddress && (
                                             <label className="flex items-center gap-2 cursor-pointer ml-5">
@@ -412,7 +414,7 @@ const CartPage = () => {
                                                     onChange={(e) => setIsMainAddress(e.target.checked)}
                                                     className="w-3.5 h-3.5"
                                                 />
-                                                <span className="text-xs text-gray-500">Set as main address</span>
+                                                <span className="text-xs text-gray-500">{t('cart.mainAddress')}</span>
                                             </label>
                                         )}
                                     </div>
@@ -425,13 +427,13 @@ const CartPage = () => {
                                             }}
                                             className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                                         >
-                                            Use This Address
+                                            {t('cart.useThisAddress')}
                                         </button>
                                         <button
                                             onClick={() => { setShowNewAddress(false); setNewAddress({ street: '', city: '', postalCode: '', country: '' }); }}
                                             className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-50 transition-colors"
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </button>
                                     </div>
                                 </div>
@@ -440,7 +442,7 @@ const CartPage = () => {
                             {/* Selected address display */}
                             {selectedAddress && !showNewAddress && (
                                 <div className="mt-4 p-3 bg-gray-50 border border-gray-200">
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">Shipping to:</p>
+                                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('cart.shippingTo')}</p>
                                     <p className="text-sm font-medium text-black">{selectedAddress.street}</p>
                                     <p className="text-xs text-gray-500">{selectedAddress.city}, {selectedAddress.postalCode}</p>
                                     <p className="text-xs text-gray-500">{selectedAddress.country}</p>
@@ -452,7 +454,7 @@ const CartPage = () => {
                         {!showPayment ? (
                             <div>
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    Payment Method
+                                    {t('cart.paymentMethod')}
                                 </h3>
                                 <div className="space-y-3 mb-6">
                                     {cardEnabled && (
@@ -469,8 +471,8 @@ const CartPage = () => {
                                                 <line x1="1" y1="10" x2="23" y2="10"/>
                                             </svg>
                                             <div>
-                                                <p className="text-sm font-semibold text-black">Pay with Card</p>
-                                                <p className="text-xs text-gray-400">Visa, Mastercard, Amex</p>
+                                                <p className="text-sm font-semibold text-black">{t('cart.payWithCard')}</p>
+                                                <p className="text-xs text-gray-400">{t('cart.cardDescription')}</p>
                                             </div>
                                         </button>
                                     )}
@@ -488,14 +490,14 @@ const CartPage = () => {
                                                 <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                                             </svg>
                                             <div>
-                                                <p className="text-sm font-semibold text-black">Cash on Delivery</p>
-                                                <p className="text-xs text-gray-400">Pay when you receive your order</p>
+                                                <p className="text-sm font-semibold text-black">{t('cart.cashOnDelivery')}</p>
+                                                <p className="text-xs text-gray-400">{t('cart.codDescription')}</p>
                                             </div>
                                         </button>
                                     )}
 
                                     {!cardEnabled && !codEnabled && (
-                                        <p className="text-sm text-red-500">No payment methods available. Please contact support.</p>
+                                        <p className="text-sm text-red-500">{t('cart.noPaymentMethods')}</p>
                                     )}
                                 </div>
 
@@ -505,7 +507,7 @@ const CartPage = () => {
                                         disabled={!cart || cart.items.length === 0}
                                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                                     >
-                                        Proceed to Payment
+                                        {t('cart.proceedToPayment')}
                                     </button>
                                 )}
 
@@ -515,7 +517,7 @@ const CartPage = () => {
                                         disabled={!cart || cart.items.length === 0 || checkingOut}
                                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                                     >
-                                        {checkingOut ? 'Placing Order...' : 'Place Order'}
+                                        {checkingOut ? t('cart.placingOrder') : t('cart.placeOrder')}
                                     </button>
                                 )}
                             </div>
@@ -543,7 +545,7 @@ const CartPage = () => {
                                     onClick={() => { setShowPayment(false); setClientSecret(null); }}
                                     className="w-full mt-3 border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors"
                                 >
-                                    ← Back to Cart
+                                    {t('cart.backToCart')}
                                 </button>
                             </>
                         )}
@@ -552,21 +554,21 @@ const CartPage = () => {
                             onClick={() => navigate('/products')}
                             className="w-full mt-3 border border-black text-black text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-50 transition-colors"
                         >
-                            Continue Shopping
+                            {t('cart.continueShopping')}
                         </button>
                     </div>
 
                     {/* Coupon input */}
                     <div className="mb-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            Promo Code
+                            {t('cart.promoCode')}
                         </h3>
                         <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={couponCode}
                                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                placeholder="Enter code"
+                                placeholder={t('cart.enterCode')}
                                 className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
                             />
                             <button
@@ -574,7 +576,7 @@ const CartPage = () => {
                                 disabled={applyingCoupon}
                                 className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors disabled:opacity-50"
                             >
-                                Apply
+                                {t('common.apply')}
                             </button>
                         </div>
                         {couponData && (
@@ -584,7 +586,7 @@ const CartPage = () => {
                                     onClick={() => { setCouponData(null); setCouponCode(''); }}
                                     className="text-xs text-gray-400 hover:text-black underline mt-1"
                                 >
-                                    Remove
+                                    {t('common.remove')}
                                 </button>
                             </div>
                         )}
@@ -593,7 +595,7 @@ const CartPage = () => {
                     {/* Order summary amounts */}
                     <div className="space-y-3 mb-6">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Subtotal</span>
+                            <span className="text-gray-500">{t('cart.subtotal')}</span>
                             <span className="font-medium">${cart.totalAmount.toFixed(2)}</span>
                         </div>
                         {couponData && (
@@ -605,11 +607,11 @@ const CartPage = () => {
                             </div>
                         )}
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Delivery</span>
-                            <span className="font-medium text-green-600">Free</span>
+                            <span className="text-gray-500">{t('cart.delivery')}</span>
+                            <span className="font-medium text-green-600">{t('cart.free')}</span>
                         </div>
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
-                            <span className="font-semibold text-black">Total</span>
+                            <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">
                                 ${couponData
                                     ? couponData.finalTotal.toFixed(2)

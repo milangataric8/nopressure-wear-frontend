@@ -8,8 +8,10 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminBanners = () => {
+    const { t } = useTranslation();
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -84,10 +86,10 @@ const AdminBanners = () => {
         try {
             if (editingBanner) {
                 await updateBanner(editingBanner.id, formData);
-                toast.success('Banner updated');
+                toast.success(t('messages.bannerUpdated'));
             } else {
                 await createBanner(formData);
-                toast.success('Banner created');
+                toast.success(t('messages.bannerCreated'));
             }
             resetForm();
             fetchBanners();
@@ -115,7 +117,7 @@ const AdminBanners = () => {
         if (!window.confirm('Delete this banner?')) return;
         try {
             await deleteBanner(id);
-            toast.success('Banner deleted');
+            toast.success(t('messages.bannerDeleted'));
             fetchBanners();
         } catch (e) {
             toast.error(e.response?.data?.message || 'Failed to delete banner');
@@ -154,7 +156,7 @@ const AdminBanners = () => {
             <AdminPageHeader
                 title="Banners"
                 subtitle="Manage hero banners on the home page"
-                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newBanner')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
 
@@ -175,7 +177,7 @@ const AdminBanners = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingBanner ? 'Edit Banner' : 'New Banner'}
+                        {editingBanner ? t('admin.edit') : t('admin.newBanner')}
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -296,14 +298,14 @@ const AdminBanners = () => {
                                 disabled={uploading}
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-50"
                             >
-                                {editingBanner ? 'Update Banner' : 'Create Banner'}
+                                {editingBanner ? t('common.update') : t('common.create')}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -367,19 +369,19 @@ const AdminBanners = () => {
                                     onClick={() => handleEdit(banner)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
-                                    Edit
+                                    {t('admin.edit')}
                                 </button>
                                 <button
                                     onClick={() => handleToggle(banner.id)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
-                                    {banner.active ? 'Deactivate' : 'Activate'}
+                                    {banner.active ? t('admin.deactivate') : t('admin.activate')}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(banner.id)}
                                     className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
                                 >
-                                    Delete
+                                    {t('admin.delete')}
                                 </button>
                             </div>
                         </div>

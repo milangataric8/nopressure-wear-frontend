@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const ChangePasswordPage = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -22,7 +24,7 @@ const ChangePasswordPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.newPassword !== formData.confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error(t('auth.passwordsNoMatch'));
             return;
         }
         setLoading(true);
@@ -31,7 +33,7 @@ const ChangePasswordPage = () => {
                 currentPassword: formData.currentPassword,
                 newPassword: formData.newPassword,
             });
-            toast.success('Password changed successfully');
+            toast.success(t('messages.passwordChanged'));
             navigate('/profile');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to change password');
@@ -53,13 +55,13 @@ const ChangePasswordPage = () => {
             </button>
 
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-black mb-1">Change Password</h1>
+                <h1 className="text-2xl font-bold text-black mb-1">{t('profile.changePassword')}</h1>
                 <p className="text-sm text-gray-500">Enter your current and new password</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className={labelClass}>Current Password</label>
+                    <label className={labelClass}>{t('profile.currentPassword')}</label>
                     <input
                         type="password"
                         name="currentPassword"
@@ -72,7 +74,7 @@ const ChangePasswordPage = () => {
                 </div>
 
                 <div>
-                    <label className={labelClass}>New Password</label>
+                    <label className={labelClass}>{t('profile.newPassword')}</label>
                     <input
                         type="password"
                         name="newPassword"
@@ -85,7 +87,7 @@ const ChangePasswordPage = () => {
                 </div>
 
                 <div>
-                    <label className={labelClass}>Confirm New Password</label>
+                    <label className={labelClass}>{t('profile.confirmNewPassword')}</label>
                     <input
                         type="password"
                         name="confirmPassword"
@@ -102,7 +104,7 @@ const ChangePasswordPage = () => {
                     disabled={loading}
                     className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
-                    {loading ? 'Changing...' : 'Change Password'}
+                    {loading ? t('common.loading') : t('profile.changePassword')}
                 </button>
             </form>
         </div>

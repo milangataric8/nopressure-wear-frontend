@@ -1,12 +1,14 @@
 import { validatePassword } from '../../utils/passwordUtils';
+import { useTranslation } from 'react-i18next';
 
 const PasswordStrength = ({ password }) => {
+    const { t } = useTranslation();
     if (!password) return null;
     validatePassword(password);
     const requirements = [
-        { label: 'At least 8 characters', met: password.length >= 8 },
-        { label: 'At least one number', met: /[0-9]/.test(password) },
-        { label: 'At least one special character', met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) },
+        { label: t('auth.minChars'), met: password.length >= 8 },
+        { label: t('auth.oneNumber'), met: /[0-9]/.test(password) },
+        { label: t('auth.oneSpecial'), met: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password) },
     ];
 
     return (

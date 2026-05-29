@@ -6,8 +6,10 @@ import { useAuth } from '../hooks/useAuth';
 import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";
 import Pagination from "../components/common/Pagination.jsx";
+import { useTranslation } from 'react-i18next';
 
 const OrdersPage = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
@@ -48,13 +50,13 @@ const OrdersPage = () => {
     if (orders.length === 0 && !loading) {
         return (
             <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">Your Orders</h2>
-                <p className="text-gray-500 mb-8">You haven't placed any orders yet</p>
+                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">{t('order.title')}</h2>
+                <p className="text-gray-500 mb-8">{t('order.empty')}</p>
                 <button
                     onClick={() => navigate('/products')}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors"
                 >
-                    Start Shopping
+                    {t('cart.continueShopping')}
                 </button>
             </div>
         );
@@ -65,7 +67,7 @@ const OrdersPage = () => {
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black">
-                        Your Orders
+                        {t('order.title')}
                     </h1>
                     {totalElements > 0 && (
                         <p className="text-sm text-gray-500 mt-1">

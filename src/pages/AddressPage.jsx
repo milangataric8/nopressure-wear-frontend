@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AddressPage = () => {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
     const [addresses, setAddresses] = useState([]);
@@ -48,13 +50,13 @@ const AddressPage = () => {
                     ...addressData,
                     userId: user.id,
                 });
-                toast.success('Address updated');
+                toast.success(t('messages.addressSaved'));
             } else {
                 await axiosInstance.post('/addresses', {
                     ...addressData,
                     userId: user.id,
                 });
-                toast.success('Address added');
+                toast.success(t('messages.addressSaved'));
             }
             resetForm();
             fetchAddresses();
@@ -109,15 +111,15 @@ const AddressPage = () => {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                        My Addresses
+                        {t('profile.addresses')}
                     </h1>
-                    <p className="text-sm text-gray-500">Manage your delivery addresses</p>
+                    <p className="text-sm text-gray-500">{t('profile.addresses')}</p>
                 </div>
                 <button
                     onClick={() => {showForm ? resetForm() : setShowForm(true)}}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                 >
-                    {showForm ? 'Cancel' : '+ New Address'}
+                    {showForm ? t('common.cancel') : t('cart.addNewAddress')}
                 </button>
             </div>
 
@@ -125,11 +127,11 @@ const AddressPage = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-8">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingAddress ? 'Edit Address' : 'New Address'}
+                        {editingAddress ? t('common.edit') : t('cart.addNewAddress')}
                     </h2>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className={labelClass}>Street</label>
+                            <label className={labelClass}>{t('cart.street')}</label>
                             <input
                                 type="text"
                                 name="street"
@@ -143,7 +145,7 @@ const AddressPage = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClass}>City</label>
+                                <label className={labelClass}>{t('cart.city')}</label>
                                 <input
                                     type="text"
                                     name="city"
@@ -155,7 +157,7 @@ const AddressPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Postal Code</label>
+                                <label className={labelClass}>{t('cart.postalCode')}</label>
                                 <input
                                     type="text"
                                     name="postalCode"
@@ -169,7 +171,7 @@ const AddressPage = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Country</label>
+                            <label className={labelClass}>{t('cart.country')}</label>
                             <input
                                 type="text"
                                 name="country"
@@ -186,14 +188,14 @@ const AddressPage = () => {
                                 type="submit"
                                 className="flex-1 bg-black text-white text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-800 transition-colors"
                             >
-                                {editingAddress ? 'Update Address' : 'Add Address'}
+                                {editingAddress ? t('common.update') : t('common.save')}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
                                 className="flex-1 border border-gray-300 text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </button>
                         </div>
                     </form>
@@ -235,13 +237,13 @@ const AddressPage = () => {
                                     onClick={() => handleEdit(address)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
-                                    Edit
+                                    {t('common.edit')}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(address.id)}
                                     className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
                                 >
-                                    Delete
+                                    {t('common.delete')}
                                 </button>
                             </div>
                         </div>

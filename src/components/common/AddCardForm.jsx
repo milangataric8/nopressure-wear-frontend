@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const AddCardForm = ({ onSuccess, onCancel }) => {
+    const { t } = useTranslation();
     const stripe = useStripe();
     const elements = useElements();
     const [processing, setProcessing] = useState(false);
@@ -25,7 +27,7 @@ const AddCardForm = ({ onSuccess, onCancel }) => {
         if (error) {
             toast.error(error.message);
         } else {
-            toast.success('Card added successfully!');
+            toast.success(t('messages.cardAdded'));
             onSuccess();
         }
 
@@ -44,13 +46,13 @@ const AddCardForm = ({ onSuccess, onCancel }) => {
                     disabled={!stripe || processing}
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
-                    {processing ? 'Saving...' : 'Save Card'}
+                    {processing ? t('common.loading') : t('common.save')}
                 </button>
                 <button
                     onClick={onCancel}
                     className="border border-gray-300 text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-50 transition-colors"
                 >
-                    Cancel
+                    {t('common.cancel')}
                 </button>
             </div>
         </div>

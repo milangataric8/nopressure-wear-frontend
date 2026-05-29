@@ -4,8 +4,10 @@ import { toast } from 'react-toastify';
 import { register } from '../api/authApi';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
+import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -24,12 +26,12 @@ const RegisterPage = () => {
         e.preventDefault();
 
         if (!isPasswordValid(formData.password)) {
-            toast.error('Password does not meet requirements');
+            toast.error(t('messages.passwordNotMeet'));
             return;
         }
 
         if (formData.password !== formData.confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error(t('auth.passwordsNoMatch'));
             return;
         }
 
@@ -41,7 +43,7 @@ const RegisterPage = () => {
                 email: formData.email,
                 password: formData.password,
             });
-            toast.success('Account created!');
+            toast.success(t('messages.registerSuccess'));
             navigate('/login');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Registration failed');
@@ -67,14 +69,14 @@ const RegisterPage = () => {
             <div className="w-full lg:w-1/2 flex items-center justify-center px-8">
                 <div className="w-full max-w-sm">
                     <div className="mb-10">
-                        <h2 className="text-2xl font-bold text-black mb-1">Create Account</h2>
+                        <h2 className="text-2xl font-bold text-black mb-1">{t('auth.register')}</h2>
                         <p className="text-sm text-gray-500">Fill in your details to get started</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClass}>First Name</label>
+                                <label className={labelClass}>{t('auth.firstName')}</label>
                                 <input
                                     type="text"
                                     name="firstName"
@@ -86,7 +88,7 @@ const RegisterPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Last Name</label>
+                                <label className={labelClass}>{t('auth.lastName')}</label>
                                 <input
                                     type="text"
                                     name="lastName"
@@ -100,7 +102,7 @@ const RegisterPage = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Email</label>
+                            <label className={labelClass}>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 name="email"
@@ -114,7 +116,7 @@ const RegisterPage = () => {
 
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
-                                Password
+                                {t('auth.password')}
                             </label>
                             <input
                                 type="password"
@@ -132,7 +134,7 @@ const RegisterPage = () => {
                         {/* Confirm Password */}
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
-                                Confirm Password
+                                {t('auth.confirmPassword')}
                             </label>
                             <input
                                 type="password"
@@ -144,10 +146,10 @@ const RegisterPage = () => {
                                 required
                             />
                             {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                                <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                                <p className="text-xs text-red-500 mt-1">{t('auth.passwordsNoMatch')}</p>
                             )}
                             {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                                <p className="text-xs text-green-600 mt-1">✓ Passwords match</p>
+                                <p className="text-xs text-green-600 mt-1">✓ {t('auth.passwordsMatch')}</p>
                             )}
                         </div>
 
@@ -156,14 +158,14 @@ const RegisterPage = () => {
                             disabled={loading}
                             className="w-full bg-black text-white text-sm font-semibold py-3 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50"
                         >
-                            {loading ? 'Creating...' : 'Create Account'}
+                            {loading ? t('common.loading') : t('auth.register')}
                         </button>
                     </form>
 
                     <p className="text-sm text-gray-500 mt-8">
-                        Already a member?{' '}
+                        {t('auth.haveAccount')}{' '}
                         <Link to="/login" className="text-black font-semibold hover:underline">
-                            Sign In
+                            {t('auth.signIn')}
                         </Link>
                     </p>
 
@@ -175,7 +177,7 @@ const RegisterPage = () => {
                             </div>
                             <div className="relative flex justify-center text-xs">
                                     <span className="bg-white px-4 text-gray-400 uppercase tracking-wide">
-                                        or
+                                        {t('auth.or')}
                                     </span>
                             </div>
                         </div>
@@ -190,7 +192,7 @@ const RegisterPage = () => {
                                 <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
                                 <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
                             </svg>
-                            Continue with Google
+                            {t('auth.continueWithGoogle')}
                         </a>
                     </div>
                 </div>

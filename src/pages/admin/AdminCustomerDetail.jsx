@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminCustomerDetail = () => {
+    const { t } = useTranslation();
     const { customerId } = useParams();
     const navigate = useNavigate();
     const [customer, setCustomer] = useState(null);
@@ -76,7 +78,7 @@ const AdminCustomerDetail = () => {
                 onClick={() => navigate('/admin/customers')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"
             >
-                ← Back to Customers
+                ← {t('admin.customers')}
             </button>
 
             {/* Customer info */}
@@ -154,11 +156,11 @@ const AdminCustomerDetail = () => {
                         <table className="w-full">
                             <thead>
                             <tr className="border-b border-gray-200 bg-gray-50">
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Order</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Date</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Items</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Total</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.order')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.date')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.items')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('cart.total')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
                             </tr>
                             </thead>
                             <tbody>

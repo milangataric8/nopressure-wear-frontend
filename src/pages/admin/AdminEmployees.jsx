@@ -7,8 +7,10 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminEmployees = () => {
+    const { t } = useTranslation();
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -64,7 +66,7 @@ const AdminEmployees = () => {
         e.preventDefault();
         try {
             await axiosInstance.post('/employees', formData);
-            toast.success('Employee created');
+            toast.success(t('messages.employeeCreated'));
             setShowForm(false);
             setFormData({
                 firstName: '',
@@ -83,7 +85,7 @@ const AdminEmployees = () => {
         if (!window.confirm('Delete this employee?')) return;
         try {
             await axiosInstance.delete(`/employees/${id}`);
-            toast.success('Employee deleted');
+            toast.success(t('messages.employeeDeleted'));
             fetchEmployees();
         } catch (e) {
             toast.error(e.response?.data?.message || 'Failed to delete employee');
@@ -120,7 +122,7 @@ const AdminEmployees = () => {
         e.preventDefault();
         try {
             await axiosInstance.put(`/employees/${editingEmployee.id}`, editFormData);
-            toast.success('Employee updated');
+            toast.success(t('messages.employeeUpdated'));
             setShowEditForm(false);
             setEditingEmployee(null);
             fetchEmployees();
@@ -137,7 +139,7 @@ const AdminEmployees = () => {
             <AdminPageHeader
                 title="Employees"
                 subtitle="Manage store employees"
-                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newEmployee')}
                 onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
             />
 
@@ -158,7 +160,7 @@ const AdminEmployees = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        New Employee
+                        {t('admin.newEmployee')}
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -225,7 +227,7 @@ const AdminEmployees = () => {
                                 onClick={() => setShowForm(false)}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -236,7 +238,7 @@ const AdminEmployees = () => {
             {showEditForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        Edit Employee
+                        {t('admin.edit')}
                     </h2>
                     <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -280,14 +282,14 @@ const AdminEmployees = () => {
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
-                                Update Employee
+                                {t('common.update')}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => { setShowEditForm(false); setEditingEmployee(null); }}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -308,10 +310,10 @@ const AdminEmployees = () => {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-gray-200 bg-gray-50">
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Name</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Email</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Status</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">Actions</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('product.name')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('auth.email')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('order.status')}</th>
+                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -334,19 +336,19 @@ const AdminEmployees = () => {
                                             onClick={() => handleEdit(employee)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            Edit
+                                            {t('admin.edit')}
                                         </button>
                                         <button
                                             onClick={() => handleToggle(employee)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            {employee.active ? 'Deactivate' : 'Activate'}
+                                            {employee.active ? t('admin.deactivate') : t('admin.activate')}
                                         </button>
                                         <button
                                             onClick={() => handleDelete(employee.id)}
                                             className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
                                         >
-                                            Delete
+                                            {t('admin.delete')}
                                         </button>
                                     </div>
                                 </td>

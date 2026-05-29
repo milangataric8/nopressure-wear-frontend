@@ -5,8 +5,10 @@ import {getOrderById, getOrderByIdAdmin, updateOrderStatus} from '../api/orderAp
 import { useAuth } from '../hooks/useAuth';
 import {getImageUrl} from "../utils/imageUtils.js";
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import { useTranslation } from 'react-i18next';
 
 const OrderDetailPage = () => {
+    const { t } = useTranslation();
     const { orderId } = useParams();
     const navigate = useNavigate();
     const { user, isAdmin, isEmployee } = useAuth();
@@ -39,7 +41,7 @@ const OrderDetailPage = () => {
     const handleStatusUpdate = async (status) => {
         try {
             await updateOrderStatus(orderId, status);
-            toast.success('Status updated');
+            toast.success(t('messages.orderUpdated'));
             fetchOrder();
         } catch (e) {
             toast.error(e.response?.data?.message || 'Failed to update status');
@@ -78,7 +80,7 @@ const OrderDetailPage = () => {
                 onClick={() => navigate(isStaff ? '/admin/orders' : '/orders')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"
             >
-                ← Back to Orders
+                {t('order.backToOrders')}
             </button>
 
             {/* Order header */}
@@ -88,7 +90,7 @@ const OrderDetailPage = () => {
                         Order - {order.orderCode}
                     </h1>
                     <p className="text-sm text-gray-500">
-                        Placed on {new Date(order.createdAt).toLocaleDateString('en-US', {
+                        {t('order.placedOn')} {new Date(order.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -106,11 +108,11 @@ const OrderDetailPage = () => {
                             onChange={(e) => handleStatusUpdate(e.target.value)}
                             className="text-xs border border-gray-300 px-3 py-2 focus:outline-none focus:border-black transition-colors"
                         >
-                            <option value="PENDING">Pending</option>
-                            <option value="CONFIRMED">Confirmed</option>
-                            <option value="SHIPPED">Shipped</option>
-                            <option value="DELIVERED">Delivered</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <option value="PENDING">{t('order.pending')}</option>
+                            <option value="CONFIRMED">{t('order.confirmed')}</option>
+                            <option value="SHIPPED">{t('order.shipped')}</option>
+                            <option value="DELIVERED">{t('order.delivered')}</option>
+                            <option value="CANCELLED">{t('order.cancelled')}</option>
                         </select>
                     )}
                 </div>
@@ -120,7 +122,7 @@ const OrderDetailPage = () => {
             {order.status !== 'CANCELLED' && (
                 <div className="border border-gray-200 p-8 mb-8">
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-6">
-                        Order Status
+                        {t('order.orderStatus')}
                     </h2>
                     <div className="flex items-center justify-between relative">
                         {/* Progress line */}
@@ -148,7 +150,7 @@ const OrderDetailPage = () => {
                                 <span className={`text-xs uppercase tracking-wide mt-2 font-medium ${
                                     step.completed ? 'text-black' : 'text-gray-400'
                                 }`}>
-                                    {step.label}
+                                    {t(`order.${step.label.toLowerCase()}`)}
                                 </span>
                             </div>
                         ))}
@@ -160,7 +162,7 @@ const OrderDetailPage = () => {
                 {/* Order items */}
                 <div className="lg:col-span-2">
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                        Items
+                        {t('order.items')}
                     </h2>
                     <div className="border border-gray-200">
                         {order.orderItems.map((item, index) => (
@@ -202,46 +204,46 @@ const OrderDetailPage = () => {
                 {/* Order summary */}
                 <div>
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                        Summary
+                        {t('order.summary')}
                     </h2>
                     <div className="border border-gray-200 p-6">
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Subtotal</span>
+                                <span className="text-gray-500">{t('cart.subtotal')}</span>
                                 <span>${order.totalAmount.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Delivery</span>
-                                <span className="text-green-600">Free</span>
+                                <span className="text-gray-500">{t('cart.delivery')}</span>
+                                <span className="text-green-600">{t('cart.free')}</span>
                             </div>
                         </div>
                         <div className="border-t border-gray-200 pt-4 flex justify-between">
-                            <span className="font-semibold text-black">Total</span>
+                            <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">${order.totalAmount.toFixed(2)}</span>
                         </div>
                     </div>
 
                     <div className="border border-gray-200 p-6 mt-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            Order Info
+                            {t('order.orderInfo')}
                         </h3>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Order ID</span>
+                                <span className="text-gray-500">{t('order.orderId')}</span>
                                 <span className="font-medium">#{order.id}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Date</span>
+                                <span className="text-gray-500">{t('order.date')}</span>
                                 <span className="font-medium">
                                     {new Date(order.createdAt).toLocaleDateString()}
                                 </span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Status</span>
+                                <span className="text-gray-500">{t('order.status')}</span>
                                 <span className="font-medium">{order.status}</span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Items</span>
+                                <span className="text-gray-500">{t('order.items')}</span>
                                 <span className="font-medium">{order.orderItems.length}</span>
                             </div>
                         </div>
@@ -250,7 +252,7 @@ const OrderDetailPage = () => {
                     {/* Customer info */}
                     <div className="border border-gray-200 p-6 mt-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            Customer
+                            {t('order.customer')}
                         </h3>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs">
@@ -269,7 +271,7 @@ const OrderDetailPage = () => {
                     {/* Shipping address */}
                     <div className="border border-gray-200 p-6 mt-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            Shipping Address
+                            {t('cart.shippingAddress')}
                         </h3>
                         {order.shippingStreet ? (
                             <div className="space-y-1">
@@ -285,17 +287,17 @@ const OrderDetailPage = () => {
                     {/* Payment info */}
                     <div className="border border-gray-200 p-6 mt-4">
                         <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            Payment
+                            {t('order.paymentInfo')}
                         </h3>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Method</span>
+                                <span className="text-gray-500">{t('order.method')}</span>
                                 <span className="font-medium">
-                                    {order.paymentMethod === 'CARD' ? 'Credit Card' : 'Cash on Delivery'}
+                                    {order.paymentMethod === 'CARD' ? t('order.creditCard') : t('order.cashOnDelivery')}
                                 </span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Status</span>
+                                <span className="text-gray-500">{t('order.status')}</span>
                                 <span className={`font-semibold uppercase ${
                                     order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'
                                 }`}>

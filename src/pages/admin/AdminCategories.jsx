@@ -13,8 +13,10 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const AdminCategories = () => {
+    const { t } = useTranslation();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -70,10 +72,10 @@ const AdminCategories = () => {
 
             if (editingCategory) {
                 await updateCategory(editingCategory.id, payload);
-                toast.success('Category updated');
+                toast.success(t('messages.categoryUpdated'));
             } else {
                 await createCategory(payload);
-                toast.success('Category created');
+                toast.success(t('messages.categoryCreated'));
             }
 
             resetForm();
@@ -118,7 +120,7 @@ const AdminCategories = () => {
             <AdminPageHeader
                 title="Categories"
                 subtitle="Manage product categories"
-                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newCategory')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
 
@@ -139,7 +141,7 @@ const AdminCategories = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingCategory ? 'Edit Category' : 'New Category'}
+                        {editingCategory ? t('admin.edit') : t('admin.newCategory')}
                     </h2>
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -191,14 +193,14 @@ const AdminCategories = () => {
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
-                                {editingCategory ? 'Update Category' : 'Create Category'}
+                                {editingCategory ? t('common.update') : t('common.create')}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -219,9 +221,9 @@ const AdminCategories = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Category</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.category')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -251,13 +253,13 @@ const AdminCategories = () => {
                                                 onClick={() => handleEdit(cat)}
                                                 className="text-xs text-gray-500 hover:text-black underline"
                                             >
-                                                Edit
+                                                {t('admin.edit')}
                                             </button>
                                             <button
                                                 onClick={() => handleToggle(cat.id)}
                                                 className="text-xs text-gray-500 hover:text-black underline"
                                             >
-                                                {cat.active ? 'Deactivate' : 'Activate'}
+                                                {cat.active ? t('admin.deactivate') : t('admin.activate')}
                                             </button>
                                         </div>
                                     </td>
@@ -295,9 +297,9 @@ const AdminCategories = () => {
                                             <td className="px-4 py-3"><StatusBadge active={cat.active} /></td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-3">
-                                                    <button onClick={() => handleEdit(cat)} className="text-xs text-gray-500 hover:text-black underline">Edit</button>
+                                                    <button onClick={() => handleEdit(cat)} className="text-xs text-gray-500 hover:text-black underline">{t('admin.edit')}</button>
                                                     <button onClick={() => handleToggle(cat.id)} className="text-xs text-gray-500 hover:text-black underline">
-                                                        {cat.active ? 'Deactivate' : 'Activate'}
+                                                        {cat.active ? t('admin.deactivate') : t('admin.activate')}
                                                     </button>
                                                 </div>
                                             </td>
@@ -314,9 +316,9 @@ const AdminCategories = () => {
                                                 <td className="px-4 py-2"><StatusBadge active={sub.active} /></td>
                                                 <td className="px-4 py-2">
                                                     <div className="flex items-center gap-3">
-                                                        <button onClick={() => handleEdit(sub)} className="text-xs text-gray-500 hover:text-black underline">Edit</button>
+                                                        <button onClick={() => handleEdit(sub)} className="text-xs text-gray-500 hover:text-black underline">{t('admin.edit')}</button>
                                                         <button onClick={() => handleToggle(sub.id)} className="text-xs text-gray-500 hover:text-black underline">
-                                                            {sub.active ? 'Deactivate' : 'Activate'}
+                                                            {sub.active ? t('admin.deactivate') : t('admin.activate')}
                                                         </button>
                                                     </div>
                                                 </td>

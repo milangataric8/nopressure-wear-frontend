@@ -3,8 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { login } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const LoginPage = () => {
+    const { t } = useTranslation();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const { loginUser } = useAuth();
@@ -21,7 +23,7 @@ const LoginPage = () => {
             const response = await login(formData);
             const { id, token, firstName, lastName, email, role } = response.data;
             loginUser({ id, firstName, lastName, email, role }, token);
-            toast.success('Welcome back!');
+            toast.success(t('messages.loginSuccess'));
             navigate('/');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Login failed');
@@ -46,14 +48,14 @@ const LoginPage = () => {
             <div className="w-full lg:w-1/2 flex items-center justify-center px-8">
                 <div className="w-full max-w-sm">
                     <div className="mb-10">
-                        <h2 className="text-2xl font-bold text-black mb-1">Sign In</h2>
+                        <h2 className="text-2xl font-bold text-black mb-1">{t('auth.login')}</h2>
                         <p className="text-sm text-gray-500">Enter your details to continue</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2">
-                                Email
+                                {t('auth.email')}
                             </label>
                             <input
                                 type="email"
@@ -68,7 +70,7 @@ const LoginPage = () => {
 
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2">
-                                Password
+                                {t('auth.password')}
                             </label>
                             <input
                                 type="password"
@@ -86,19 +88,19 @@ const LoginPage = () => {
                             disabled={loading}
                             className="w-full bg-black text-white text-sm font-semibold py-3 uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50"
                         >
-                            {loading ? 'Signing In...' : 'Sign In'}
+                            {loading ? t('common.loading') : t('auth.signIn')}
                         </button>
                     </form>
 
                     <p className="text-sm text-gray-500 mt-8">
-                        Not a member?{' '}
+                        {t('auth.noAccount')}{' '}
                         <Link to="/register" className="text-black font-semibold hover:underline">
-                            Join Us
+                            {t('nav.joinUs')}
                         </Link>
                     </p>
                     <p className="text-sm text-gray-500 mt-2 text-right">
                         <Link to="/forgot-password" className="text-black hover:underline text-xs">
-                            Forgot password?
+                            {t('auth.forgotPassword')}
                         </Link>
                     </p>
 
@@ -110,7 +112,7 @@ const LoginPage = () => {
                             </div>
                             <div className="relative flex justify-center text-xs">
                                     <span className="bg-white px-4 text-gray-400 uppercase tracking-wide">
-                                        or
+                                        {t('auth.or')}
                                     </span>
                             </div>
                         </div>
@@ -125,7 +127,7 @@ const LoginPage = () => {
                                 <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
                                 <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
                             </svg>
-                            Continue with Google
+                            {t('auth.continueWithGoogle')}
                         </a>
                     </div>
                 </div>

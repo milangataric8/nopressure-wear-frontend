@@ -3,8 +3,10 @@ import axiosInstance from '../api/axiosInstance';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const ForgotPasswordPage = () => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [sent, setSent] = useState(false);
@@ -35,7 +37,7 @@ const ForgotPasswordPage = () => {
                         to="/login"
                         className="text-sm font-semibold text-black hover:underline"
                     >
-                        Back to Sign In
+                        {t('auth.signIn')}
                     </Link>
                 </div>
             </div>
@@ -46,7 +48,7 @@ const ForgotPasswordPage = () => {
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-black mb-1">Forgot Password</h1>
+                    <h1 className="text-2xl font-bold text-black mb-1">{t('auth.forgotPassword')}</h1>
                     <p className="text-sm text-gray-500">
                         Enter your email and we'll send you a reset link
                     </p>
@@ -55,7 +57,7 @@ const ForgotPasswordPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
-                            Email
+                            {t('auth.email')}
                         </label>
                         <input
                             type="email"
@@ -79,7 +81,7 @@ const ForgotPasswordPage = () => {
                 <p className="text-sm text-gray-500 mt-6 text-center">
                     Remember your password?{' '}
                     <Link to="/login" className="text-black font-semibold hover:underline">
-                        Sign In
+                        {t('auth.signIn')}
                     </Link>
                 </p>
             </div>

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 const CheckoutForm = ({ onSuccess }) => {
+    const { t } = useTranslation();
     const stripe = useStripe();
     const elements = useElements();
     const [processing, setProcessing] = useState(false);
@@ -26,7 +28,7 @@ const CheckoutForm = ({ onSuccess }) => {
             toast.error(error.message);
             setProcessing(false);
         } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-            toast.success('Payment successful!');
+            toast.success(t('messages.paymentSuccess'));
             onSuccess();
         }
     };
@@ -34,7 +36,7 @@ const CheckoutForm = ({ onSuccess }) => {
     return (
         <div className="border border-gray-200 p-6">
             <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                Payment
+                {t('cart.payment')}
             </h3>
             <PaymentElement
                 className="mb-4"
@@ -52,7 +54,7 @@ const CheckoutForm = ({ onSuccess }) => {
                 disabled={!stripe || processing}
                 className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-                {processing ? 'Processing...' : 'Pay Now'}
+                {processing ? t('cart.processing') : t('cart.payNow')}
             </button>
         </div>
     );

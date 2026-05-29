@@ -6,6 +6,7 @@ import { getOrders } from '../../api/orderApi';
 import { getActiveCategories } from '../../api/categoryApi';
 import { getImageUrl } from '../../utils/imageUtils';
 import { getSettingsMap } from "../../api/settingsApi.js";
+import { useTranslation } from 'react-i18next';
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount} = useAuth();
@@ -20,6 +21,7 @@ const Navbar = () => {
     const dropdownRef = useRef(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const { t, i18n } = useTranslation();
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
     const getSubcategories = (parentId) => (categories || []).filter(cat => cat.parentId === parentId);
@@ -69,6 +71,11 @@ const Navbar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'en' ? 'sr' : 'en';
+        i18n.changeLanguage(newLang);
+    };
+
     const handleLogout = () => {
         logoutUser();
         navigate('/login');
@@ -99,25 +106,30 @@ const Navbar = () => {
             {/* Top mini navbar */}
             <div className="bg-gray-100 border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-end gap-6">
+                    {/* Language switcher */}
+                    <button
+                        onClick={toggleLanguage}
+                        className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
+                    >
+                        {i18n.language === 'en' ? 'SR' : 'EN'}
+                    </button>
+
                     {isAuthenticated() ? (
                         <>
                             <Link to="/profile" className="text-xs text-black hover:text-black transition-colors">
                                 {user?.firstName} {user?.lastName}
                             </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="text-xs text-black hover:text-black transition-colors"
-                            >
-                                Sign Out
+                            <button onClick={handleLogout} className="text-xs text-black hover:text-black transition-colors">
+                                {t('nav.signOut')}
                             </button>
                         </>
                     ) : (
                         <>
                             <Link to="/login" className="text-xs text-black hover:text-black transition-colors">
-                                Sign In
+                                {t('nav.signIn')}
                             </Link>
                             <Link to="/register" className="text-xs text-black hover:text-black transition-colors">
-                                Join Us
+                                {t('nav.joinUs')}
                             </Link>
                         </>
                     )}
@@ -158,7 +170,7 @@ const Navbar = () => {
                                     to="/products"
                                     className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
                                 >
-                                    Products
+                                    {t('nav.products')}
                                 </Link>
 
                                 {activeDropdown === 'products' && (
@@ -193,7 +205,7 @@ const Navbar = () => {
                                                     onClick={() => setActiveDropdown(null)}
                                                     className="text-xs font-semibold uppercase tracking-wide text-black hover:underline whitespace-nowrap"
                                                 >
-                                                    View All Products →
+                                                    {t('nav.viewAllProducts')} →
                                                 </Link>
                                             </div>
                                         </div>
@@ -212,13 +224,13 @@ const Navbar = () => {
                                         to="/orders"
                                         className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
                                     >
-                                        Orders
+                                        {t('nav.orders')}
                                     </Link>
 
                                     {activeDropdown === 'orders' && (
                                         <div className="absolute top-full right-0 mt-0 bg-white border border-gray-200 shadow-lg z-50 p-4 w-72">
                                             {orders.length === 0 ? (
-                                                <p className="text-xs text-gray-400 text-center py-4">No orders yet</p>
+                                                <p className="text-xs text-gray-400 text-center py-4">{t('order.empty')}</p>
                                             ) : (
                                                 <>
                                                     <div className="space-y-3 mb-4">
@@ -249,7 +261,7 @@ const Navbar = () => {
                                                         onClick={() => setActiveDropdown(null)}
                                                         className="block w-full text-center border border-black text-black text-xs font-semibold uppercase tracking-wide py-2 hover:bg-gray-50 transition-colors"
                                                     >
-                                                        View All Orders
+                                                        {t('nav.viewAllOrders')}
                                                     </Link>
                                                 </>
                                             )}
@@ -269,7 +281,7 @@ const Navbar = () => {
                                         to="/admin"
                                         className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
                                     >
-                                        Admin
+                                        {t('nav.admin')}
                                     </Link>
 
                                     {activeDropdown === 'admin' && (
@@ -279,28 +291,28 @@ const Navbar = () => {
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Products
+                                                {t('admin.products')}
                                             </Link>
                                             <Link
                                                 to="/admin/categories"
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Categories
+                                                {t('admin.categories')}
                                             </Link>
                                             <Link
                                                 to="/admin/orders"
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Orders
+                                                {t('admin.orders')}
                                             </Link>
                                             <Link
                                                 to="/admin/coupons"
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Coupons
+                                                {t('admin.coupons')}
                                             </Link>
                                             {isAdmin() && (
                                                 <Link
@@ -308,7 +320,7 @@ const Navbar = () => {
                                                     onClick={() => setActiveDropdown(null)}
                                                     className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                                 >
-                                                    Employees
+                                                    {t('admin.employees')}
                                                 </Link>
                                             )}
                                             <Link
@@ -316,14 +328,14 @@ const Navbar = () => {
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Banners
+                                                {t('admin.banners')}
                                             </Link>
                                             <Link
                                                 to="/admin/customers"
                                                 onClick={() => setActiveDropdown(null)}
                                                 className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                             >
-                                                Customers
+                                                {t('admin.customers')}
                                             </Link>
                                             {isAdmin() && (
                                                 <Link
@@ -331,7 +343,7 @@ const Navbar = () => {
                                                     onClick={() => setActiveDropdown(null)}
                                                     className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
                                                 >
-                                                    Settings
+                                                    {t('admin.settings')}
                                                 </Link>
                                             )}
                                         </div>
@@ -349,7 +361,7 @@ const Navbar = () => {
                                         type="text"
                                         value={searchInput}
                                         onChange={(e) => setSearchInput(e.target.value)}
-                                        placeholder="Search..."
+                                        placeholder={t('nav.search')}
                                         className="border border-gray-300 px-3 py-0 text-sm w-40 h-8 focus:outline-none focus:border-black transition-colors pr-6"
                                     />
                                     {searchInput && (
@@ -385,7 +397,7 @@ const Navbar = () => {
                                             type="text"
                                             value={searchInput}
                                             onChange={(e) => setSearchInput(e.target.value)}
-                                            placeholder="Search..."
+                                            placeholder={t('nav.search')}
                                             className="w-full border border-gray-300 px-3 h-8 text-sm focus:outline-none focus:border-black transition-colors"
                                             autoFocus
                                         />
@@ -440,7 +452,7 @@ const Navbar = () => {
                                     {activeDropdown === 'cart' && (
                                         <div className="absolute top-full right-0 mt-0 bg-white border border-gray-200 shadow-lg z-50 p-4 w-72">
                                             {!cart || cart.items.length === 0 ? (
-                                                <p className="text-xs text-gray-400 text-center py-4">Your cart is empty</p>
+                                                <p className="text-xs text-gray-400 text-center py-4">{t('nav.cartEmpty')}</p>
                                             ) : (
                                                 <>
                                                     <div className="space-y-3 mb-4">
@@ -462,7 +474,7 @@ const Navbar = () => {
                                                         ))}
                                                     </div>
                                                     <div className="border-t border-gray-200 pt-3 flex justify-between items-center mb-3">
-                                                        <span className="text-xs font-semibold text-black">Total</span>
+                                                        <span className="text-xs font-semibold text-black">{t('cart.total')}</span>
                                                         <span className="text-sm font-bold text-black">${cart.totalAmount.toFixed(2)}</span>
                                                     </div>
                                                     <Link
@@ -470,7 +482,7 @@ const Navbar = () => {
                                                         onClick={() => setActiveDropdown(null)}
                                                         className="block w-full text-center bg-black text-white text-xs font-semibold uppercase tracking-wide py-2 hover:bg-gray-800 transition-colors"
                                                     >
-                                                        View Cart
+                                                        {t('nav.viewCart')}
                                                     </Link>
                                                 </>
                                             )}
@@ -508,7 +520,7 @@ const Navbar = () => {
                                         type="text"
                                         value={searchInput}
                                         onChange={(e) => setSearchInput(e.target.value)}
-                                        placeholder="Search..."
+                                        placeholder={t('nav.search')}
                                         className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
                                     />
                                     <button type="submit" className="bg-black text-white px-3 flex items-center justify-center">
@@ -520,27 +532,27 @@ const Navbar = () => {
                                 </form>
 
                                 {/* Links */}
-                                <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Products</Link>
+                                <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.products')}</Link>
                                 {isAuthenticated() && (
                                     <>
-                                        <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Orders</Link>
-                                        <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">Cart</Link>
+                                        <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.orders')}</Link>
+                                        <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('cart.title')}</Link>
                                     </>
                                 )}
 
                                 {(isAdmin() || isEmployee()) && (
                                     <div className="border-t border-gray-200 pt-3">
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Admin</p>
-                                        <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Products</Link>
-                                        <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Categories</Link>
-                                        <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Orders</Link>
-                                        <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Coupons</Link>
-                                        <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Customers</Link>
-                                        <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Banners</Link>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">{t('nav.admin')}</p>
+                                        <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.products')}</Link>
+                                        <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.categories')}</Link>
+                                        <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.orders')}</Link>
+                                        <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.coupons')}</Link>
+                                        <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.customers')}</Link>
+                                        <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.banners')}</Link>
                                         {isAdmin() && (
                                             <>
-                                                <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Employees</Link>
-                                                <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">Settings</Link>
+                                                <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.employees')}</Link>
+                                                <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.settings')}</Link>
                                             </>
                                         )}
                                     </div>

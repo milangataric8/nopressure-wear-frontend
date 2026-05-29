@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
@@ -8,6 +9,7 @@ import HeroBanner from "../components/common/HeroBanner.jsx";
 import {toast} from "react-toastify";
 
 const HomePage = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -17,7 +19,7 @@ const HomePage = () => {
             const response = await getActiveProducts({ page: 0, size: 4 });
             setFeaturedProducts(response.data.content);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load featured products');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         }
     }, []);
 
@@ -26,7 +28,7 @@ const HomePage = () => {
             const response = await getCategories();
             setCategories(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load categories');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         }
     }, []);
 
@@ -69,13 +71,13 @@ const HomePage = () => {
                 <div className="max-w-7xl mx-auto px-6 py-16 border-t border-gray-200">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-xl font-black uppercase tracking-tight text-black">
-                            Featured Products
+                            {t('product.featuredProducts')}
                         </h2>
                         <Link
                             to="/products"
                             className="text-xs font-semibold uppercase tracking-wide text-black hover:underline"
                         >
-                            View All →
+                            {t('product.viewAll')} →
                         </Link>
                     </div>
 
@@ -94,7 +96,7 @@ const HomePage = () => {
                                             className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
-                                        <span className="text-gray-400 text-xs">No image</span>
+                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                     )}
                                 </div>
                                 <div>
@@ -155,7 +157,7 @@ const HomePage = () => {
                                         <span className={`text-xs ${
                                             product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                                         }`}>
-                                            {product.stockQuantity > 0 ? 'In Stock' : 'Sold Out'}
+                                            {product.stockQuantity > 0 ? t('product.inStock') : t('product.soldOut')}
                                         </span>
                                     </div>
                                 </div>

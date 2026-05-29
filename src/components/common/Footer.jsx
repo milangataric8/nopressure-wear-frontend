@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getSettingsMap } from '../../api/settingsApi';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+    const { t } = useTranslation();
     const [settings, setSettings] = useState({});
 
     useEffect(() => {
@@ -39,7 +41,7 @@ const Footer = () => {
                     {/* Visit Us */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            Visit Us
+                            {t('footer.visitUs')}
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
                             <p>{settings.footer_address}</p>
@@ -55,7 +57,7 @@ const Footer = () => {
                     {/* Contact */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            Contact
+                            {t('footer.contact')}
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
                             <p>{settings.footer_email}</p>
@@ -67,7 +69,7 @@ const Footer = () => {
                 {/* Map */}
                 <div className="border-t border-gray-200 pt-8">
                     <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                        Find Us
+                        {t('footer.findUs')}
                     </h3>
                     <div className="h-48 overflow-hidden">
                         <iframe
@@ -84,7 +86,7 @@ const Footer = () => {
 
                 <div className="border-t border-gray-200 mt-8 pt-6 text-center">
                     <p className="text-xs text-gray-400">
-                        © {new Date().getFullYear()} {settings.store_name}. All rights reserved.
+                        © {new Date().getFullYear()} {settings.store_name}. {t('footer.allRightsReserved')}.
                     </p>
                 </div>
             </div>

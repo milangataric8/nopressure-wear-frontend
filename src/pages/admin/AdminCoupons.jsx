@@ -8,8 +8,10 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminCoupons = () => {
+    const { t } = useTranslation();
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -62,7 +64,7 @@ const AdminCoupons = () => {
                 usageLimit: parseInt(formData.usageLimit),
                 expiresAt: formData.expiresAt || null,
             });
-            toast.success('Coupon created');
+            toast.success(t('messages.couponCreated'));
             setShowForm(false);
             setFormData({
                 code: '',
@@ -81,7 +83,7 @@ const AdminCoupons = () => {
         if (!window.confirm('Delete this coupon?')) return;
         try {
             await axiosInstance.delete(`/coupons/${id}`);
-            toast.success('Coupon deleted');
+            toast.success(t('messages.couponDeleted'));
             fetchCoupons();
         } catch (e) {
             toast.error(e.response?.data?.message || 'Failed to delete coupon');
@@ -105,7 +107,7 @@ const AdminCoupons = () => {
             <AdminPageHeader
                 title="Coupons"
                 subtitle="Manage discount coupons"
-                buttonLabel={showForm ? 'Cancel' : '+ New Product'}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newCoupon')}
                 onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
             />
 
@@ -126,7 +128,7 @@ const AdminCoupons = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        New Coupon
+                        {t('admin.newCoupon')}
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -200,7 +202,7 @@ const AdminCoupons = () => {
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
-                                Create Coupon
+                                {t('common.create')}
                             </button>
                         </div>
                     </form>
@@ -221,13 +223,13 @@ const AdminCoupons = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Code</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Type</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Value</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Usage</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Expires</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.code')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.type')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.value')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.usage')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('profile.expires')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -257,13 +259,13 @@ const AdminCoupons = () => {
                                             onClick={() => handleToggle(coupon.id)}
                                             className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                         >
-                                            {coupon.active ? 'Deactivate' : 'Activate'}
+                                            {coupon.active ? t('admin.deactivate') : t('admin.activate')}
                                         </button>
                                         <button
                                             onClick={() => handleDelete(coupon.id)}
                                             className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
                                         >
-                                            Delete
+                                            {t('admin.delete')}
                                         </button>
                                     </div>
                                 </td>

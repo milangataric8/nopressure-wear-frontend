@@ -4,8 +4,10 @@ import { getSettings, updateSettings } from '../../api/settingsApi';
 import {uploadImage} from "../../api/uploadApi.js";
 import { getAllFilters, updateFilter, createFilter, deleteFilter } from '../../api/filterApi';
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminSettings = () => {
+    const { t } = useTranslation();
     const [settings, setSettings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
@@ -18,23 +20,23 @@ const AdminSettings = () => {
 
     const sections = [
         {
-            title: 'General',
+            title: t('settings.general'),
             keys: ['store_name', 'store_logo_url', 'store_tagline']
         },
         {
-            title: 'Location',
+            title: t('settings.location'),
             keys: ['footer_address', 'footer_city', 'footer_map_address']
         },
         {
-            title: 'Hours',
+            title: t('settings.hours'),
             keys: ['footer_hours_weekday', 'footer_hours_saturday', 'footer_hours_sunday']
         },
         {
-            title: 'Contact',
+            title: t('settings.contact'),
             keys: ['footer_email', 'footer_phone']
         },
         {
-            title: 'Payment',
+            title: t('settings.payment'),
             keys: ['payment_card_enabled', 'payment_cod_enabled']
         }
     ];
@@ -63,7 +65,7 @@ const AdminSettings = () => {
     const handleSave = async (id) => {
         try {
             await updateSettings(id, editValue);
-            toast.success('Setting updated');
+            toast.success(t('messages.settingUpdated'));
             setEditing(null);
             fetchSettings();
             window.dispatchEvent(new Event('settings-updated'));
@@ -115,9 +117,9 @@ const AdminSettings = () => {
         <div className="max-w-4xl mx-auto px-6 py-10">
             <div className="mb-10">
                 <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                    Store Settings
+                    {t('settings.title')}
                 </h1>
-                <p className="text-sm text-gray-500">Manage store information and appearance</p>
+                <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
             </div>
 
             <div className="space-y-8">
@@ -163,7 +165,7 @@ const AdminSettings = () => {
                                                     }`} />
                                                 </button>
                                                 <span className="text-sm text-gray-500">
-                                                    {setting.value === 'true' ? 'Enabled' : 'Disabled'}
+                                                    {setting.value === 'true' ? t('settings.enabled') : t('settings.disabled')}
                                                 </span>
                                             </div>
                                         ) : setting.key === 'store_logo_url' ? (
@@ -191,7 +193,7 @@ const AdminSettings = () => {
                                                         </label>
                                                         <label className="cursor-pointer">
                                                             <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
-                                                                {setting.value ? 'Change Logo' : 'Upload Logo'}
+                                                                {setting.value ? t('settings.changeLogo') : t('settings.uploadLogo')}
                                                             </div>
                                                             <input
                                                                 type="file"
@@ -204,7 +206,7 @@ const AdminSettings = () => {
                                                                     try {
                                                                         const response = await uploadImage(file, removeBg);
                                                                         await updateSettings(setting.id, response.data.url);
-                                                                        toast.success('Logo updated');
+                                                                        toast.success(t('messages.logoUpdated'));
                                                                         fetchSettings();
                                                                         window.dispatchEvent(new Event('settings-updated'));
                                                                     } catch (e) {
@@ -218,13 +220,13 @@ const AdminSettings = () => {
                                                         <button
                                                             onClick={async () => {
                                                                 await updateSettings(setting.id, '');
-                                                                toast.success('Logo removed');
+                                                                toast.success(t('messages.logoRemoved'));
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             }}
                                                             className="text-xs text-red-400 hover:text-red-600 underline"
                                                         >
-                                                            Remove
+                                                            {t('common.remove')}
                                                         </button>
                                                     )}
                                                 </div>
@@ -241,26 +243,26 @@ const AdminSettings = () => {
                                                         onClick={() => handleSave(setting.id)}
                                                         className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
                                                     >
-                                                        Save
+                                                        {t('common.save')}
                                                     </button>
                                                     <button
                                                         onClick={() => setEditing(null)}
                                                         className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors"
                                                     >
-                                                        Cancel
+                                                        {t('common.cancel')}
                                                     </button>
                                                 </div>
                                             ) : (
                                                 <div className="flex-1 flex items-center justify-between">
                                                     <p className="text-sm text-black">
                                                         {setting.value ||
-                                                            <span className="text-gray-400 italic">Not set</span>}
+                                                            <span className="text-gray-400 italic">{t('settings.notSet')}</span>}
                                                     </p>
                                                     <button
                                                         onClick={() => handleEdit(setting)}
                                                         className="text-xs text-gray-500 hover:text-black transition-colors underline ml-4"
                                                     >
-                                                        Edit
+                                                        {t('common.edit')}
                                                     </button>
                                                 </div>
                                             )}
@@ -273,10 +275,10 @@ const AdminSettings = () => {
                 {/* Filter Configuration */}
                 <div>
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4 pb-2 border-b border-gray-200">
-                        Product Filters
+                        {t('settings.productFilters')}
                     </h2>
                     <p className="text-xs text-gray-400 mb-4">
-                        Toggle which filters are visible on the Products page
+                        {t('settings.filterToggleDesc')}
                     </p>
                     <div className="space-y-3">
                         {filters.map(filter => (
@@ -322,7 +324,7 @@ const AdminSettings = () => {
                                             }}
                                             className="text-xs text-red-400 hover:text-red-600 underline"
                                         >
-                                            Delete
+                                            {t('admin.delete')}
                                         </button>
                                     )}
                                 </div>
@@ -336,7 +338,7 @@ const AdminSettings = () => {
                         <div className="space-y-3">
                             <div className="flex gap-3">
                                 <div className="flex-1">
-                                    <label className="block text-xs text-gray-500 mb-1">Field Name (no spaces)</label>
+                                    <label className="block text-xs text-gray-500 mb-1">{t('settings.fieldName')}</label>
                                     <input
                                         type="text"
                                         value={newFilterName}
@@ -346,7 +348,7 @@ const AdminSettings = () => {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-xs text-gray-500 mb-1">Display Name</label>
+                                    <label className="block text-xs text-gray-500 mb-1">{t('settings.displayName')}</label>
                                     <input
                                         type="text"
                                         value={newFilterDisplay}
@@ -381,13 +383,13 @@ const AdminSettings = () => {
                                     }}
                                     className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800"
                                 >
-                                    Add Filter
+                                    {t('settings.addFilter')}
                                 </button>
                                 <button
                                     onClick={() => setShowNewFilter(false)}
                                     className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50"
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                 </button>
                             </div>
                         </div>
@@ -396,7 +398,7 @@ const AdminSettings = () => {
                             onClick={() => setShowNewFilter(true)}
                             className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black"
                         >
-                            + Add Custom Filter
+                            {t('settings.addCustomFilter')}
                         </button>
                     )}
                 </div>

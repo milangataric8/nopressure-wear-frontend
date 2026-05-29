@@ -4,8 +4,10 @@ import { toast } from 'react-toastify';
 import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import { useTranslation } from 'react-i18next';
 
 const AdminOrders = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ const AdminOrders = () => {
     const handleStatusUpdate = async (orderId, status) => {
         try {
             await updateOrderStatus(orderId, status);
-            toast.success('Order status updated');
+            toast.success(t('messages.orderUpdated'));
             fetchAllOrders();
         } catch (e) {
             toast.error(e.response?.data?.message || 'Failed to update status');
@@ -63,9 +65,9 @@ const AdminOrders = () => {
         <div className="max-w-7xl mx-auto px-6 py-10">
             <div className="mb-10">
                 <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                    Orders
+                    {t('admin.orders')}
                 </h1>
-                <p className="text-sm text-gray-500">Manage customer orders</p>
+                <p className="text-sm text-gray-500">{t('admin.manageOrders')}</p>
             </div>
 
             {/* Search */}
@@ -84,7 +86,7 @@ const AdminOrders = () => {
                     type="submit"
                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                 >
-                    Search
+                    {t('admin.search')}
                 </button>
                 {searchQuery && (
                     <button
@@ -92,7 +94,7 @@ const AdminOrders = () => {
                         onClick={() => { setSearchInput(''); setSearchQuery(''); setPage(0); }}
                         className="border border-gray-300 text-sm px-4 py-2.5 hover:bg-gray-50 transition-colors"
                     >
-                        Clear
+                        {t('common.clear')}
                     </button>
                 )}
             </form>
@@ -100,11 +102,11 @@ const AdminOrders = () => {
             {/* Status filter */}
             <div className="flex border border-gray-200 mb-6">
                 {[
-                    { label: 'Pending', value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-100 text-yellow-800' },
-                    { label: 'Confirmed', value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-100 text-blue-800' },
-                    { label: 'Shipped', value: 'SHIPPED', bg: 'bg-purple-50', text: 'text-purple-700', active: 'bg-purple-100 text-purple-800' },
-                    { label: 'Delivered', value: 'DELIVERED', bg: 'bg-green-50', text: 'text-green-700', active: 'bg-green-100 text-green-800' },
-                    { label: 'Cancelled', value: 'CANCELLED', bg: 'bg-red-50', text: 'text-red-700', active: 'bg-red-100 text-red-800' },
+                    { label: t('order.pending'), value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-100 text-yellow-800' },
+                    { label: t('order.confirmed'), value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-100 text-blue-800' },
+                    { label: t('order.shipped'), value: 'SHIPPED', bg: 'bg-purple-50', text: 'text-purple-700', active: 'bg-purple-100 text-purple-800' },
+                    { label: t('order.delivered'), value: 'DELIVERED', bg: 'bg-green-50', text: 'text-green-700', active: 'bg-green-100 text-green-800' },
+                    { label: t('order.cancelled'), value: 'CANCELLED', bg: 'bg-red-50', text: 'text-red-700', active: 'bg-red-100 text-red-800' },
                 ].map(status => (
                     <button
                         key={status.value}
@@ -132,12 +134,12 @@ const AdminOrders = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Order</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Customer</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Items</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Total</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Update Status</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.order')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.customer')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.items')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('cart.total')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.updateStatus')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -171,11 +173,11 @@ const AdminOrders = () => {
                                         onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
                                         className="text-xs border border-gray-300 px-2 py-1.5 focus:outline-none focus:border-black transition-colors"
                                     >
-                                        <option value="PENDING">Pending</option>
-                                        <option value="CONFIRMED">Confirmed</option>
-                                        <option value="SHIPPED">Shipped</option>
-                                        <option value="DELIVERED">Delivered</option>
-                                        <option value="CANCELLED">Cancelled</option>
+                                        <option value="PENDING">{t('order.pending')}</option>
+                                        <option value="CONFIRMED">{t('order.confirmed')}</option>
+                                        <option value="SHIPPED">{t('order.shipped')}</option>
+                                        <option value="DELIVERED">{t('order.delivered')}</option>
+                                        <option value="CANCELLED">{t('order.cancelled')}</option>
                                     </select>
                                 </td>
                             </tr>

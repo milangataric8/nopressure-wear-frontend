@@ -68,9 +68,6 @@ const ProductsPage = () => {
                 if (value) params[`attr_${key}`] = value;
             });
 
-            // In fetchProducts, after building params
-            console.log('Final params:', JSON.stringify(params));
-
             const response = await searchActiveProducts(params);
 
             setProducts(response.data.content);

@@ -85,7 +85,7 @@ const ProductsPage = () => {
             const response = await getCategories();
             setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log('Failed to load categories: ' + e.message, {});
+            console.log(e.response?.data?.message || 'Failed to load categories', {});
         }
     }, []);
 

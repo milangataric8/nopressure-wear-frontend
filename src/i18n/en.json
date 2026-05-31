@@ -23,6 +23,7 @@
     "banners": "Banners",
     "customers": "Customers",
     "settings": "Settings",
+    "popups": "Popups",
     "newProduct": "+ New Product",
     "newCategory": "+ New Category",
     "newCoupon": "+ New Coupon",
@@ -56,7 +57,8 @@
     "manageEmployees": "Manage store employees",
     "manageBanners": "Manage hero banners and carousel",
     "manageCustomers": "View and manage customers",
-    "manageSettings": "Manage store name, contact and location"
+    "manageSettings": "Manage store name, contact and location",
+    "managePopups": "Manage homepage popup notifications"
   },
   "product": {
     "allProducts": "All Products",

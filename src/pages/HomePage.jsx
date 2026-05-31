@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import {getImageUrl} from "../utils/imageUtils.js";
-import HeroBanner from "../components/common/HeroBanner.jsx";
 import {toast} from "react-toastify";
+import HeroBanner from "../components/common/HeroBanner.jsx";
+import HomePopup from "../components/common/HomePopup.jsx";
 
 const HomePage = () => {
     const { t } = useTranslation();
@@ -39,6 +40,7 @@ const HomePage = () => {
 
     return (
         <div>
+            <HomePopup />
             <HeroBanner />
 
             {/* Categories */}

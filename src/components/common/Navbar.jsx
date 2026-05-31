@@ -346,6 +346,15 @@ const Navbar = () => {
                                                     {t('admin.settings')}
                                                 </Link>
                                             )}
+                                            {isAdmin() && (
+                                                <Link
+                                                    to="/admin/popups"
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                                                >
+                                                    {t('admin.popups')}
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -553,6 +562,7 @@ const Navbar = () => {
                                             <>
                                                 <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.employees')}</Link>
                                                 <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.settings')}</Link>
+                                                <Link to="/admin/popups" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.popups')}</Link>
                                             </>
                                         )}
                                     </div>

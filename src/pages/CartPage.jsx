@@ -96,7 +96,7 @@ const CartPage = () => {
             setCartCount(response.data.items.length);
             toast.success('Item removed');
         } catch (e) {
-            toast.error('Failed to remove item, error: ' + e.message || 'Unknown error');
+            toast.error(e.response?.data?.message || 'Failed to remove item, error');
         }
     };
 

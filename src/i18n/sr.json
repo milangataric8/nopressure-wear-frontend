@@ -23,6 +23,7 @@
     "banners": "Baneri",
     "customers": "Kupci",
     "settings": "Podešavanja",
+    "popups": "Iskačući prozori",
     "newProduct": "+ Novi proizvod",
     "newCategory": "+ Nova kategorija",
     "newCoupon": "+ Novi kupon",
@@ -56,7 +57,8 @@
     "manageEmployees": "Upravljajte zaposlenima u prodavnici",
     "manageBanners": "Upravljajte baner slikama i karuselom",
     "manageCustomers": "Pregledajte i upravljajte kupcima",
-    "manageSettings": "Upravljajte nazivom prodavnice, kontaktom i lokacijom"
+    "manageSettings": "Upravljajte nazivom prodavnice, kontaktom i lokacijom",
+    "managePopups": "Upravljajte iskačućim prozorima"
   },
   "product": {
     "allProducts": "Svi proizvodi",

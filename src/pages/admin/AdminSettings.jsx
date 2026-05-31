@@ -210,7 +210,7 @@ const AdminSettings = () => {
                                                                         fetchSettings();
                                                                         window.dispatchEvent(new Event('settings-updated'));
                                                                     } catch (e) {
-                                                                        toast.error('Failed to upload logo, error: ' + e.message);
+                                                                        toast.error(e.response?.data?.message || 'Failed to upload logo, error');
                                                                     }
                                                                 }}
                                                             />

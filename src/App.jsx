@@ -30,6 +30,7 @@ import AdminBanners from "./pages/admin/AdminBanners.jsx";
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminPopups from './pages/admin/AdminPopups';
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -41,7 +42,7 @@ function App() {
                     const response = await getCart(user.id);
                     setCartCount(response.data.items.length);
                 } catch (e) {
-                    console.log('We have a problem with cart, error: ' + e.message || 'Unknown error');
+                    console.log(e.response?.data?.message || 'We have a problem with cart');
                 }
             }
         };
@@ -115,6 +116,9 @@ function App() {
                     } />
                     <Route path="/admin/settings" element={
                         <ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/popups" element={
+                        <ProtectedRoute adminOnly><AdminPopups /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

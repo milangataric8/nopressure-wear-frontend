@@ -355,6 +355,15 @@ const Navbar = () => {
                                                     {t('admin.popups')}
                                                 </Link>
                                             )}
+                                            {isAdmin() && (
+                                                <Link
+                                                    to="/admin/stores"
+                                                    onClick={() => setActiveDropdown(null)}
+                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
+                                                >
+                                                    {t('admin.storeLocations')}
+                                                </Link>
+                                            )}
                                         </div>
                                     )}
                                 </div>

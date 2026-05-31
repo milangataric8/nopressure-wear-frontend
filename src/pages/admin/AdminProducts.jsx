@@ -16,11 +16,13 @@ import { getImageUrl } from "../../utils/imageUtils.js";
 import { uploadImage, uploadVideo } from '../../api/uploadApi';
 import { addProductAttribute, deleteProductAttribute } from '../../api/productAttributeApi.js';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
+import { useTranslation } from 'react-i18next';
+import { getAllStoresForProduct, addProductToStore, removeProductFromStore, toggleProductStoreStock } from '../../api/storeApi';
+import { getActiveStores } from '../../api/storeApi';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
-import { useTranslation } from 'react-i18next';
 
 const AdminProducts = () => {
     const { t } = useTranslation();
@@ -44,6 +46,9 @@ const AdminProducts = () => {
     const [availableColors, setAvailableColors] = useState([]);
     const [newAttrKey, setNewAttrKey] = useState('');
     const [newAttrValue, setNewAttrValue] = useState('');
+    const [allStores, setAllStores] = useState([]);
+    const [productStores, setProductStores] = useState([]);
+    const [selectedStoreId, setSelectedStoreId] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -120,6 +125,10 @@ const AdminProducts = () => {
         }).catch(() => {});
     }, []);
 
+    useEffect(() => {
+        getActiveStores().then(r => setAllStores(r.data)).catch(() => {});
+    }, []);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -176,6 +185,11 @@ const AdminProducts = () => {
             brand: product.brand || '',
         });
         setShowForm(true);
+
+        getAllStoresForProduct(product.id)
+            .then(r => setProductStores(r.data))
+            .catch(() => setProductStores([]));
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -538,6 +552,104 @@ const AdminProducts = () => {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Store availability — only when editing */}
+                        {editingProduct && (
+                            <div className="md:col-span-2">
+                                <label className={labelClass}>{t('admin.storeAvailability')}</label>
+                                <p className="text-xs text-gray-400 mb-3">
+                                    {t('admin.selectStore')}
+                                </p>
+
+                                {/* Linked stores */}
+                                <div className="space-y-2 mb-3">
+                                    {productStores.map(ps => (
+                                        <div key={ps.id} className="flex items-center justify-between border border-gray-200 px-3 py-2">
+                                            <div>
+                                                <p className="text-xs font-semibold text-black">{ps.storeName}</p>
+                                                <p className="text-xs text-gray-400">{ps.storeCity} — {ps.storeStreet}</p>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={async () => {
+                                                        try {
+                                                            await toggleProductStoreStock(ps.id);
+                                                            const updated = await getAllStoresForProduct(editingProduct.id);
+                                                            setProductStores(updated.data);
+                                                        } catch (e) {
+                                                            toast.error(e.response?.data?.message || 'Failed to toggle stock');
+                                                        }
+                                                    }}
+                                                    className={`text-xs font-semibold uppercase px-2 py-0.5 ${
+                                                        ps.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                                    }`}
+                                                >
+                                                    {ps.inStock ? t('product.inStock') : t('product.soldOut')}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={async () => {
+                                                        try {
+                                                            await removeProductFromStore(editingProduct.id, ps.storeLocationId);
+                                                            setProductStores(prev => prev.filter(s => s.id !== ps.id));
+                                                            toast.success('Store removed');
+                                                        } catch (e) {
+                                                            toast.error(e.response?.data?.message || 'Failed to remove store');
+                                                        }
+                                                    }}
+                                                    className="text-xs text-red-400 hover:text-red-600"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Add store */}
+                                <div className="flex gap-2 items-end">
+                                    <div className="flex-1">
+                                        <select
+                                            value={selectedStoreId}
+                                            onChange={(e) => setSelectedStoreId(e.target.value)}
+                                            className={inputClass}
+                                        >
+                                            <option value="">Select store...</option>
+                                            {allStores
+                                                .filter(s => !productStores.some(ps => ps.storeLocationId === s.id))
+                                                .map(store => (
+                                                    <option key={store.id} value={store.id}>
+                                                        {store.name} — {store.city}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!selectedStoreId) return;
+                                            try {
+                                                await addProductToStore(editingProduct.id, {
+                                                    storeLocationId: parseInt(selectedStoreId),
+                                                    inStock: true
+                                                });
+                                                const updated = await getAllStoresForProduct(editingProduct.id);
+                                                setProductStores(updated.data);
+                                                setSelectedStoreId('');
+                                                toast.success('Store added');
+                                            } catch (error) {
+                                                toast.error(error.response?.data?.message || 'Failed to add store');
+                                            }
+                                        }}
+                                        className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800 transition-colors"
+                                    >
+                                        {t('store.addStore')}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="md:col-span-2 flex justify-center">
                             {formData.colorName && (
                                 <div className="flex items-center gap-3">
@@ -552,7 +664,7 @@ const AdminProducts = () => {
                                         onClick={() => setFormData(prev => ({ ...prev, colorName: '', colorHex: '#000000' }))}
                                         className="text-xs text-red-400 hover:text-red-600 underline ml-2"
                                     >
-                                        Clear
+                                        {t('common.clear')}
                                     </button>
                                 </div>
                             )}
@@ -634,7 +746,7 @@ const AdminProducts = () => {
                                         }}
                                         className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800"
                                     >
-                                        Add
+                                        {t('common.add')}
                                     </button>
                                 </div>
                             </div>

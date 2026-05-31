@@ -31,6 +31,7 @@ import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminPopups from './pages/admin/AdminPopups';
+import AdminStores from "./pages/admin/AdminStores.jsx";
 
 function App() {
     const { user, isAuthenticated, setCartCount } = useAuth();
@@ -119,6 +120,9 @@ function App() {
                     } />
                     <Route path="/admin/popups" element={
                         <ProtectedRoute adminOnly><AdminPopups /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/stores" element={
+                        <ProtectedRoute adminOnly><AdminStores /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

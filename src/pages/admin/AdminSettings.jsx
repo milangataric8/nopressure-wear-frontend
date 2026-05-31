@@ -38,6 +38,10 @@ const AdminSettings = () => {
         {
             title: t('settings.payment'),
             keys: ['payment_card_enabled', 'payment_cod_enabled']
+        },
+        {
+            title: 'Features',
+            keys: ['find_in_store_enabled']
         }
     ];
 
@@ -142,7 +146,7 @@ const AdminSettings = () => {
                                         </div>
 
                                         {/* Boolean toggle for payment settings */}
-                                        {(setting.key === 'payment_card_enabled' || setting.key === 'payment_cod_enabled') ? (
+                                        {(setting.key === 'payment_card_enabled' || setting.key === 'payment_cod_enabled') || setting.key === 'find_in_store_enabled' ? (
                                             <div className="flex-1 flex items-center gap-3">
                                                 <button
                                                     onClick={async () => {

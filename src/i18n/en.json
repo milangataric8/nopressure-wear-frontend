@@ -58,7 +58,10 @@
     "manageBanners": "Manage hero banners and carousel",
     "manageCustomers": "View and manage customers",
     "manageSettings": "Manage store name, contact and location",
-    "managePopups": "Manage homepage popup notifications"
+    "managePopups": "Manage homepage popup notifications",
+    "selectStore": "Select which stores carry this product",
+    "storeAvailability": "Store availability",
+    "storeLocations": "Store Locations"
   },
   "product": {
     "allProducts": "All Products",
@@ -213,7 +216,8 @@
     "confirm": "Confirm",
     "noImage": "No image",
     "upload": "Upload",
-    "remove": "Remove"
+    "remove": "Remove",
+    "add": "Add"
   },
   "settings": {
     "title": "Store Settings",
@@ -275,5 +279,8 @@
     "invalidCoupon": "Invalid coupon",
     "signInFirst": "Please sign in first",
     "passwordNotMeet": "Password does not meet requirements"
+  },
+  "store": {
+    "addStore": "Add Store"
   }
 }

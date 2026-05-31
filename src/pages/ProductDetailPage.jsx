@@ -7,6 +7,8 @@ import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
+import { getStoresForProduct } from '../api/storeApi';
+import { getSettingsMap } from '../api/settingsApi';
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -19,6 +21,10 @@ const ProductDetailPage = () => {
     const [addingToCart, setAddingToCart] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [, setSelectedImageIndex] = useState(0);
+    const [showFindInStore, setShowFindInStore] = useState(false);
+    const [productStores, setProductStores] = useState([]);
+    const [findInStoreEnabled, setFindInStoreEnabled] = useState(false);
+    const [storesLoading, setStoresLoading] = useState(false);
 
     const fetchProduct = useCallback(async () => {
         try {
@@ -40,6 +46,29 @@ const ProductDetailPage = () => {
     useEffect(() => {
         fetchProduct();
     }, [fetchProduct]);
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            setFindInStoreEnabled(r.data.find_in_store_enabled !== 'false');
+        }).catch(() => {});
+    }, []);
+
+    const handleFindInStore = async () => {
+        if (showFindInStore) {
+            setShowFindInStore(false);
+            return;
+        }
+        setStoresLoading(true);
+        try {
+            const response = await getStoresForProduct(product.id);
+            setProductStores(response.data);
+            setShowFindInStore(true);
+        } catch (_) {
+            toast.error('Failed to load store availability');
+        } finally {
+            setStoresLoading(false);
+        }
+    };
 
     const handleAddToCart = async () => {
         if (!isAuthenticated()) {
@@ -242,6 +271,54 @@ const ProductDetailPage = () => {
                     >
                         {addingToCart ? t('product.adding') : t('product.addToCart')}
                     </button>
+
+                    {/* Find in Store */}
+                    {findInStoreEnabled && (
+                        <>
+                            <button
+                                onClick={handleFindInStore}
+                                disabled={storesLoading}
+                                className="w-full mt-3 border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                {storesLoading ? 'Loading...' : showFindInStore ? 'Hide Stores' : 'Find in Store'}
+                            </button>
+
+                            {showFindInStore && (
+                                <div className="mt-4 border border-gray-200">
+                                    {productStores.length === 0 ? (
+                                        <div className="p-6 text-center">
+                                            <p className="text-sm text-gray-400">Not available in any store</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                    Available in {productStores.length} {productStores.length === 1 ? 'store' : 'stores'}
+                                                </p>
+                                            </div>
+                                            {productStores.map(ps => (
+                                                <div key={ps.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0">
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-black">{ps.storeName}</p>
+                                                        <p className="text-xs text-gray-500">{ps.storeStreet}, {ps.storeCity}</p>
+                                                        {ps.storePhone && (
+                                                            <p className="text-xs text-gray-400 mt-0.5">{ps.storePhone}</p>
+                                                        )}
+                                                        {ps.storeWorkingHours && (
+                                                            <p className="text-xs text-gray-400">{ps.storeWorkingHours}</p>
+                                                        )}
+                                                    </div>
+                                                    <span className="text-xs font-semibold uppercase px-2 py-1 bg-green-100 text-green-700">
+                                                        t('product.inStock')
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </div>

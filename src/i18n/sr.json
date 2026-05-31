@@ -58,7 +58,10 @@
     "manageBanners": "Upravljajte baner slikama i karuselom",
     "manageCustomers": "Pregledajte i upravljajte kupcima",
     "manageSettings": "Upravljajte nazivom prodavnice, kontaktom i lokacijom",
-    "managePopups": "Upravljajte iskačućim prozorima"
+    "managePopups": "Upravljajte iskačućim prozorima",
+    "selectStore": "Odaberite prodavnice koje sadrže ovaj proizvod",
+    "storeAvailability": "Dostupno u prodavnici",
+    "storeLocations": "Lokacije prodavnica"
   },
   "product": {
     "allProducts": "Svi proizvodi",
@@ -213,7 +216,8 @@
     "confirm": "Potvrdi",
     "noImage": "Nema slike",
     "upload": "Otpremi",
-    "remove": "Ukloni"
+    "remove": "Ukloni",
+    "add": "Dodaj"
   },
   "settings": {
     "title": "Podešavanja prodavnice",
@@ -275,5 +279,8 @@
     "invalidCoupon": "Nevažeći kupon",
     "signInFirst": "Najpre se prijavite",
     "passwordNotMeet": "Lozinka ne ispunjava uslove"
+  },
+  "store": {
+    "addStore": "Dodaj prodavnicu"
   }
 }

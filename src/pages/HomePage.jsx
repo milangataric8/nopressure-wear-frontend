@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../hooks/useFormatPrice';
 import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
@@ -11,6 +12,7 @@ import HomePopup from "../components/common/HomePopup.jsx";
 
 const HomePage = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -154,7 +156,7 @@ const HomePage = () => {
                                     )}
                                     <div className="flex items-center justify-between">
                                         <span className="text-md font-bold text-black">
-                                            ${product.price}
+                                            {formatPrice(product.price)}
                                         </span>
                                         <span className={`text-xs ${
                                             product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'

@@ -17,6 +17,7 @@ import { uploadImage, uploadVideo } from '../../api/uploadApi';
 import { addProductAttribute, deleteProductAttribute } from '../../api/productAttributeApi.js';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../../hooks/useFormatPrice';
 import { getAllStoresForProduct, addProductToStore, removeProductFromStore, toggleProductStoreStock } from '../../api/storeApi';
 import { getActiveStores } from '../../api/storeApi';
 import Pagination from "../../components/common/Pagination.jsx";
@@ -26,6 +27,7 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 
 const AdminProducts = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -95,7 +97,7 @@ const AdminProducts = () => {
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load products');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -165,7 +167,7 @@ const AdminProducts = () => {
             resetForm();
             fetchProducts();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to save product');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -198,7 +200,7 @@ const AdminProducts = () => {
             await activateDeactivateProduct(id);
             fetchProducts();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle product')
+            toast.error(e.response?.data?.message || t('messages.failedToToggleProduct'))
         }
     };
 
@@ -229,12 +231,12 @@ const AdminProducts = () => {
             const response = await uploadImage(file, removeBg);
             setFormData(prev => ({ ...prev, imageUrl: response.data.url }));
             if (response.data.warning) {
-                toast.warning('Image uploaded but background removal failed');
+                toast.warning(t('messages.imageUploadBgFailed'));
             } else {
-                toast.success(removeBg ? 'Image uploaded with background removed' : 'Main image uploaded');
+                toast.success(removeBg ? t('messages.imageUploadedBgRemoved') : t('messages.mainImageUploaded'));
             }
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to upload image');
+            toast.error(e.response?.data?.message || t('messages.failedToUploadImage'));
         }
     };
 
@@ -253,7 +255,7 @@ const AdminProducts = () => {
                     displayOrder: editingProduct.images?.length || 0,
                     isPrimary: false
                 });
-                toast.success('Image added');
+                toast.success(t('messages.imageAdded'));
                 const updated = await getProductById(editingProduct.id);
                 setEditingProduct(updated.data);
                 fetchProducts();
@@ -261,20 +263,20 @@ const AdminProducts = () => {
                 setPendingImages(prev => [...prev, url]);
             }
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to add image');
+            toast.error(e.response?.data?.message || t('messages.failedToAddImage'));
         }
     };
 
     const handleDeleteImage = async (imageId) => {
         try {
             await deleteProductImage(imageId);
-            toast.success('Image deleted');
+            toast.success(t('messages.imageDeleted'));
             setEditingProduct(prev => ({
                 ...prev,
                 images: prev.images.filter(img => img.id !== imageId)
             }));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete image');
+            toast.error(e.response?.data?.message || t('messages.failedToDeleteImage'));
         }
     };
 
@@ -285,9 +287,9 @@ const AdminProducts = () => {
         try {
             const response = await uploadVideo(file);
             setFormData(prev => ({ ...prev, videoUrl: response.data.url }));
-            toast.success('Video uploaded');
+            toast.success(t('messages.videoUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to upload video');
+            toast.error(e.response?.data?.message || t('messages.failedToUploadVideo'));
         }
     };
 
@@ -297,8 +299,8 @@ const AdminProducts = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Products"
-                subtitle="Manage your product catalog"
+                title={t('admin.products')}
+                subtitle={t('admin.manageProducts')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newProduct')}
                 onButtonClick={() => {
                         if (showForm) {
@@ -320,7 +322,7 @@ const AdminProducts = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search products by name or SKU..."
+                    searchPlaceholder={t('admin.searchProducts')}
                 />
             )}
 
@@ -328,7 +330,7 @@ const AdminProducts = () => {
                 <div className="flex w-1/3">
                     {!showForm && availableColors.length > 0 && (
                         <div className="flex gap-2 mb-4 flex-wrap items-center">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">Colors:</span>
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">{t('product.color')}:</span>
                             {availableColors.map(color => (
                                 <button
                                     key={color.colorName}
@@ -352,7 +354,7 @@ const AdminProducts = () => {
                 <div className="flex w-10/12">
                     {!showForm && availableBrands.length > 0 && (
                         <div className="flex gap-2 mb-4 flex-wrap">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">Brands:</span>
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">{t('product.brand')}:</span>
                             {availableBrands.map(brand => (
                                 <button
                                     key={brand}
@@ -434,7 +436,7 @@ const AdminProducts = () => {
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Name</label>
+                            <label className={labelClass}>{t('product.name')}</label>
                             <input
                                 type="text"
                                 name="name"
@@ -447,7 +449,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>SKU</label>
+                            <label className={labelClass}>{t('admin.sku')}</label>
                             <input
                                 type="text"
                                 name="sku"
@@ -460,7 +462,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Price</label>
+                            <label className={labelClass}>{t('product.price')}</label>
                             <input
                                 type="number"
                                 name="price"
@@ -474,7 +476,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Stock Quantity</label>
+                            <label className={labelClass}>{t('admin.stockQuantity')}</label>
                             <input
                                 type="number"
                                 name="stockQuantity"
@@ -487,14 +489,14 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Category</label>
+                            <label className={labelClass}>{t('admin.category')}</label>
                             <select
                                 name="categoryId"
                                 value={formData.categoryId}
                                 onChange={handleChange}
                                 className={inputClass}
                             >
-                                <option value="">No category</option>
+                                <option value="">{t('admin.noCategory')}</option>
                                 {categories.map(cat => (
                                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                                 ))}
@@ -502,7 +504,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Brand</label>
+                            <label className={labelClass}>{t('product.brand')}</label>
                             <input
                                 type="text"
                                 name="brand"
@@ -515,7 +517,7 @@ const AdminProducts = () => {
 
                         {/* Color */}
                         <div className="md:col-span-2 flex justify-center">
-                            <label className={labelClass}>Color</label>
+                            <label className={labelClass}>{t('product.color')}</label>
                         </div>
                         <div className="md:col-span-2 flex justify-center">
                             <div className="flex gap-3 rounded-4xl">
@@ -578,7 +580,7 @@ const AdminProducts = () => {
                                                             const updated = await getAllStoresForProduct(editingProduct.id);
                                                             setProductStores(updated.data);
                                                         } catch (e) {
-                                                            toast.error(e.response?.data?.message || 'Failed to toggle stock');
+                                                            toast.error(e.response?.data?.message || t('messages.failedToToggleStock'));
                                                         }
                                                     }}
                                                     className={`text-xs font-semibold uppercase px-2 py-0.5 ${
@@ -593,9 +595,9 @@ const AdminProducts = () => {
                                                         try {
                                                             await removeProductFromStore(editingProduct.id, ps.storeLocationId);
                                                             setProductStores(prev => prev.filter(s => s.id !== ps.id));
-                                                            toast.success('Store removed');
+                                                            toast.success(t('messages.storeRemoved'));
                                                         } catch (e) {
-                                                            toast.error(e.response?.data?.message || 'Failed to remove store');
+                                                            toast.error(e.response?.data?.message || t('messages.failedToRemoveStore'));
                                                         }
                                                     }}
                                                     className="text-xs text-red-400 hover:text-red-600"
@@ -615,7 +617,7 @@ const AdminProducts = () => {
                                             onChange={(e) => setSelectedStoreId(e.target.value)}
                                             className={inputClass}
                                         >
-                                            <option value="">Select store...</option>
+                                            <option value="">{t('admin.selectStorePlaceholder')}</option>
                                             {allStores
                                                 .filter(s => !productStores.some(ps => ps.storeLocationId === s.id))
                                                 .map(store => (
@@ -637,9 +639,9 @@ const AdminProducts = () => {
                                                 const updated = await getAllStoresForProduct(editingProduct.id);
                                                 setProductStores(updated.data);
                                                 setSelectedStoreId('');
-                                                toast.success('Store added');
+                                                toast.success(t('messages.storeAdded'));
                                             } catch (error) {
-                                                toast.error(error.response?.data?.message || 'Failed to add store');
+                                                toast.error(error.response?.data?.message || t('messages.failedToAddStore'));
                                             }
                                         }}
                                         className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800 transition-colors"
@@ -673,7 +675,7 @@ const AdminProducts = () => {
                         {/* Product Attributes — only when editing */}
                         {editingProduct && (
                             <div className="md:col-span-2">
-                                <label className={labelClass}>Custom Attributes</label>
+                                <label className={labelClass}>{t('admin.customAttributes')}</label>
 
                                 {/* Existing attributes */}
                                 <div className="flex gap-2 flex-wrap mb-3">
@@ -686,11 +688,11 @@ const AdminProducts = () => {
                                                 onClick={async () => {
                                                     try {
                                                         await deleteProductAttribute(attr.id);
-                                                        toast.success('Attribute removed');
+                                                        toast.success(t('messages.attributeRemoved'));
                                                         const updated = await getProductById(editingProduct.id);
                                                         setEditingProduct(updated.data);
                                                     } catch (e) {
-                                                        toast.error(e.response?.data?.message || 'Failed to remove attribute');
+                                                        toast.error(e.response?.data?.message || t('messages.failedToRemoveAttribute'));
                                                     }
                                                 }}
                                                 className="text-red-400 hover:text-red-600 text-xs"
@@ -704,7 +706,7 @@ const AdminProducts = () => {
                                 {/* Add new attribute */}
                                 <div className="flex gap-2 items-end">
                                     <div className="flex-1">
-                                        <label className="block text-xs text-gray-500 mb-1">Key</label>
+                                        <label className="block text-xs text-gray-500 mb-1">{t('admin.key')}</label>
                                         <input
                                             type="text"
                                             value={newAttrKey}
@@ -714,7 +716,7 @@ const AdminProducts = () => {
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <label className="block text-xs text-gray-500 mb-1">Value</label>
+                                        <label className="block text-xs text-gray-500 mb-1">{t('admin.value')}</label>
                                         <input
                                             type="text"
                                             value={newAttrValue}
@@ -727,7 +729,7 @@ const AdminProducts = () => {
                                         type="button"
                                         onClick={async () => {
                                             if (!newAttrKey || !newAttrValue) {
-                                                toast.error('Fill in both fields');
+                                                toast.error(t('messages.fillBothFields'));
                                                 return;
                                             }
                                             try {
@@ -735,13 +737,13 @@ const AdminProducts = () => {
                                                     key: newAttrKey,
                                                     value: newAttrValue
                                                 });
-                                                toast.success('Attribute added');
+                                                toast.success(t('messages.attributeAdded'));
                                                 setNewAttrKey('');
                                                 setNewAttrValue('');
                                                 const updated = await getProductById(editingProduct.id);
                                                 setEditingProduct(updated.data);
                                             } catch (e) {
-                                                toast.error(e.response?.data?.message || 'Failed to add attribute');
+                                                toast.error(e.response?.data?.message || t('messages.failedToAddAttribute'));
                                             }
                                         }}
                                         className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800"
@@ -753,7 +755,7 @@ const AdminProducts = () => {
                         )}
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Main Image</label>
+                            <label className={labelClass}>{t('admin.mainImage')}</label>
                             <div className="flex items-center gap-3 mb-2">
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
@@ -763,13 +765,13 @@ const AdminProducts = () => {
                                         className="w-3.5 h-3.5"
                                     />
                                     <span className="text-xs text-gray-500 uppercase tracking-wide">
-                                        Remove background
+                                        {t('admin.removeBackground')}
                                     </span>
                                 </label>
                             </div>
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    Upload Main Image
+                                    {t('admin.uploadMainImage')}
                                 </div>
                                 <input
                                     type="file"
@@ -788,7 +790,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Additional Images (max 5)</label>
+                            <label className={labelClass}>{t('admin.additionalImages')}</label>
                             <div className="flex gap-2 flex-wrap mb-3">
                                 {editingProduct ? (
                                     editingProduct.images?.map(img => (
@@ -828,7 +830,7 @@ const AdminProducts = () => {
                             </div>
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    + Add Image
+                                    {t('admin.addImage')}
                                 </div>
                                 <input
                                     type="file"
@@ -840,22 +842,22 @@ const AdminProducts = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Product Video (optional)</label>
+                            <label className={labelClass}>{t('admin.productVideo')}</label>
                             {formData.videoUrl && (
                                 <div className="mb-2 flex items-center gap-2">
-                                    <span className="text-xs text-green-600">✓ Video uploaded</span>
+                                    <span className="text-xs text-green-600">✓ {t('messages.videoUploaded')}</span>
                                     <button
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, videoUrl: '' }))}
                                         className="text-xs text-red-400 hover:text-red-600"
                                     >
-                                        Remove
+                                        {t('common.remove')}
                                     </button>
                                 </div>
                             )}
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    Upload Video
+                                    {t('admin.uploadVideo')}
                                 </div>
                                 <input
                                     type="file"
@@ -867,7 +869,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Description</label>
+                            <label className={labelClass}>{t('admin.description')}</label>
                             <textarea
                                 name="description"
                                 value={formData.description}
@@ -941,10 +943,10 @@ const AdminProducts = () => {
                                 </td>
                                 <td className="px-3 py-3">
                                     <p className="text-xs font-semibold text-black">{product.name}</p>
-                                    <p className="text-xs text-gray-400">{product.categoryName || 'No category'}</p>
+                                    <p className="text-xs text-gray-400">{product.categoryName || t('admin.noCategory')}</p>
                                 </td>
                                 <td className="hidden md:table-cell px-3 py-3 text-xs text-gray-500">{product.sku}</td>
-                                <td className="px-3 py-3 text-xs font-semibold text-black">${product.price}</td>
+                                <td className="px-3 py-3 text-xs font-semibold text-black">{formatPrice(product.price)}</td>
                                 <td className="hidden md:table-cell px-3 py-3 text-xs text-black">{product.stockQuantity}</td>
                                 <td className="px-3 py-3">
                                     <StatusBadge active={product.active} />

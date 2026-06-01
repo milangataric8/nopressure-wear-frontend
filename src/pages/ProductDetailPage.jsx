@@ -7,11 +7,13 @@ import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../hooks/useFormatPrice';
 import { getStoresForProduct } from '../api/storeApi';
 import { getSettingsMap } from '../api/settingsApi';
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated, setCartCount, cartCount } = useAuth();
@@ -36,7 +38,7 @@ const ProductDetailPage = () => {
                 setSelectedImage(response.data.imageUrl);
             }
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Product not found');
+            toast.error(e.response?.data?.message || t('messages.productNotFound'));
             navigate('/products');
         } finally {
             setLoading(false);
@@ -64,7 +66,7 @@ const ProductDetailPage = () => {
             setProductStores(response.data);
             setShowFindInStore(true);
         } catch (_) {
-            toast.error('Failed to load store availability');
+            toast.error(t('messages.failedToLoadStores'));
         } finally {
             setStoresLoading(false);
         }
@@ -82,7 +84,7 @@ const ProductDetailPage = () => {
             setCartCount(cartCount + quantity);
             toast.success(t('messages.addedToCart'));
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to add to cart');
+            toast.error(error.response?.data?.message || t('messages.failedToAddToCart'));
         } finally {
             setAddingToCart(false);
         }
@@ -119,7 +121,7 @@ const ProductDetailPage = () => {
                                 className="w-full h-full object-contain p-4"
                             />
                         ) : (
-                            <span className="text-gray-400 text-sm">No image</span>
+                            <span className="text-gray-400 text-sm">{t('common.noImage')}</span>
                         )}
                     </div>
 
@@ -164,7 +166,7 @@ const ProductDetailPage = () => {
                 {/* Info */}
                 <div className="flex flex-col justify-start">
                     <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
-                        {product.categoryName || 'Uncategorized'}
+                        {product.categoryName || t('product.uncategorized')}
                     </p>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
                         {product.name}
@@ -179,13 +181,13 @@ const ProductDetailPage = () => {
 
                     <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200">
                         <span className="text-2xl font-bold text-black">
-                            ${product.price}
+                            {formatPrice(product.price)}
                         </span>
                         <span className={`text-xs font-semibold uppercase tracking-wide ${
                             product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                         }`}>
                             {product.stockQuantity > 0
-                                ? `${product.stockQuantity} in stock`
+                                ? t('product.inStockCount', { count: product.stockQuantity })
                                 : t('product.soldOut')}
                         </span>
                     </div>
@@ -280,20 +282,22 @@ const ProductDetailPage = () => {
                                 disabled={storesLoading}
                                 className="w-full mt-3 border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
                             >
-                                {storesLoading ? 'Loading...' : showFindInStore ? 'Hide Stores' : 'Find in Store'}
+                                {storesLoading ? t('common.loading') : showFindInStore ? t('product.hideStores') : t('product.findInStore')}
                             </button>
 
                             {showFindInStore && (
                                 <div className="mt-4 border border-gray-200">
                                     {productStores.length === 0 ? (
                                         <div className="p-6 text-center">
-                                            <p className="text-sm text-gray-400">Not available in any store</p>
+                                            <p className="text-sm text-gray-400">{t('product.noStores')}</p>
                                         </div>
                                     ) : (
                                         <div>
                                             <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
                                                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                                    Available in {productStores.length} {productStores.length === 1 ? 'store' : 'stores'}
+                                                    {productStores.length === 1
+                                                        ? t('product.availableInStore', { count: 1 })
+                                                        : t('product.availableInStores', { count: productStores.length })}
                                                 </p>
                                             </div>
                                             {productStores.map(ps => (
@@ -309,7 +313,7 @@ const ProductDetailPage = () => {
                                                         )}
                                                     </div>
                                                     <span className="text-xs font-semibold uppercase px-2 py-1 bg-green-100 text-green-700">
-                                                        t('product.inStock')
+                                                        {t('product.inStock')}
                                                     </span>
                                                 </div>
                                             ))}

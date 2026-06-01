@@ -13,10 +13,12 @@ import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../components/common/CheckoutForm';
 import { createPaymentIntent } from '../api/paymentApi';
 import { getAddressByUser, createAddress } from '../api/addressApi';
+import useFormatPrice from '../hooks/useFormatPrice';
 import { getSettingsMap } from '../api/settingsApi';
 
 const CartPage = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const { user, setCartCount } = useAuth();
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -257,12 +259,12 @@ const CartPage = () => {
                                         {item.productName}
                                     </h3>
                                     <span className="text-sm font-bold text-black">
-                                        ${item.subtotal.toFixed(2)}
+                                        {formatPrice(item.subtotal)}
                                     </span>
                                 </div>
                                 <p className="text-xs text-gray-400 mb-1">SKU: {item.productSku}</p>
                                 <p className="text-xs text-gray-500 mb-4">
-                                    ${item.productPrice} / item
+                                    {formatPrice(item.productPrice)} {t('order.perItem')}
                                 </p>
 
                                 <div className="flex items-center justify-between">
@@ -315,7 +317,7 @@ const CartPage = () => {
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
-                                <span className="font-medium">${cart.totalAmount.toFixed(2)}</span>
+                                <span className="font-medium">{formatPrice(cart.totalAmount)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
@@ -323,7 +325,7 @@ const CartPage = () => {
                             </div>
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
                                 <span className="font-semibold text-black">{t('cart.total')}</span>
-                                <span className="font-bold text-black">${cart.totalAmount.toFixed(2)}</span>
+                                <span className="font-bold text-black">{formatPrice(cart.totalAmount)}</span>
                             </div>
                         </div>
 
@@ -596,13 +598,13 @@ const CartPage = () => {
                     <div className="space-y-3 mb-6">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">{t('cart.subtotal')}</span>
-                            <span className="font-medium">${cart.totalAmount.toFixed(2)}</span>
+                            <span className="font-medium">{formatPrice(cart.totalAmount)}</span>
                         </div>
                         {couponData && (
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Discount ({couponData.code})</span>
                                 <span className="font-medium text-green-600">
-                                    -${couponData.discountAmount.toFixed(2)}
+                                    -{formatPrice(couponData.discountAmount)}
                                 </span>
                             </div>
                         )}
@@ -613,9 +615,7 @@ const CartPage = () => {
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">
-                                ${couponData
-                                    ? couponData.finalTotal.toFixed(2)
-                                    : cart.totalAmount.toFixed(2)}
+                                {formatPrice(couponData ? couponData.finalTotal : cart.totalAmount)}
                             </span>
                         </div>
                     </div>

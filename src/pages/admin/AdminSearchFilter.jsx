@@ -8,7 +8,7 @@ const AdminSearchFilter = ({
                                activeFilter,
                                setActiveFilter,
                                setPage,
-                               searchPlaceholder = 'Search...'
+                               searchPlaceholder
                            }) => {
     const { t } = useTranslation();
     return (
@@ -46,7 +46,7 @@ const AdminSearchFilter = ({
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder={searchPlaceholder}
+                    placeholder={searchPlaceholder || t('admin.searchDefault')}
                     className="flex-1 min-w-0 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button

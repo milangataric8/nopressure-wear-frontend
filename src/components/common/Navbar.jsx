@@ -7,6 +7,7 @@ import { getActiveCategories } from '../../api/categoryApi';
 import { getImageUrl } from '../../utils/imageUtils';
 import { getSettingsMap } from "../../api/settingsApi.js";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../../hooks/useFormatPrice';
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount} = useAuth();
@@ -22,6 +23,7 @@ const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const { t, i18n } = useTranslation();
+    const formatPrice = useFormatPrice();
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
     const getSubcategories = (parentId) => (categories || []).filter(cat => cat.parentId === parentId);
@@ -251,7 +253,7 @@ const Navbar = () => {
                                                                     <p className={`text-xs font-semibold uppercase ${getStatusStyle(order.status)}`}>
                                                                         {order.status}
                                                                     </p>
-                                                                    <p className="text-xs font-bold text-black">${order.totalAmount.toFixed(2)}</p>
+                                                                    <p className="text-xs font-bold text-black">{formatPrice(order.totalAmount)}</p>
                                                                 </div>
                                                             </Link>
                                                         ))}
@@ -485,15 +487,15 @@ const Navbar = () => {
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
                                                                     <p className="text-xs font-semibold text-black truncate">{item.productName}</p>
-                                                                    <p className="text-xs text-gray-400">Qty: {item.quantity} × ${item.productPrice}</p>
+                                                                    <p className="text-xs text-gray-400">{t('order.qty')}: {item.quantity} × {formatPrice(item.productPrice)}</p>
                                                                 </div>
-                                                                <span className="text-xs font-bold text-black">${item.subtotal.toFixed(2)}</span>
+                                                                <span className="text-xs font-bold text-black">{formatPrice(item.subtotal)}</span>
                                                             </div>
                                                         ))}
                                                     </div>
                                                     <div className="border-t border-gray-200 pt-3 flex justify-between items-center mb-3">
                                                         <span className="text-xs font-semibold text-black">{t('cart.total')}</span>
-                                                        <span className="text-sm font-bold text-black">${cart.totalAmount.toFixed(2)}</span>
+                                                        <span className="text-sm font-bold text-black">{formatPrice(cart.totalAmount)}</span>
                                                     </div>
                                                     <Link
                                                         to="/cart"

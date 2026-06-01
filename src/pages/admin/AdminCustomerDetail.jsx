@@ -7,9 +7,19 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../../hooks/useFormatPrice';
 
 const AdminCustomerDetail = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const formatPrice = useFormatPrice();
+    const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
+    const getStatusLabel = (status) => ({
+        PENDING: t('order.pending'),
+        CONFIRMED: t('order.confirmed'),
+        SHIPPED: t('order.shipped'),
+        DELIVERED: t('order.delivered'),
+        CANCELLED: t('order.cancelled'),
+    }[status] || status);
     const { customerId } = useParams();
     const navigate = useNavigate();
     const [customer, setCustomer] = useState(null);
@@ -25,7 +35,7 @@ const AdminCustomerDetail = () => {
             const response = await axiosInstance.get(`/users/${customerId}`);
             setCustomer(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load customer');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
             navigate('/admin/customers');
         } finally {
             setLoading(false);
@@ -42,7 +52,7 @@ const AdminCustomerDetail = () => {
             setTotalPages(response.data.totalPages);
             setTotalOrders(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load orders');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setOrdersLoading(false);
         }
@@ -92,13 +102,13 @@ const AdminCustomerDetail = () => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="border border-gray-200 p-6 text-center">
                             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                                Total Orders
+                                {t('admin.totalOrders')}
                             </p>
                             <p className="text-3xl font-black text-black">{totalOrders}</p>
                         </div>
                         <div className="border border-gray-200 p-6 flex flex-col items-center justify-center">
                             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
-                                Status
+                                {t('order.status')}
                             </p>
 
                             <StatusBadge active={customer.active} />
@@ -108,25 +118,25 @@ const AdminCustomerDetail = () => {
 
                 <div className="border border-gray-200 p-6">
                     <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                        Account Info
+                        {t('admin.accountInfo')}
                     </h3>
                     <div className="space-y-3">
                         <div>
-                            <p className="text-xs text-gray-400 mb-0.5">First Name</p>
+                            <p className="text-xs text-gray-400 mb-0.5">{t('auth.firstName')}</p>
                             <p className="text-sm font-medium text-black">{customer.firstName}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Last Name</p>
+                            <p className="text-xs text-gray-400 mb-0.5">{t('auth.lastName')}</p>
                             <p className="text-sm font-medium text-black">{customer.lastName}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Email</p>
+                            <p className="text-xs text-gray-400 mb-0.5">{t('auth.email')}</p>
                             <p className="text-sm font-medium text-black">{customer.email}</p>
                         </div>
                         <div>
-                            <p className="text-xs text-gray-400 mb-0.5">Member Since</p>
+                            <p className="text-xs text-gray-400 mb-0.5">{t('admin.memberSince')}</p>
                             <p className="text-sm font-medium text-black">
-                                {new Date(customer.createdAt).toLocaleDateString('en-US', {
+                                {new Date(customer.createdAt).toLocaleDateString(dateLocale, {
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric'
@@ -140,7 +150,7 @@ const AdminCustomerDetail = () => {
             {/* Orders */}
             <div>
                 <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                    Orders
+                    {t('admin.orders')}
                 </h2>
 
                 {ordersLoading && <LoadingSpinner />}
@@ -149,7 +159,7 @@ const AdminCustomerDetail = () => {
                 }
                 { orders.length === 0 ? (
                     <div className="border border-gray-200 p-12 text-center">
-                        <p className="text-sm text-gray-400">No orders yet</p>
+                        <p className="text-sm text-gray-400">{t('order.empty')}</p>
                     </div>
                 ) : (
                     <div className="border border-gray-200">
@@ -176,21 +186,21 @@ const AdminCustomerDetail = () => {
                                         </p>
                                     </td>
                                     <td className="px-4 py-3 text-sm text-gray-500">
-                                        {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                        {new Date(order.createdAt).toLocaleDateString(dateLocale, {
                                             year: 'numeric',
                                             month: 'short',
                                             day: 'numeric'
                                         })}
                                     </td>
                                     <td className="px-4 py-3 text-sm text-gray-500">
-                                        {order.orderItems?.length || 0} items
+                                        {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
                                     </td>
                                     <td className="px-4 py-3 text-sm font-semibold text-black">
-                                        ${order.totalAmount?.toFixed(2)}
+                                        {formatPrice(order.totalAmount)}
                                     </td>
                                     <td className="px-4 py-3">
                                             <span className={`text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(order.status)}`}>
-                                                {order.status}
+                                                {getStatusLabel(order.status)}
                                             </span>
                                     </td>
                                 </tr>

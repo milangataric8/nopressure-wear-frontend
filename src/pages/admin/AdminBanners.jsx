@@ -45,7 +45,7 @@ const AdminBanners = () => {
             setBanners(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load banners');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -73,9 +73,9 @@ const AdminBanners = () => {
                 response = await uploadImage(file);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
-            toast.success('File uploaded');
+            toast.success(t('messages.fileUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to upload file');
+            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
         } finally {
             setUploading(false);
         }
@@ -94,7 +94,7 @@ const AdminBanners = () => {
             resetForm();
             fetchBanners();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save banner');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -114,13 +114,13 @@ const AdminBanners = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this banner?')) return;
+        if (!window.confirm(t('messages.confirmDelete'))) return;
         try {
             await deleteBanner(id);
             toast.success(t('messages.bannerDeleted'));
             fetchBanners();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete banner');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -129,7 +129,7 @@ const AdminBanners = () => {
             await toggleBanner(id);
             fetchBanners();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle banner');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -154,8 +154,8 @@ const AdminBanners = () => {
 
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Banners"
-                subtitle="Manage hero banners on the home page"
+                title={t('admin.banners')}
+                subtitle={t('admin.manageBanners')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newBanner')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
@@ -169,7 +169,7 @@ const AdminBanners = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search products by title..."
+                    searchPlaceholder={t('admin.searchBanners')}
                 />
             )}
 
@@ -181,7 +181,7 @@ const AdminBanners = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Title</label>
+                            <label className={labelClass}>{t('admin.title')}</label>
                             <input
                                 type="text"
                                 name="title"
@@ -194,7 +194,7 @@ const AdminBanners = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Subtitle</label>
+                            <label className={labelClass}>{t('admin.subtitle')}</label>
                             <input
                                 type="text"
                                 name="subtitle"
@@ -206,20 +206,20 @@ const AdminBanners = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Media Type</label>
+                            <label className={labelClass}>{t('admin.mediaType')}</label>
                             <select
                                 name="mediaType"
                                 value={formData.mediaType}
                                 onChange={handleChange}
                                 className={inputClass}
                             >
-                                <option value="IMAGE">Image</option>
-                                <option value="VIDEO">Video</option>
+                                <option value="IMAGE">{t('admin.mediaImage')}</option>
+                                <option value="VIDEO">{t('admin.mediaVideo')}</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className={labelClass}>Display Order</label>
+                            <label className={labelClass}>{t('admin.displayOrder')}</label>
                             <input
                                 type="number"
                                 name="displayOrder"
@@ -232,11 +232,11 @@ const AdminBanners = () => {
 
                         <div className="md:col-span-2">
                             <label className={labelClass}>
-                                Upload {formData.mediaType === 'VIDEO' ? 'Video' : 'Image'}
+                                {t('common.upload')} {formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}
                             </label>
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    {uploading ? 'Uploading...' : `Upload ${formData.mediaType === 'VIDEO' ? 'Video' : 'Image'}`}
+                                    {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
                                 </div>
                                 <input
                                     type="file"
@@ -269,7 +269,7 @@ const AdminBanners = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Button Text</label>
+                            <label className={labelClass}>{t('admin.buttonText')}</label>
                             <input
                                 type="text"
                                 name="buttonText"
@@ -281,7 +281,7 @@ const AdminBanners = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Button Link</label>
+                            <label className={labelClass}>{t('admin.buttonLink')}</label>
                             <input
                                 type="text"
                                 name="buttonLink"
@@ -319,7 +319,7 @@ const AdminBanners = () => {
             }
             { banners.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No banners yet</p>
+                    <p className="text-sm">{t('admin.noBanners')}</p>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -343,7 +343,7 @@ const AdminBanners = () => {
                                     )
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                        <span className="text-gray-400 text-xs">No media</span>
+                                        <span className="text-gray-400 text-xs">{t('admin.noMedia')}</span>
                                     </div>
                                 )}
                             </div>
@@ -360,7 +360,7 @@ const AdminBanners = () => {
                                 {banner.subtitle && (
                                     <p className="text-xs text-gray-500 mb-1">{banner.subtitle}</p>
                                 )}
-                                <p className="text-xs text-gray-400">Order: {banner.displayOrder}</p>
+                                <p className="text-xs text-gray-400">{t('settings.order')}: {banner.displayOrder}</p>
                             </div>
 
                             {/* Actions */}

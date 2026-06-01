@@ -5,9 +5,11 @@ import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../../hooks/useFormatPrice';
 
 const AdminOrders = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ const AdminOrders = () => {
             setOrders(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load orders');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -43,9 +45,17 @@ const AdminOrders = () => {
             toast.success(t('messages.orderUpdated'));
             fetchAllOrders();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update status');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
+
+    const getStatusLabel = (status) => ({
+        PENDING: t('order.pending'),
+        CONFIRMED: t('order.confirmed'),
+        SHIPPED: t('order.shipped'),
+        DELIVERED: t('order.delivered'),
+        CANCELLED: t('order.cancelled'),
+    }[status] || status);
 
     const getStatusStyle = (status) => {
         switch (status) {
@@ -79,7 +89,7 @@ const AdminOrders = () => {
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder="Search orders by order code or customer name..."
+                    placeholder={t('admin.searchOrders')}
                     className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button
@@ -127,7 +137,7 @@ const AdminOrders = () => {
 
             {orders.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No orders yet</p>
+                    <p className="text-sm">{t('order.empty')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">
@@ -157,14 +167,14 @@ const AdminOrders = () => {
                                     {order.customerFullName}
                                 </td>
                                 <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
-                                    {order.orderItems?.length || 0} items
+                                    {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
                                 </td>
                                 <td className="px-4 py-3 text-sm font-bold text-black">
-                                    ${order.totalAmount.toFixed(2)}
+                                    {formatPrice(order.totalAmount)}
                                 </td>
                                 <td className="px-4 py-3">
                                         <span className={`text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(order.status)}`}>
-                                            {order.status}
+                                            {getStatusLabel(order.status)}
                                         </span>
                                 </td>
                                 <td className="px-4 py-3">

@@ -47,7 +47,7 @@ const AdminCategories = () => {
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load categories');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -81,7 +81,7 @@ const AdminCategories = () => {
             resetForm();
             fetchCategories();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save category');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -102,7 +102,7 @@ const AdminCategories = () => {
             fetchCategories();
             localStorage.setItem('categories-updated', Date.now().toString());
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle category');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -118,8 +118,8 @@ const AdminCategories = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Categories"
-                subtitle="Manage product categories"
+                title={t('admin.categories')}
+                subtitle={t('admin.manageCategories')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newCategory')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
@@ -133,7 +133,7 @@ const AdminCategories = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search category by name..."
+                    searchPlaceholder={t('admin.searchCategories')}
                 />
             )}
 
@@ -146,7 +146,7 @@ const AdminCategories = () => {
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Name</label>
+                            <label className={labelClass}>{t('product.name')}</label>
                             <input
                                 type="text"
                                 name="name"
@@ -159,14 +159,14 @@ const AdminCategories = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Parent Category</label>
+                            <label className={labelClass}>{t('admin.parentCategory')}</label>
                             <select
                                 name="parentId"
                                 value={formData.parentId}
                                 onChange={handleChange}
                                 className={inputClass}
                             >
-                                <option value="">No parent</option>
+                                <option value="">{t('admin.noParent')}</option>
                                 {categories
                                     .filter(cat => !editingCategory || cat.id !== editingCategory.id)
                                     .map(cat => (
@@ -177,7 +177,7 @@ const AdminCategories = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Description</label>
+                            <label className={labelClass}>{t('admin.description')}</label>
                             <input
                                 type="text"
                                 name="description"
@@ -214,7 +214,7 @@ const AdminCategories = () => {
             }
             { categories.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No categories yet</p>
+                    <p className="text-sm">{t('admin.noCategories')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">
@@ -236,7 +236,7 @@ const AdminCategories = () => {
                                             <p className="text-sm font-semibold text-black">{cat.name}</p>
                                             {cat.parentId && (
                                                 <span className="text-xs text-gray-400">
-                                                    ({categories.find(c => c.id === cat.parentId)?.name || 'Subcategory'})
+                                                    ({categories.find(c => c.id === cat.parentId)?.name || t('admin.subcategory')})
                                                 </span>
                                             )}
                                         </div>

@@ -8,9 +8,11 @@ import { getVisibleFilters } from '../api/filterApi';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../hooks/useFormatPrice';
 
 const ProductsPage = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -569,7 +571,7 @@ const ProductsPage = () => {
 
                                         <div className="flex items-center justify-between">
                                             <span className="text-md font-bold text-black">
-                                                ${product.price}
+                                                {formatPrice(product.price)}
                                             </span>
                                             <span className={`text-xs ${
                                                 product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'

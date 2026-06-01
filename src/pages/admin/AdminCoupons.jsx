@@ -9,9 +9,11 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../../hooks/useFormatPrice';
 
 const AdminCoupons = () => {
     const { t } = useTranslation();
+    const formatPrice = useFormatPrice();
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -41,7 +43,7 @@ const AdminCoupons = () => {
             setCoupons(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load coupons');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -75,18 +77,18 @@ const AdminCoupons = () => {
             });
             fetchCoupons();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create coupon');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this coupon?')) return;
+        if (!window.confirm(t('messages.confirmDelete'))) return;
         try {
             await axiosInstance.delete(`/coupons/${id}`);
             toast.success(t('messages.couponDeleted'));
             fetchCoupons();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete coupon');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -95,7 +97,7 @@ const AdminCoupons = () => {
             await axiosInstance.patch(`/coupons/${id}/toggle`);
             fetchCoupons();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle coupon');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -105,8 +107,8 @@ const AdminCoupons = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Coupons"
-                subtitle="Manage discount coupons"
+                title={t('admin.coupons')}
+                subtitle={t('admin.manageCoupons')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newCoupon')}
                 onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
             />
@@ -120,7 +122,7 @@ const AdminCoupons = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search products by code..."
+                    searchPlaceholder={t('admin.searchCoupons')}
                 />
             )}
 
@@ -132,7 +134,7 @@ const AdminCoupons = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Code</label>
+                            <label className={labelClass}>{t('admin.code')}</label>
                             <input
                                 type="text"
                                 name="code"
@@ -145,21 +147,21 @@ const AdminCoupons = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Discount Type</label>
+                            <label className={labelClass}>{t('admin.discountType')}</label>
                             <select
                                 name="discountType"
                                 value={formData.discountType}
                                 onChange={handleChange}
                                 className={inputClass}
                             >
-                                <option value="PERCENTAGE">Percentage (%)</option>
-                                <option value="FIXED">Fixed Amount ($)</option>
+                                <option value="PERCENTAGE">{t('admin.percentageDiscount')}</option>
+                                <option value="FIXED">{t('admin.fixedAmount')}</option>
                             </select>
                         </div>
 
                         <div>
                             <label className={labelClass}>
-                                Discount Value {formData.discountType === 'PERCENTAGE' ? '(%)' : '($)'}
+                                {t('admin.discountValue')} {formData.discountType === 'PERCENTAGE' ? '(%)' : '($)'}
                             </label>
                             <input
                                 type="number"
@@ -174,7 +176,7 @@ const AdminCoupons = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Usage Limit</label>
+                            <label className={labelClass}>{t('admin.usageLimit')}</label>
                             <input
                                 type="number"
                                 name="usageLimit"
@@ -187,7 +189,7 @@ const AdminCoupons = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Expires At (optional)</label>
+                            <label className={labelClass}>{t('admin.expiresAt')}</label>
                             <input
                                 type="datetime-local"
                                 name="expiresAt"
@@ -216,7 +218,7 @@ const AdminCoupons = () => {
             }
             { coupons.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No coupons yet</p>
+                    <p className="text-sm">{t('admin.noCoupons')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">
@@ -240,7 +242,7 @@ const AdminCoupons = () => {
                                 <td className="px-4 py-3 text-sm font-semibold text-black">
                                     {coupon.discountType === 'PERCENTAGE'
                                         ? `${coupon.discountValue}%`
-                                        : `$${coupon.discountValue}`}
+                                        : formatPrice(coupon.discountValue)}
                                 </td>
                                 <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {coupon.usageCount} / {coupon.usageLimit}

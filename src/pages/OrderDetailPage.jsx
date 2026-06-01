@@ -6,9 +6,24 @@ import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from "../utils/imageUtils.js";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import useFormatPrice from '../hooks/useFormatPrice';
 
 const OrderDetailPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
+    const formatPrice = useFormatPrice();
+    const getStatusLabel = (status) => ({
+        PENDING: t('order.pending'),
+        CONFIRMED: t('order.confirmed'),
+        SHIPPED: t('order.shipped'),
+        DELIVERED: t('order.delivered'),
+        CANCELLED: t('order.cancelled'),
+    }[status] || status);
+    const getPaymentStatusLabel = (status) => ({
+        PAID: t('order.paid'),
+        PENDING: t('order.paymentPending'),
+        FAILED: t('order.paymentFailed'),
+    }[status] || status);
     const { orderId } = useParams();
     const navigate = useNavigate();
     const { user, isAdmin, isEmployee } = useAuth();
@@ -27,7 +42,7 @@ const OrderDetailPage = () => {
             }
             setOrder(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load order');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
             navigate(isStaff ? '/admin/orders' : '/orders');
         } finally {
             setLoading(false);
@@ -44,7 +59,7 @@ const OrderDetailPage = () => {
             toast.success(t('messages.orderUpdated'));
             fetchOrder();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update status');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -87,10 +102,10 @@ const OrderDetailPage = () => {
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
-                        Order - {order.orderCode}
+                        {t('order.orderLabel')} - {order.orderCode}
                     </h1>
                     <p className="text-sm text-gray-500">
-                        {t('order.placedOn')} {new Date(order.createdAt).toLocaleDateString('en-US', {
+                        {t('order.placedOn')} {new Date(order.createdAt).toLocaleDateString(dateLocale, {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -99,7 +114,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex items-center gap-4">
                 <span className={`text-xs font-semibold uppercase tracking-wide px-3 py-1.5 ${getStatusStyle(order.status)}`}>
-                    {order.status}
+                    {getStatusLabel(order.status)}
                 </span>
                     {/* Status update for admin/employee */}
                     {isStaff && (
@@ -189,11 +204,11 @@ const OrderDetailPage = () => {
                                             {item.productName}
                                         </h3>
                                         <span className="text-sm font-bold text-black">
-                                            ${item.subtotal.toFixed(2)}
+                                            {formatPrice(item.subtotal)}
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-400 mt-1">
-                                        Qty: {item.quantity} × ${item.priceAtPurchase}
+                                        {t('order.qty')}: {item.quantity} × {formatPrice(item.priceAtPurchase)}
                                     </p>
                                 </div>
                             </div>
@@ -210,7 +225,7 @@ const OrderDetailPage = () => {
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
-                                <span>${order.totalAmount.toFixed(2)}</span>
+                                <span>{formatPrice(order.totalAmount)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
@@ -219,7 +234,7 @@ const OrderDetailPage = () => {
                         </div>
                         <div className="border-t border-gray-200 pt-4 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
-                            <span className="font-bold text-black">${order.totalAmount.toFixed(2)}</span>
+                            <span className="font-bold text-black">{formatPrice(order.totalAmount)}</span>
                         </div>
                     </div>
 
@@ -240,7 +255,7 @@ const OrderDetailPage = () => {
                             </div>
                             <div className="flex justify-between text-xs">
                                 <span className="text-gray-500">{t('order.status')}</span>
-                                <span className="font-medium">{order.status}</span>
+                                <span className="font-medium">{getStatusLabel(order.status)}</span>
                             </div>
                             <div className="flex justify-between text-xs">
                                 <span className="text-gray-500">{t('order.items')}</span>
@@ -256,13 +271,13 @@ const OrderDetailPage = () => {
                         </h3>
                         <div className="space-y-2">
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Name</span>
+                                <span className="text-gray-500">{t('order.name')}</span>
                                 <span className="font-medium">
                                     {order.customerFullName}
                                 </span>
                             </div>
                             <div className="flex justify-between text-xs">
-                                <span className="text-gray-500">Email</span>
+                                <span className="text-gray-500">{t('auth.email')}</span>
                                 <span className="font-medium">{order.customerEmail}</span>
                             </div>
                         </div>
@@ -280,7 +295,7 @@ const OrderDetailPage = () => {
                                 <p className="text-xs text-gray-500">{order.shippingCountry}</p>
                             </div>
                         ) : (
-                            <p className="text-xs text-gray-400">No shipping address provided</p>
+                            <p className="text-xs text-gray-400">{t('order.noShippingAddress')}</p>
                         )}
                     </div>
 
@@ -301,7 +316,7 @@ const OrderDetailPage = () => {
                                 <span className={`font-semibold uppercase ${
                                     order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-yellow-600'
                                 }`}>
-                                    {order.paymentStatus}
+                                    {getPaymentStatusLabel(order.paymentStatus)}
                                 </span>
                             </div>
                         </div>

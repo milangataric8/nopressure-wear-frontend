@@ -48,7 +48,7 @@ const AdminEmployees = () => {
             setEmployees(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load employees');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -77,18 +77,18 @@ const AdminEmployees = () => {
             });
             fetchEmployees();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create employee');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this employee?')) return;
+        if (!window.confirm(t('messages.confirmDelete'))) return;
         try {
             await axiosInstance.delete(`/employees/${id}`);
             toast.success(t('messages.employeeDeleted'));
             fetchEmployees();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete employee');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -101,7 +101,7 @@ const AdminEmployees = () => {
             }
             fetchEmployees();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update employee status');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -127,7 +127,7 @@ const AdminEmployees = () => {
             setEditingEmployee(null);
             fetchEmployees();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update employee');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -137,8 +137,8 @@ const AdminEmployees = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Employees"
-                subtitle="Manage store employees"
+                title={t('admin.employees')}
+                subtitle={t('admin.manageEmployees')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newEmployee')}
                 onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
             />
@@ -152,7 +152,7 @@ const AdminEmployees = () => {
                     activeFilter={activeFilter}
                     setActiveFilter={setActiveFilter}
                     setPage={setPage}
-                    searchPlaceholder="Search products by name or email..."
+                    searchPlaceholder={t('admin.searchEmployees')}
                 />
             )}
 
@@ -164,7 +164,7 @@ const AdminEmployees = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>First Name</label>
+                            <label className={labelClass}>{t('auth.firstName')}</label>
                             <input
                                 type="text"
                                 name="firstName"
@@ -177,7 +177,7 @@ const AdminEmployees = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Last Name</label>
+                            <label className={labelClass}>{t('auth.lastName')}</label>
                             <input
                                 type="text"
                                 name="lastName"
@@ -190,7 +190,7 @@ const AdminEmployees = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Email</label>
+                            <label className={labelClass}>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 name="email"
@@ -203,7 +203,7 @@ const AdminEmployees = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Password</label>
+                            <label className={labelClass}>{t('auth.password')}</label>
                             <input
                                 type="password"
                                 name="password"
@@ -220,7 +220,7 @@ const AdminEmployees = () => {
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
-                                Create Employee
+                                {t('common.create')}
                             </button>
                             <button
                                 type="button"
@@ -242,7 +242,7 @@ const AdminEmployees = () => {
                     </h2>
                     <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>First Name</label>
+                            <label className={labelClass}>{t('auth.firstName')}</label>
                             <input
                                 type="text"
                                 name="firstName"
@@ -254,7 +254,7 @@ const AdminEmployees = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Last Name</label>
+                            <label className={labelClass}>{t('auth.lastName')}</label>
                             <input
                                 type="text"
                                 name="lastName"
@@ -266,7 +266,7 @@ const AdminEmployees = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Email</label>
+                            <label className={labelClass}>{t('auth.email')}</label>
                             <input
                                 type="email"
                                 name="email"
@@ -303,7 +303,7 @@ const AdminEmployees = () => {
             }
             { employees.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No employees yet</p>
+                    <p className="text-sm">{t('admin.noEmployees')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">

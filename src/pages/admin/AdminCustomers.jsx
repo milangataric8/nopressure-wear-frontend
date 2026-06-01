@@ -10,7 +10,8 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
 
 const AdminCustomers = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
     const navigate = useNavigate();
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ const AdminCustomers = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load customers');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -53,7 +54,7 @@ const AdminCustomers = () => {
                         {t('admin.customers')}
                     </h1>
                     <p className="text-sm text-gray-500">
-                        {totalElements} customer{totalElements !== 1 ? 's' : ''} total
+                        {t('admin.customersTotal', { count: totalElements })}
                     </p>
                 </div>
             </div>
@@ -66,7 +67,7 @@ const AdminCustomers = () => {
                 activeFilter={activeFilter}
                 setActiveFilter={setActiveFilter}
                 setPage={setPage}
-                searchPlaceholder="Search products by name or SKU..."
+                searchPlaceholder={t('admin.searchCustomers')}
             />
 
             {/* Table */}
@@ -76,7 +77,7 @@ const AdminCustomers = () => {
             }
             { customers.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No customers found</p>
+                    <p className="text-sm">{t('admin.noCustomers')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">
@@ -105,7 +106,7 @@ const AdminCustomers = () => {
                                     {customer.email}
                                 </td>
                                 <td className="px-4 py-3 text-xs text-gray-500">
-                                    {new Date(customer.createdAt).toLocaleDateString('en-US', {
+                                    {new Date(customer.createdAt).toLocaleDateString(dateLocale, {
                                         year: 'numeric',
                                         month: 'long',
                                         day: 'numeric'

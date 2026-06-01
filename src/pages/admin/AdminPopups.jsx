@@ -6,8 +6,10 @@ import { getImageUrl } from '../../utils/imageUtils';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 const AdminPopups = () => {
+    const { t } = useTranslation();
     const [popups, setPopups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -32,7 +34,7 @@ const AdminPopups = () => {
             const response = await getAllPopups();
             setPopups(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load popups');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -63,9 +65,9 @@ const AdminPopups = () => {
                 response = await uploadImage(file);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
-            toast.success('File uploaded');
+            toast.success(t('messages.fileUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to upload file');
+            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
         } finally {
             setUploading(false);
         }
@@ -76,15 +78,15 @@ const AdminPopups = () => {
         try {
             if (editingPopup) {
                 await updatePopup(editingPopup.id, formData);
-                toast.success('Popup updated');
+                toast.success(t('messages.popupUpdated'));
             } else {
                 await createPopup(formData);
-                toast.success('Popup created');
+                toast.success(t('messages.popupCreated'));
             }
             resetForm();
             fetchPopups();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save popup');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -107,13 +109,13 @@ const AdminPopups = () => {
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this popup?')) return;
+        if (!window.confirm(t('messages.confirmDelete'))) return;
         try {
             await deletePopup(id);
-            toast.success('Popup deleted');
+            toast.success(t('messages.popupDeleted'));
             fetchPopups();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete popup');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -122,7 +124,7 @@ const AdminPopups = () => {
             await togglePopup(id);
             fetchPopups();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle popup');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -149,9 +151,9 @@ const AdminPopups = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Popups"
-                subtitle="Manage homepage popup notifications"
-                buttonLabel={showForm ? 'Cancel' : '+ New Popup'}
+                title={t('admin.popups')}
+                subtitle={t('admin.managePopups')}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newPopup')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
 
@@ -159,12 +161,12 @@ const AdminPopups = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingPopup ? 'Edit Popup' : 'New Popup'}
+                        {editingPopup ? t('admin.edit') : t('admin.newPopup')}
                     </h2>
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Title</label>
+                            <label className={labelClass}>{t('admin.title')}</label>
                             <input
                                 type="text"
                                 name="title"
@@ -177,7 +179,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Subtitle</label>
+                            <label className={labelClass}>{t('admin.subtitle')}</label>
                             <input
                                 type="text"
                                 name="subtitle"
@@ -189,7 +191,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Content</label>
+                            <label className={labelClass}>{t('admin.content')}</label>
                             <textarea
                                 name="content"
                                 value={formData.content}
@@ -201,25 +203,25 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Media Type</label>
+                            <label className={labelClass}>{t('admin.mediaType')}</label>
                             <select
                                 name="mediaType"
                                 value={formData.mediaType}
                                 onChange={handleChange}
                                 className={inputClass}
                             >
-                                <option value="IMAGE">Image</option>
-                                <option value="VIDEO">Video</option>
+                                <option value="IMAGE">{t('admin.mediaImage')}</option>
+                                <option value="VIDEO">{t('admin.mediaVideo')}</option>
                             </select>
                         </div>
 
                         <div>
                             <label className={labelClass}>
-                                Upload {formData.mediaType === 'VIDEO' ? 'Video' : 'Image'}
+                                {t('common.upload')} {formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}
                             </label>
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    {uploading ? 'Uploading...' : `Upload ${formData.mediaType === 'VIDEO' ? 'Video' : 'Image'}`}
+                                    {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
                                 </div>
                                 <input
                                     type="file"
@@ -241,7 +243,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Button Text</label>
+                            <label className={labelClass}>{t('admin.buttonText')}</label>
                             <input
                                 type="text"
                                 name="buttonText"
@@ -253,7 +255,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Button Link</label>
+                            <label className={labelClass}>{t('admin.buttonLink')}</label>
                             <input
                                 type="text"
                                 name="buttonLink"
@@ -265,7 +267,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Background Color</label>
+                            <label className={labelClass}>{t('admin.backgroundColor')}</label>
                             <div className="flex gap-3 items-center">
                                 <input
                                     type="color"
@@ -285,7 +287,7 @@ const AdminPopups = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Text Color</label>
+                            <label className={labelClass}>{t('admin.textColor')}</label>
                             <div className="flex gap-3 items-center">
                                 <input
                                     type="color"
@@ -314,14 +316,14 @@ const AdminPopups = () => {
                                     className="w-3.5 h-3.5"
                                 />
                                 <span className="text-xs text-gray-500 uppercase tracking-wide">
-                                    Show only once per user
+                                    {t('admin.showOnce')}
                                 </span>
                             </label>
                         </div>
 
                         {/* Preview */}
                         <div className="md:col-span-2">
-                            <label className={labelClass}>Preview</label>
+                            <label className={labelClass}>{t('admin.preview')}</label>
                             <div
                                 className="border border-gray-200 overflow-hidden"
                                 style={{ backgroundColor: formData.backgroundColor }}
@@ -333,7 +335,7 @@ const AdminPopups = () => {
                                 )}
                                 <div className="p-6 text-center">
                                     <h3 className="text-xl font-black uppercase tracking-tight mb-1" style={{ color: formData.textColor }}>
-                                        {formData.title || 'Title'}
+                                        {formData.title || t('admin.title')}
                                     </h3>
                                     {formData.subtitle && (
                                         <p className="text-xs opacity-70 mb-2" style={{ color: formData.textColor }}>{formData.subtitle}</p>
@@ -359,14 +361,14 @@ const AdminPopups = () => {
                                 disabled={uploading}
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-50"
                             >
-                                {editingPopup ? 'Update Popup' : 'Create Popup'}
+                                {editingPopup ? t('common.update') : t('common.create')}
                             </button>
                             <button
                                 type="button"
                                 onClick={resetForm}
                                 className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors"
                             >
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -378,7 +380,7 @@ const AdminPopups = () => {
                 <LoadingSpinner />
             ) : popups.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No popups yet</p>
+                    <p className="text-sm">{t('admin.noPopups')}</p>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -411,7 +413,7 @@ const AdminPopups = () => {
                                     <h3 className="text-sm font-semibold text-black">{popup.title}</h3>
                                     <StatusBadge active={popup.active} />
                                     {popup.showOnce && (
-                                        <span className="text-xs text-gray-400 uppercase">Show once</span>
+                                        <span className="text-xs text-gray-400 uppercase">{t('admin.showOnceLabel')}</span>
                                     )}
                                 </div>
                                 {popup.subtitle && (
@@ -425,19 +427,19 @@ const AdminPopups = () => {
                                     onClick={() => handleEdit(popup)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
-                                    Edit
+                                    {t('admin.edit')}
                                 </button>
                                 <button
                                     onClick={() => handleToggle(popup.id)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
-                                    {popup.active ? 'Deactivate' : 'Activate'}
+                                    {popup.active ? t('admin.deactivate') : t('admin.activate')}
                                 </button>
                                 <button
                                     onClick={() => handleDelete(popup.id)}
                                     className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
                                 >
-                                    Delete
+                                    {t('admin.delete')}
                                 </button>
                             </div>
                         </div>

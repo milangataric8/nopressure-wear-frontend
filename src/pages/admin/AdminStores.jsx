@@ -4,8 +4,10 @@ import { getAllStores, createStore, updateStore, toggleStore, deleteStore } from
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 const AdminStores = () => {
+    const { t } = useTranslation();
     const [stores, setStores] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -27,7 +29,7 @@ const AdminStores = () => {
             const response = await getAllStores();
             setStores(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load stores');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -46,15 +48,15 @@ const AdminStores = () => {
         try {
             if (editingStore) {
                 await updateStore(editingStore.id, formData);
-                toast.success('Store updated');
+                toast.success(t('messages.storeUpdated'));
             } else {
                 await createStore(formData);
-                toast.success('Store created');
+                toast.success(t('messages.storeCreated'));
             }
             resetForm();
             fetchStores();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save store');
+            toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -79,18 +81,18 @@ const AdminStores = () => {
             await toggleStore(id);
             fetchStores();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to toggle store');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this store location?')) return;
+        if (!window.confirm(t('messages.confirmDelete'))) return;
         try {
             await deleteStore(id);
-            toast.success('Store deleted');
+            toast.success(t('messages.storeDeleted'));
             fetchStores();
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete store');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -115,9 +117,9 @@ const AdminStores = () => {
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <AdminPageHeader
-                title="Store Locations"
-                subtitle="Manage physical store locations"
-                buttonLabel={showForm ? 'Cancel' : '+ New Store'}
+                title={t('admin.storeLocations')}
+                subtitle={t('admin.manageStoreLocations')}
+                buttonLabel={showForm ? t('admin.cancel') : t('admin.newStore')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
 
@@ -125,46 +127,46 @@ const AdminStores = () => {
             {showForm && (
                 <div className="border border-gray-200 p-8 mb-10">
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
-                        {editingStore ? 'Edit Store' : 'New Store'}
+                        {editingStore ? t('admin.edit') : t('admin.newStore')}
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>Store Name</label>
+                            <label className={labelClass}>{t('admin.storeName')}</label>
                             <input type="text" name="name" value={formData.name} onChange={handleChange}
                                    className={inputClass} placeholder="Downtown Store" required />
                         </div>
                         <div>
-                            <label className={labelClass}>Street</label>
+                            <label className={labelClass}>{t('admin.street')}</label>
                             <input type="text" name="street" value={formData.street} onChange={handleChange}
                                    className={inputClass} placeholder="123 Main Street" required />
                         </div>
                         <div>
-                            <label className={labelClass}>City</label>
+                            <label className={labelClass}>{t('cart.city')}</label>
                             <input type="text" name="city" value={formData.city} onChange={handleChange}
                                    className={inputClass} placeholder="Novi Sad" required />
                         </div>
                         <div>
-                            <label className={labelClass}>Postal Code</label>
+                            <label className={labelClass}>{t('cart.postalCode')}</label>
                             <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange}
                                    className={inputClass} placeholder="21000" />
                         </div>
                         <div>
-                            <label className={labelClass}>Country</label>
+                            <label className={labelClass}>{t('cart.country')}</label>
                             <input type="text" name="country" value={formData.country} onChange={handleChange}
                                    className={inputClass} placeholder="Serbia" required />
                         </div>
                         <div>
-                            <label className={labelClass}>Phone</label>
+                            <label className={labelClass}>{t('admin.phone')}</label>
                             <input type="text" name="phone" value={formData.phone} onChange={handleChange}
                                    className={inputClass} placeholder="+381 21 123 456" />
                         </div>
                         <div>
-                            <label className={labelClass}>Email</label>
+                            <label className={labelClass}>{t('auth.email')}</label>
                             <input type="email" name="email" value={formData.email} onChange={handleChange}
                                    className={inputClass} placeholder="store@webshop.com" />
                         </div>
                         <div>
-                            <label className={labelClass}>Working Hours</label>
+                            <label className={labelClass}>{t('admin.workingHours')}</label>
                             <input type="text" name="workingHours" value={formData.workingHours} onChange={handleChange}
                                    className={inputClass} placeholder="Mon-Fri: 9-20, Sat: 9-16" />
                         </div>
@@ -172,11 +174,11 @@ const AdminStores = () => {
                         <div className="md:col-span-2 flex gap-3">
                             <button type="submit"
                                     className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors">
-                                {editingStore ? 'Update Store' : 'Create Store'}
+                                {editingStore ? t('common.update') : t('common.create')}
                             </button>
                             <button type="button" onClick={resetForm}
                                     className="border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-50 transition-colors">
-                                Cancel
+                                {t('admin.cancel')}
                             </button>
                         </div>
                     </form>
@@ -188,19 +190,19 @@ const AdminStores = () => {
                 <LoadingSpinner />
             ) : stores.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">No store locations yet</p>
+                    <p className="text-sm">{t('admin.noStoreLocations')}</p>
                 </div>
             ) : (
                 <div className="border border-gray-200">
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Store</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Address</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Contact</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Hours</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Status</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">Actions</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.storeLocations')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.address')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.contact')}</th>
+                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.workingHours')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -226,13 +228,17 @@ const AdminStores = () => {
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-3">
                                         <button onClick={() => handleEdit(store)}
-                                                className="text-xs text-gray-500 hover:text-black underline">Edit</button>
+                                                className="text-xs text-gray-500 hover:text-black underline">
+                                            {t('admin.edit')}
+                                        </button>
                                         <button onClick={() => handleToggle(store.id)}
                                                 className="text-xs text-gray-500 hover:text-black underline">
-                                            {store.active ? 'Deactivate' : 'Activate'}
+                                            {store.active ? t('admin.deactivate') : t('admin.activate')}
                                         </button>
                                         <button onClick={() => handleDelete(store.id)}
-                                                className="text-xs text-red-400 hover:text-red-600 underline">Delete</button>
+                                                className="text-xs text-red-400 hover:text-red-600 underline">
+                                            {t('admin.delete')}
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

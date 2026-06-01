@@ -40,7 +40,7 @@ const AdminSettings = () => {
             keys: ['payment_card_enabled', 'payment_cod_enabled']
         },
         {
-            title: 'Features',
+            title: t('settings.features'),
             keys: ['find_in_store_enabled']
         }
     ];
@@ -51,7 +51,7 @@ const AdminSettings = () => {
             const response = await getSettings();
             setSettings(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load settings');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -74,7 +74,7 @@ const AdminSettings = () => {
             fetchSettings();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update settings');
+            toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
     };
 
@@ -94,11 +94,11 @@ const AdminSettings = () => {
     const handleFilterToggle = async (filter) => {
         try {
             await updateFilter(filter.id, { visible: !filter.visible });
-            toast.success(`${filter.displayName} filter ${filter.visible ? 'hidden' : 'shown'}`);
+            toast.success(filter.visible ? t('messages.filterHidden', { name: filter.displayName }) : t('messages.filterShown', { name: filter.displayName }));
             fetchFilters();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update filter');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
 
@@ -108,8 +108,27 @@ const AdminSettings = () => {
             fetchFilters();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to reorder filter');
+            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
+    };
+
+    const translateFilterName = (displayName) => {
+        const map = {
+            'Categories': t('settings.filterCategories'),
+            'Color': t('settings.filterColor'),
+            'Brand': t('settings.filterBrand'),
+            'Price': t('settings.filterPrice'),
+        };
+        return map[displayName] || displayName;
+    };
+
+    const translateFilterType = (filterType) => {
+        const map = {
+            select: t('settings.filterTypeSelect'),
+            color: t('settings.filterTypeColor'),
+            range: t('settings.filterTypeRange'),
+        };
+        return map[filterType] || filterType;
     };
 
     const inputClass = "w-full border border-gray-300 px-3 py-2 text-sm text-black focus:outline-none focus:border-black transition-colors";
@@ -141,7 +160,7 @@ const AdminSettings = () => {
                                     <div key={setting.id} className="flex items-center gap-4">
                                         <div className="w-48 flex-shrink-0">
                                             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                                {setting.label}
+                                                {t(`settings.${setting.key}`, { defaultValue: setting.label })}
                                             </p>
                                         </div>
 
@@ -153,11 +172,11 @@ const AdminSettings = () => {
                                                         try {
                                                             const newValue = setting.value === 'true' ? 'false' : 'true';
                                                             await updateSettings(setting.id, newValue);
-                                                            toast.success(`${setting.label} ${newValue === 'true' ? 'enabled' : 'disabled'}`);
+                                                            toast.success(newValue === 'true' ? t('messages.settingEnabled', { name: setting.label }) : t('messages.settingDisabled', { name: setting.label }));
                                                             fetchSettings();
                                                             window.dispatchEvent(new Event('settings-updated'));
                                                         } catch (e) {
-                                                            toast.error(e.response?.data?.message || 'Failed to update setting');
+                                                            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
                                                         }
                                                     }}
                                                     className={`w-10 h-5 rounded-full transition-colors relative ${
@@ -192,7 +211,7 @@ const AdminSettings = () => {
                                                                 className="w-3.5 h-3.5"
                                                             />
                                                             <span className="text-xs text-gray-500 uppercase tracking-wide">
-                                                                Remove background
+                                                                {t('admin.removeBackground')}
                                                             </span>
                                                         </label>
                                                         <label className="cursor-pointer">
@@ -214,7 +233,7 @@ const AdminSettings = () => {
                                                                         fetchSettings();
                                                                         window.dispatchEvent(new Event('settings-updated'));
                                                                     } catch (e) {
-                                                                        toast.error(e.response?.data?.message || 'Failed to upload logo, error');
+                                                                        toast.error(e.response?.data?.message || t('messages.failedToUploadLogo'));
                                                                     }
                                                                 }}
                                                             />
@@ -300,12 +319,12 @@ const AdminSettings = () => {
                                         }`} />
                                     </button>
                                     <div>
-                                        <p className="text-sm font-medium text-black">{filter.displayName}</p>
-                                        <p className="text-xs text-gray-400">{filter.filterType} filter</p>
+                                        <p className="text-sm font-medium text-black">{translateFilterName(filter.displayName)}</p>
+                                        <p className="text-xs text-gray-400">{translateFilterType(filter.filterType)}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className="text-xs text-gray-400">Order:</span>
+                                    <span className="text-xs text-gray-400">{t('settings.order')}:</span>
                                     <input
                                         type="number"
                                         value={filter.displayOrder}
@@ -316,14 +335,14 @@ const AdminSettings = () => {
                                     {filter.fieldName.startsWith('attr_') && (
                                         <button
                                             onClick={async () => {
-                                                if (!window.confirm(`Delete ${filter.displayName} filter?`)) return;
+                                                if (!window.confirm(t('messages.confirmDelete'))) return;
                                                 try {
                                                     await deleteFilter(filter.id);
-                                                    toast.success('Filter deleted');
+                                                    toast.success(t('messages.filterDeleted'));
                                                     fetchFilters();
                                                     window.dispatchEvent(new Event('settings-updated'));
                                                 } catch (e) {
-                                                    toast.error(e.response?.data?.message || 'Failed to delete filter');
+                                                    toast.error(e.response?.data?.message || t('messages.failedToSave'));
                                                 }
                                             }}
                                             className="text-xs text-red-400 hover:text-red-600 underline"
@@ -366,7 +385,7 @@ const AdminSettings = () => {
                                 <button
                                     onClick={async () => {
                                         if (!newFilterName || !newFilterDisplay) {
-                                            toast.error('Fill in both fields');
+                                            toast.error(t('messages.fillBothFields'));
                                             return;
                                         }
                                         try {
@@ -375,14 +394,14 @@ const AdminSettings = () => {
                                                 displayName: newFilterDisplay,
                                                 filterType: 'select'
                                             });
-                                            toast.success('Filter created');
+                                            toast.success(t('messages.filterCreated'));
                                             setNewFilterName('');
                                             setNewFilterDisplay('');
                                             setShowNewFilter(false);
                                             fetchFilters();
                                             window.dispatchEvent(new Event('settings-updated'));
                                         } catch (e) {
-                                            toast.error(e.response?.data?.message || 'Failed to create filter');
+                                            toast.error(e.response?.data?.message || t('messages.failedToSave'));
                                         }
                                     }}
                                     className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800"

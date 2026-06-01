@@ -7,9 +7,19 @@ import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";
 import Pagination from "../components/common/Pagination.jsx";
 import { useTranslation } from 'react-i18next';
+import useFormatPrice from '../hooks/useFormatPrice';
 
 const OrdersPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
+    const formatPrice = useFormatPrice();
+    const getStatusLabel = (status) => ({
+        PENDING: t('order.pending'),
+        CONFIRMED: t('order.confirmed'),
+        SHIPPED: t('order.shipped'),
+        DELIVERED: t('order.delivered'),
+        CANCELLED: t('order.cancelled'),
+    }[status] || status);
     const { user } = useAuth();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
@@ -26,7 +36,7 @@ const OrdersPage = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load orders');
+            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -71,7 +81,7 @@ const OrdersPage = () => {
                     </h1>
                     {totalElements > 0 && (
                         <p className="text-sm text-gray-500 mt-1">
-                            {totalElements} order{totalElements !== 1 ? 's' : ''} total
+                            {t('order.ordersTotal', { count: totalElements })}
                         </p>
                     )}
                 </div>
@@ -118,10 +128,10 @@ const OrdersPage = () => {
                                 <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
                                     <div>
                                         <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">
-                                            Order #{order.id}
+                                            {t('order.orderLabel')} #{order.id}
                                         </p>
                                         <p className="text-xs text-gray-400">
-                                            {new Date(order.createdAt).toLocaleDateString('en-US', {
+                                            {new Date(order.createdAt).toLocaleDateString(dateLocale, {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric'
@@ -130,10 +140,10 @@ const OrdersPage = () => {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <span className={`text-xs font-semibold uppercase tracking-wide px-3 py-1 ${getStatusStyle(order.status)}`}>
-                                            {order.status}
+                                            {getStatusLabel(order.status)}
                                         </span>
                                         <span className="text-sm font-bold text-black">
-                                            ${order.totalAmount.toFixed(2)}
+                                            {formatPrice(order.totalAmount)}
                                         </span>
                                     </div>
                                 </div>
@@ -159,15 +169,15 @@ const OrdersPage = () => {
                                                         {item.productName}
                                                     </p>
                                                     <p className="text-xs text-gray-400">
-                                                        Qty: {item.quantity}
+                                                        {t('order.qty')}: {item.quantity}
                                                     </p>
                                                     <p className="text-xs text-gray-400">
-                                                        ${item.priceAtPurchase} / item
+                                                        {formatPrice(item.priceAtPurchase)} {t('order.perItem')}
                                                     </p>
                                                 </div>
                                             </div>
                                             <span className="text-sm font-bold text-black">
-                                                ${item.subtotal.toFixed(2)}
+                                                {formatPrice(item.subtotal)}
                                             </span>
                                         </div>
                                     ))}

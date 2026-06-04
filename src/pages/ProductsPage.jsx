@@ -40,8 +40,6 @@ const ProductsPage = () => {
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
     const [filterConfig, setFilterConfig] = useState([]);
-    const [dynamicFilters, setDynamicFilters] = useState({});
-    const [selectedAttributes, setSelectedAttributes] = useState({});
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -66,10 +64,6 @@ const ProductsPage = () => {
             if (selectedBrand) params.brand = selectedBrand;
             if (selectedColor) params.colorName = selectedColor;
 
-            Object.entries(selectedAttributes).forEach(([key, value]) => {
-                if (value) params[`attr_${key}`] = value;
-            });
-
             const response = await searchActiveProducts(params);
 
             setProducts(response.data.content);
@@ -80,7 +74,7 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories, selectedAttributes]);
+    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -150,13 +144,6 @@ const ProductsPage = () => {
     }, [searchParams]);
 
     useEffect(() => {
-        getProductFilters().then(r => {
-            setAvailableBrands(r.data.brands || []);
-            setAvailableColors(r.data.colors || []);
-        }).catch(() => {});
-    }, []);
-
-    useEffect(() => {
         getVisibleFilters().then(r => {
             setFilterConfig(r.data);
         }).catch((e) => console.log('Filter error:', e));
@@ -177,8 +164,7 @@ const ProductsPage = () => {
         getProductFilters().then(r => {
             setAvailableBrands(r.data.brands || []);
             setAvailableColors(r.data.colors || []);
-            setDynamicFilters(r.data.attributes || {});
-        }).catch((e) => console.log('Filter error:', e));
+        }).catch(() => {});
     }, []);
 
     const handleCategoryClick = (categoryId) => {
@@ -328,42 +314,6 @@ const ProductsPage = () => {
                                 </div>
                             </div>
                         )}
-
-                        {/* Dynamic attribute filters */}
-                        {Object.entries(dynamicFilters).map(([key, values]) => {
-                            const filterFieldName = `attr_${key.toLowerCase()}`;
-                            if (!isFilterVisible(filterFieldName)) return null;
-                            const displayName = filterConfig.find(f => f.fieldName === filterFieldName)?.displayName || key;
-
-                            return (
-                                <div key={key} className="mb-6">
-                                    <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                                        {displayName}
-                                    </h3>
-                                    <div className="space-y-1">
-                                        {values.map(value => (
-                                            <button
-                                                key={value}
-                                                onClick={() => {
-                                                    setSelectedAttributes(prev => ({
-                                                        ...prev,
-                                                        [key]: prev[key] === value ? '' : value
-                                                    }));
-                                                    setPage(0);
-                                                }}
-                                                className={`block w-full text-left text-sm py-1 transition-colors ${
-                                                    selectedAttributes[key] === value
-                                                        ? 'font-semibold text-black'
-                                                        : 'text-gray-500 hover:text-black'
-                                                }`}
-                                            >
-                                                {value}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })}
 
                         {/* Price filter */}
                         {isFilterVisible('price') && (

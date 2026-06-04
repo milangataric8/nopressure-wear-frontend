@@ -163,7 +163,29 @@
     "availableInStore": "Available in {{count}} store",
     "availableInStores": "Available in {{count}} stores",
     "uncategorized": "Uncategorized",
-    "inStockCount": "{{count}} in stock"
+    "inStockCount": "{{count}} in stock",
+    "noColor": "No Color",
+    "multiColor": "Multi-Color",
+    "colors": {
+      "white": "White",
+      "black": "Black",
+      "gray": "Gray",
+      "silver": "Silver",
+      "red": "Red",
+      "blue": "Blue",
+      "navy": "Navy",
+      "green": "Green",
+      "yellow": "Yellow",
+      "orange": "Orange",
+      "purple": "Purple",
+      "pink": "Pink",
+      "gold": "Gold",
+      "brown": "Brown",
+      "beige": "Beige",
+      "midnightBlue": "Midnight Blue",
+      "spaceGray": "Space Gray",
+      "roseGold": "Rose Gold"
+    }
   },
   "cart": {
     "title": "Shopping Cart",

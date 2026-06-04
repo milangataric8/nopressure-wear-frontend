@@ -163,7 +163,29 @@
     "availableInStore": "Dostupno u {{count}} prodavnici",
     "availableInStores": "Dostupno u {{count}} prodavnicama",
     "uncategorized": "Bez kategorije",
-    "inStockCount": "{{count}} na stanju"
+    "inStockCount": "{{count}} na stanju",
+    "noColor": "Bez boje",
+    "multiColor": "Više boja",
+    "colors": {
+      "white": "Bela",
+      "black": "Crna",
+      "gray": "Siva",
+      "silver": "Srebrna",
+      "red": "Crvena",
+      "blue": "Plava",
+      "navy": "Tamnoplava",
+      "green": "Zelena",
+      "yellow": "Žuta",
+      "orange": "Narandžasta",
+      "purple": "Ljubičasta",
+      "pink": "Roze",
+      "gold": "Zlatna",
+      "brown": "Braon",
+      "beige": "Bež",
+      "midnightBlue": "Ponoćno plava",
+      "spaceGray": "Svemirska siva",
+      "roseGold": "Ružičasto zlatna"
+    }
   },
   "cart": {
     "title": "Korpa",

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getSettings, updateSettings } from '../../api/settingsApi';
 import {uploadImage} from "../../api/uploadApi.js";
-import { getAllFilters, updateFilter, createFilter, deleteFilter } from '../../api/filterApi';
+import { getAllFilters, updateFilter } from '../../api/filterApi';
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
 
@@ -14,9 +14,6 @@ const AdminSettings = () => {
     const [editValue, setEditValue] = useState('');
     const [removeBg, setRemoveBg] = useState(false);
     const [filters, setFilters] = useState([]);
-    const [newFilterName, setNewFilterName] = useState('');
-    const [newFilterDisplay, setNewFilterDisplay] = useState('');
-    const [showNewFilter, setShowNewFilter] = useState(false);
 
     const sections = [
         {
@@ -331,99 +328,10 @@ const AdminSettings = () => {
                                         onChange={(e) => handleFilterReorder(filter, parseInt(e.target.value))}
                                         className="w-12 border border-gray-300 px-2 py-1 text-xs text-center focus:outline-none focus:border-black"
                                     />
-                                    {/* Delete button — only for custom filters */}
-                                    {filter.fieldName.startsWith('attr_') && (
-                                        <button
-                                            onClick={async () => {
-                                                if (!window.confirm(t('messages.confirmDelete'))) return;
-                                                try {
-                                                    await deleteFilter(filter.id);
-                                                    toast.success(t('messages.filterDeleted'));
-                                                    fetchFilters();
-                                                    window.dispatchEvent(new Event('settings-updated'));
-                                                } catch (e) {
-                                                    toast.error(e.response?.data?.message || t('messages.failedToSave'));
-                                                }
-                                            }}
-                                            className="text-xs text-red-400 hover:text-red-600 underline"
-                                        >
-                                            {t('admin.delete')}
-                                        </button>
-                                    )}
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
-                {/* Add new filter */}
-                <div className="mt-6 border-t border-gray-200 pt-4">
-                    {showNewFilter ? (
-                        <div className="space-y-3">
-                            <div className="flex gap-3">
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-500 mb-1">{t('settings.fieldName')}</label>
-                                    <input
-                                        type="text"
-                                        value={newFilterName}
-                                        onChange={(e) => setNewFilterName(e.target.value.replace(/\s/g, ''))}
-                                        className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
-                                        placeholder="e.g. material"
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-xs text-gray-500 mb-1">{t('settings.displayName')}</label>
-                                    <input
-                                        type="text"
-                                        value={newFilterDisplay}
-                                        onChange={(e) => setNewFilterDisplay(e.target.value)}
-                                        className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
-                                        placeholder="e.g. Material"
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={async () => {
-                                        if (!newFilterName || !newFilterDisplay) {
-                                            toast.error(t('messages.fillBothFields'));
-                                            return;
-                                        }
-                                        try {
-                                            await createFilter({
-                                                fieldName: `attr_${newFilterName}`,
-                                                displayName: newFilterDisplay,
-                                                filterType: 'select'
-                                            });
-                                            toast.success(t('messages.filterCreated'));
-                                            setNewFilterName('');
-                                            setNewFilterDisplay('');
-                                            setShowNewFilter(false);
-                                            fetchFilters();
-                                            window.dispatchEvent(new Event('settings-updated'));
-                                        } catch (e) {
-                                            toast.error(e.response?.data?.message || t('messages.failedToSave'));
-                                        }
-                                    }}
-                                    className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800"
-                                >
-                                    {t('settings.addFilter')}
-                                </button>
-                                <button
-                                    onClick={() => setShowNewFilter(false)}
-                                    className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50"
-                                >
-                                    {t('common.cancel')}
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setShowNewFilter(true)}
-                            className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black"
-                        >
-                            {t('settings.addCustomFilter')}
-                        </button>
-                    )}
                 </div>
             </div>
         </div>

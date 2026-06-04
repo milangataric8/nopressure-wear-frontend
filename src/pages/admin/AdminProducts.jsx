@@ -14,7 +14,6 @@ import {
 import { getCategories } from '../../api/categoryApi';
 import { getImageUrl } from "../../utils/imageUtils.js";
 import { uploadImage, uploadVideo } from '../../api/uploadApi';
-import { addProductAttribute, deleteProductAttribute } from '../../api/productAttributeApi.js';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import { useTranslation } from 'react-i18next';
 import useFormatPrice from '../../hooks/useFormatPrice';
@@ -46,8 +45,6 @@ const AdminProducts = () => {
     const [colorFilter, setColorFilter] = useState('');
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
-    const [newAttrKey, setNewAttrKey] = useState('');
-    const [newAttrValue, setNewAttrValue] = useState('');
     const [allStores, setAllStores] = useState([]);
     const [productStores, setProductStores] = useState([]);
     const [selectedStoreId, setSelectedStoreId] = useState('');
@@ -62,25 +59,32 @@ const AdminProducts = () => {
         categoryId: '',
     });
     const COLOR_PALETTE = [
-        { name: 'White', hex: '#FFFFFF' },
-        { name: 'Black', hex: '#000000' },
-        { name: 'Gray', hex: '#808080' },
-        { name: 'Silver', hex: '#C0C0C0' },
-        { name: 'Red', hex: '#FF0000' },
-        { name: 'Blue', hex: '#0000FF' },
-        { name: 'Navy', hex: '#000080' },
-        { name: 'Green', hex: '#008000' },
-        { name: 'Yellow', hex: '#FFFF00' },
-        { name: 'Orange', hex: '#FF8C00' },
-        { name: 'Purple', hex: '#800080' },
-        { name: 'Pink', hex: '#FFC0CB' },
-        { name: 'Gold', hex: '#FFD700' },
-        { name: 'Brown', hex: '#8B4513' },
-        { name: 'Beige', hex: '#F5F5DC' },
-        { name: 'Midnight Blue', hex: '#191970' },
-        { name: 'Space Gray', hex: '#4A4A4A' },
-        { name: 'Rose Gold', hex: '#B76E79' },
+        { name: 'White', hex: '#FFFFFF', key: 'white' },
+        { name: 'Black', hex: '#000000', key: 'black' },
+        { name: 'Gray', hex: '#808080', key: 'gray' },
+        { name: 'Silver', hex: '#C0C0C0', key: 'silver' },
+        { name: 'Red', hex: '#FF0000', key: 'red' },
+        { name: 'Blue', hex: '#0000FF', key: 'blue' },
+        { name: 'Navy', hex: '#000080', key: 'navy' },
+        { name: 'Green', hex: '#008000', key: 'green' },
+        { name: 'Yellow', hex: '#FFFF00', key: 'yellow' },
+        { name: 'Orange', hex: '#FF8C00', key: 'orange' },
+        { name: 'Purple', hex: '#800080', key: 'purple' },
+        { name: 'Pink', hex: '#FFC0CB', key: 'pink' },
+        { name: 'Gold', hex: '#FFD700', key: 'gold' },
+        { name: 'Brown', hex: '#8B4513', key: 'brown' },
+        { name: 'Beige', hex: '#F5F5DC', key: 'beige' },
+        { name: 'Midnight Blue', hex: '#191970', key: 'midnightBlue' },
+        { name: 'Space Gray', hex: '#4A4A4A', key: 'spaceGray' },
+        { name: 'Rose Gold', hex: '#B76E79', key: 'roseGold' },
     ];
+
+    const translateColorName = (name) => {
+        if (name === 'No Color') return t('product.noColor');
+        if (name === 'Multi-Color') return t('product.multiColor');
+        const c = COLOR_PALETTE.find(p => p.name === name);
+        return c ? t(`product.colors.${c.key}`) : name;
+    };
 
     const fetchProducts = useCallback(async () => {
         setLoading(true);
@@ -183,7 +187,7 @@ const AdminProducts = () => {
             videoUrl: product.videoUrl || '',
             categoryId: product.categoryId || '',
             colorName: product.colorName || '',
-            colorHex: product.colorHex || '#000000',
+            colorHex: product.colorHex || '',
             brand: product.brand || '',
         });
         setShowForm(true);
@@ -214,7 +218,7 @@ const AdminProducts = () => {
             imageUrl: '',
             videoUrl: '',
             colorName: '',
-            colorHex: '#000000',
+            colorHex: '',
             brand: '',
             categoryId: '',
         });
@@ -337,7 +341,7 @@ const AdminProducts = () => {
                                     onClick={() => { setColorFilter(prev => prev === color.colorName ? '' : color.colorName); setPage(0); }}
                                     className={`w-6 h-6 rounded-full border border-gray-300 hover:border-gray-500 transition-colors`}
                                     style={{ backgroundColor: color.colorHex }}
-                                    title={color.colorName}
+                                    title={translateColorName(color.colorName)}
                                 >
                                     {colorFilter === color.colorName && (
                                         <span className="flex items-center justify-center h-full">
@@ -520,7 +524,7 @@ const AdminProducts = () => {
                             <label className={labelClass}>{t('product.color')}</label>
                         </div>
                         <div className="md:col-span-2 flex justify-center">
-                            <div className="flex gap-3 rounded-4xl">
+                            <div className="flex flex-wrap gap-3 justify-center">
                                 {COLOR_PALETTE.map(color => (
                                     <button
                                         key={color.name}
@@ -536,11 +540,11 @@ const AdminProducts = () => {
                                                 : 'border-gray-200 hover:border-gray-400'
                                         }`}
                                         style={{ backgroundColor: color.hex }}
-                                        title={color.name}
+                                        title={t(`product.colors.${color.key}`)}
                                     >
                                         {formData.colorName === color.name && (
                                             <span className="flex items-center justify-center h-full">
-                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
                                                      stroke={
                                                         ['#FFFFFF', '#FFFF00', '#FFD700', '#FFC0CB', '#F5F5DC', '#C0C0C0']
                                                          .includes(color.hex) ? 'black' : 'white'
@@ -552,6 +556,53 @@ const AdminProducts = () => {
                                         )}
                                     </button>
                                 ))}
+
+                                {/* Separator */}
+                                <div className="w-px bg-gray-200 self-stretch mx-1" />
+
+                                {/* No Color */}
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, colorName: 'No Color', colorHex: '' }))}
+                                    className={`w-10 h-10 rounded-full border-2 transition-colors relative overflow-hidden bg-white ${
+                                        formData.colorName === 'No Color'
+                                            ? 'border-black'
+                                            : 'border-gray-200 hover:border-gray-400'
+                                    }`}
+                                    title={t('product.noColor')}
+                                >
+                                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 24 24">
+                                        <line x1="5" y1="5" x2="19" y2="19" stroke="#ef4444" strokeWidth="2.5"/>
+                                    </svg>
+                                    {formData.colorName === 'No Color' && (
+                                        <span className="absolute inset-0 flex items-center justify-center">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3.5">
+                                                <polyline points="20 6 9 17 4 12"/>
+                                            </svg>
+                                        </span>
+                                    )}
+                                </button>
+
+                                {/* Multi-Color */}
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, colorName: 'Multi-Color', colorHex: 'multicolor' }))}
+                                    className={`w-10 h-10 rounded-full border-2 transition-colors relative overflow-hidden ${
+                                        formData.colorName === 'Multi-Color'
+                                            ? 'border-black'
+                                            : 'border-gray-200 hover:border-gray-400'
+                                    }`}
+                                    style={{ background: 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)' }}
+                                    title={t('product.multiColor')}
+                                >
+                                    {formData.colorName === 'Multi-Color' && (
+                                        <span className="flex items-center justify-center h-full">
+                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="4">
+                                                <polyline points="20 6 9 17 4 12"/>
+                                            </svg>
+                                        </span>
+                                    )}
+                                </button>
                             </div>
                         </div>
 
@@ -655,15 +706,30 @@ const AdminProducts = () => {
                         <div className="md:col-span-2 flex justify-center">
                             {formData.colorName && (
                                 <div className="flex items-center gap-3">
-                                    <div
-                                        className="w-8 h-8 rounded-full border border-gray-300"
-                                        style={{ backgroundColor: formData.colorHex }}
-                                    />
-                                    <span className="text-sm text-black font-medium">{formData.colorName}</span>
-                                    <span className="text-xs text-gray-400">{formData.colorHex}</span>
+                                    {formData.colorName === 'Multi-Color' ? (
+                                        <div
+                                            className="w-8 h-8 rounded-full border border-gray-300 flex-shrink-0"
+                                            style={{ background: 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)' }}
+                                        />
+                                    ) : formData.colorName === 'No Color' ? (
+                                        <div className="w-8 h-8 rounded-full border border-gray-300 bg-white relative overflow-hidden flex-shrink-0">
+                                            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 24 24">
+                                                <line x1="5" y1="5" x2="19" y2="19" stroke="#ef4444" strokeWidth="2.5"/>
+                                            </svg>
+                                        </div>
+                                    ) : (
+                                        <div
+                                            className="w-8 h-8 rounded-full border border-gray-300 flex-shrink-0"
+                                            style={{ backgroundColor: formData.colorHex }}
+                                        />
+                                    )}
+                                    <span className="text-sm text-black font-medium">{translateColorName(formData.colorName)}</span>
+                                    {formData.colorHex && formData.colorName !== 'Multi-Color' && (
+                                        <span className="text-xs text-gray-400">{formData.colorHex}</span>
+                                    )}
                                     <button
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, colorName: '', colorHex: '#000000' }))}
+                                        onClick={() => setFormData(prev => ({ ...prev, colorName: '', colorHex: '' }))}
                                         className="text-xs text-red-400 hover:text-red-600 underline ml-2"
                                     >
                                         {t('common.clear')}
@@ -671,88 +737,6 @@ const AdminProducts = () => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Product Attributes — only when editing */}
-                        {editingProduct && (
-                            <div className="md:col-span-2">
-                                <label className={labelClass}>{t('admin.customAttributes')}</label>
-
-                                {/* Existing attributes */}
-                                <div className="flex gap-2 flex-wrap mb-3">
-                                    {editingProduct.attributes?.map(attr => (
-                                        <div key={attr.id} className="flex items-center gap-2 border border-gray-200 px-3 py-1.5">
-                                            <span className="text-xs text-gray-500">{attr.key}:</span>
-                                            <span className="text-xs font-medium text-black">{attr.value}</span>
-                                            <button
-                                                type="button"
-                                                onClick={async () => {
-                                                    try {
-                                                        await deleteProductAttribute(attr.id);
-                                                        toast.success(t('messages.attributeRemoved'));
-                                                        const updated = await getProductById(editingProduct.id);
-                                                        setEditingProduct(updated.data);
-                                                    } catch (e) {
-                                                        toast.error(e.response?.data?.message || t('messages.failedToRemoveAttribute'));
-                                                    }
-                                                }}
-                                                className="text-red-400 hover:text-red-600 text-xs"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Add new attribute */}
-                                <div className="flex gap-2 items-end">
-                                    <div className="flex-1">
-                                        <label className="block text-xs text-gray-500 mb-1">{t('admin.key')}</label>
-                                        <input
-                                            type="text"
-                                            value={newAttrKey}
-                                            onChange={(e) => setNewAttrKey(e.target.value)}
-                                            className={inputClass}
-                                            placeholder="e.g. material"
-                                        />
-                                    </div>
-                                    <div className="flex-1">
-                                        <label className="block text-xs text-gray-500 mb-1">{t('admin.value')}</label>
-                                        <input
-                                            type="text"
-                                            value={newAttrValue}
-                                            onChange={(e) => setNewAttrValue(e.target.value)}
-                                            className={inputClass}
-                                            placeholder="e.g. Silicone"
-                                        />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={async () => {
-                                            if (!newAttrKey || !newAttrValue) {
-                                                toast.error(t('messages.fillBothFields'));
-                                                return;
-                                            }
-                                            try {
-                                                await addProductAttribute(editingProduct.id, {
-                                                    key: newAttrKey,
-                                                    value: newAttrValue
-                                                });
-                                                toast.success(t('messages.attributeAdded'));
-                                                setNewAttrKey('');
-                                                setNewAttrValue('');
-                                                const updated = await getProductById(editingProduct.id);
-                                                setEditingProduct(updated.data);
-                                            } catch (e) {
-                                                toast.error(e.response?.data?.message || t('messages.failedToAddAttribute'));
-                                            }
-                                        }}
-                                        className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800"
-                                    >
-                                        {t('common.add')}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
 
                         <div className="md:col-span-2">
                             <label className={labelClass}>{t('admin.mainImage')}</label>

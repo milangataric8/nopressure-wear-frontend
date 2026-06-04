@@ -201,7 +201,7 @@ const ProductDetailPage = () => {
                         </h1>
                         <button
                             onClick={handleToggleFavorite}
-                            className="flex-shrink-0 w-10 h-10 flex items-center justify-center border border-gray-200 hover:border-black transition-colors"
+                            className="flex-shrink-0 w-10 h-10 flex items-center justify-center transition-colors"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                  fill={isFavorited ? '#000000' : 'none'}
@@ -211,18 +211,6 @@ const ProductDetailPage = () => {
                             </svg>
                         </button>
                     </div>
-
-                    <button
-                        onClick={handleToggleFavorite}
-                        className="flex-shrink-0 w-10 h-10 flex items-center justify-center border border-gray-200 hover:border-black transition-colors"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                             fill={isFavorited ? '#000000' : 'none'}
-                             stroke="#000000"
-                             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                        </svg>
-                    </button>
 
                     <p className="text-xs text-gray-400 mb-6">
                         {t('product.productCode')}: {product.sku}

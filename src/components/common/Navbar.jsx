@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import useFormatPrice from '../../hooks/useFormatPrice';
 
 const Navbar = () => {
-    const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount} = useAuth();
+    const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount, favoriteCount } = useAuth();
     const navigate = useNavigate();
     const [searchInput, setSearchInput] = useState('');
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -449,6 +449,20 @@ const Navbar = () => {
                                 </button>
                             </div>
 
+                            {/* Favorites heart icon */}
+                            {isAuthenticated() && (
+                                <Link to="/favorites" className="relative flex items-center text-gray-600 hover:text-black transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
+                                    {favoriteCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-4 h-4 flex items-center justify-center">
+                                            {favoriteCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            )}
+
                             {/* Cart */}
                             {isAuthenticated() && (
                                 <div
@@ -556,6 +570,9 @@ const Navbar = () => {
                                 {isAuthenticated() && (
                                     <>
                                         <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.orders')}</Link>
+                                        <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">
+                                            {t('favorite.favorites')} {favoriteCount > 0 && `(${favoriteCount})`}
+                                        </Link>
                                         <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('cart.title')}</Link>
                                     </>
                                 )}

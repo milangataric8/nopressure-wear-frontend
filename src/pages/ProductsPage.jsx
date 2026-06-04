@@ -5,9 +5,9 @@ import { getProductFilters, searchActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
 import { getImageUrl } from '../utils/imageUtils';
 import { getVisibleFilters } from '../api/filterApi';
+import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
-import { useTranslation } from 'react-i18next';
 import useFormatPrice from '../hooks/useFormatPrice';
 
 const ProductsPage = () => {

@@ -236,6 +236,12 @@
     "paymentFailed": "Failed",
     "name": "Name"
   },
+  "favorite": {
+    "favorites": "Favorites",
+    "myFavorites": "My Favorites",
+    "noFavorites": "No favorites yet",
+    "browseProducts": "Browse Products"
+  },
   "auth": {
     "login": "Sign In",
     "register": "Create Account",
@@ -423,6 +429,11 @@
     "filterShown": "{{name}} filter shown",
     "settingEnabled": "{{name}} enabled",
     "settingDisabled": "{{name}} disabled",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "failedToLoadFavorites": "Failed to load favorites",
+    "failedToRemoveFromFavorites": "Failed to remove from favorites",
+    "failedToUpdateFavorites": "Failed to update favorites",
     "failedToUpdate": "Failed to update",
     "failedToUploadLogo": "Failed to upload logo",
     "confirmDelete": "Are you sure you want to delete this?"

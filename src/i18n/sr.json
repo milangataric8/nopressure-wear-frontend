@@ -236,6 +236,12 @@
     "paymentFailed": "Neuspešno",
     "name": "Ime i prezime"
   },
+  "favorite": {
+    "favorites": "Omiljeno",
+    "myFavorites": "Moji omiljeni",
+    "noFavorites": "Nema omiljenih proizvoda",
+    "browseProducts": "Pregledaj proizvode"
+  },
   "auth": {
     "login": "Prijava",
     "register": "Kreiraj nalog",
@@ -423,6 +429,11 @@
     "filterShown": "Filter {{name}} prikazan",
     "settingEnabled": "{{name}} uključeno",
     "settingDisabled": "{{name}} isključeno",
+    "addedToFavorites": "Dodato u omiljene",
+    "removedFromFavorites": "Uklonjeno iz omiljenih",
+    "failedToLoadFavorites": "Greška pri učitavanju omiljenih",
+    "failedToRemoveFromFavorites": "Greška pri uklanjanju iz omiljenih",
+    "failedToUpdateFavorites": "Greška pri ažuriranju omiljenih",
     "failedToUpdate": "Greška pri ažuriranju",
     "failedToUploadLogo": "Greška pri otpremanju loga",
     "confirmDelete": "Da li ste sigurni da želite da obrišete ovo?"

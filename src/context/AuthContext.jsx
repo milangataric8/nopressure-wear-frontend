@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
 
     const [token, setToken] = useState(() => localStorage.getItem('token'));
     const [cartCount, setCartCount] = useState(0);
+    const [favoriteCount, setFavoriteCount] = useState(0);
 
     const loginUser = (userData, jwtToken) => {
         setUser(userData);
@@ -33,9 +34,16 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user, token, loginUser, logoutUser,
-            isAdmin, isEmployee, isAuthenticated,
-            cartCount, setCartCount
+            user,
+            token,
+            loginUser,
+            logoutUser,
+            isAdmin,
+            isEmployee,
+            isAuthenticated,
+            cartCount,
+            setCartCount,
+            setFavoriteCount
         }}>
             {children}
         </AuthContext.Provider>

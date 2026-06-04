@@ -32,9 +32,11 @@ import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminPopups from './pages/admin/AdminPopups';
 import AdminStores from "./pages/admin/AdminStores.jsx";
+import { getFavoriteCount } from './api/favoriteApi';
+import FavoritesPage from './pages/FavoritesPage';
 
 function App() {
-    const { user, isAuthenticated, setCartCount } = useAuth();
+    const { user, isAuthenticated, setCartCount, setFavoriteCount } = useAuth();
 
     useEffect(() => {
         const initCart = async () => {
@@ -48,6 +50,22 @@ function App() {
             }
         };
         initCart();
+    }, [user?.id]);
+
+    useEffect(() => {
+        const initData = async () => {
+            if (isAuthenticated() && user?.id) {
+                try {
+                    const cartResponse = await getCart(user.id);
+                    setCartCount(cartResponse.data.items.length);
+                    const favResponse = await getFavoriteCount(user.id);
+                    setFavoriteCount(favResponse.data.count);
+                } catch (e) {
+                    console.log('Init error: ' + e.message);
+                }
+            }
+        };
+        initData();
     }, [user?.id]);
 
     return (
@@ -123,6 +141,9 @@ function App() {
                     } />
                     <Route path="/admin/stores" element={
                         <ProtectedRoute adminOnly><AdminStores /></ProtectedRoute>
+                    } />
+                    <Route path="/favorites" element={
+                        <ProtectedRoute><FavoritesPage /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

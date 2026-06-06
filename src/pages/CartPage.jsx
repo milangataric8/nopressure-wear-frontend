@@ -97,9 +97,9 @@ const CartPage = () => {
             const response = await removeCartItem(user.id, cartItemId);
             setCart(response.data);
             setCartCount(response.data.items.length);
-            toast.success('Item removed');
+            toast.success(t('messages.itemRemoved'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to remove item, error');
+            toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
         }
     };
 
@@ -108,9 +108,9 @@ const CartPage = () => {
             await clearCart(user.id);
             setCart({ ...cart, items: [], totalAmount: 0 });
             setCartCount(0);
-            toast.success('Cart cleared');
+            toast.success(t('messages.cartCleared'));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to clear cart');
+            toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
         }
     };
 
@@ -249,7 +249,7 @@ const CartPage = () => {
                                         className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                     />
                                 ) : (
-                                    <span className="text-gray-400 text-xs">No image</span>
+                                    <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                 )}
                             </div>
 
@@ -263,7 +263,7 @@ const CartPage = () => {
                                         {formatPrice(item.subtotal)}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-400 mb-1">SKU: {item.productSku}</p>
+                                <p className="text-xs text-gray-400 mb-1">{t('cart.sku')}: {item.productSku}</p>
                                 <p className="text-xs text-gray-400 mb-1">
                                     <PriceDisplay
                                         price={item.productPrice}
@@ -308,7 +308,7 @@ const CartPage = () => {
                         onClick={handleClearCart}
                         className="text-xs text-gray-400 hover:text-black transition-colors underline"
                     >
-                        Clear Bag
+                        {t('cart.clearBag')}
                     </button>
                 </div>
 
@@ -607,7 +607,7 @@ const CartPage = () => {
                         </div>
                         {couponData && (
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Discount ({couponData.code})</span>
+                                <span className="text-gray-500">{t('cart.discount', { code: couponData.code })}</span>
                                 <span className="font-medium text-green-600">
                                     -{formatPrice(couponData.discountAmount)}
                                 </span>

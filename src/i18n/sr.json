@@ -170,6 +170,8 @@
     "availableInStores": "Dostupno u {{count}} prodavnicama",
     "uncategorized": "Bez kategorije",
     "inStockCount": "{{count}} na stanju",
+    "shopByCategory": "Kupujte po kategoriji",
+    "resultsFor": "Rezultati za: \"{{query}}\"",
     "noColor": "Bez boje",
     "multiColor": "Više boja",
     "colors": {
@@ -229,7 +231,10 @@
     "payment": "Plaćanje",
     "payNow": "Plati odmah",
     "processing": "Obrađujem...",
-    "selectAddress": "Izaberite adresu za dostavu"
+    "selectAddress": "Izaberite adresu za dostavu",
+    "clearBag": "Isprazni korpu",
+    "discount": "Popust ({{code}})",
+    "sku": "SKU"
   },
   "order": {
     "title": "Moje porudžbine",
@@ -328,6 +333,7 @@
   "footer": {
     "visitUs": "Posetite nas",
     "contact": "Kontakt",
+    "followUs": "Pratite nas",
     "findUs": "Pronađite nas",
     "allRightsReserved": "Sva prava zadržana"
   },
@@ -352,6 +358,9 @@
     "remove": "Ukloni",
     "add": "Dodaj",
     "uploading": "Otpremanje...",
+    "min": "Min",
+    "max": "Maks",
+    "sku": "SKU",
     "priceFormat": "{{amount}} RSD"
   },
   "settings": {
@@ -482,7 +491,11 @@
     "failedToUpdateFavorites": "Greška pri ažuriranju omiljenih",
     "failedToUpdate": "Greška pri ažuriranju",
     "failedToUploadLogo": "Greška pri otpremanju loga",
-    "confirmDelete": "Da li ste sigurni da želite da obrišete ovo?"
+    "confirmDelete": "Da li ste sigurni da želite da obrišete ovo?",
+    "itemRemoved": "Artikal uklonjen",
+    "cartCleared": "Korpa ispražnjena",
+    "failedToRemoveItem": "Greška pri uklanjanju artikla",
+    "failedToClearCart": "Greška pri pražnjenju korpe"
   },
   "store": {
     "addStore": "Dodaj prodavnicu"

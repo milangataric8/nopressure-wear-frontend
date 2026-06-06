@@ -195,7 +195,7 @@ const OrderDetailPage = () => {
                                             className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                         />
                                     ) : (
-                                        <span className="text-gray-400 text-xs">No image</span>
+                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                     )}
                                 </div>
                                 <div className="flex-1">

@@ -46,7 +46,7 @@ const Footer = () => {
                     {/* Visit Us */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            Visit Us
+                            {t('footer.visitUs')}
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
                             <p>{settings.footer_address || ''}</p>
@@ -62,7 +62,7 @@ const Footer = () => {
                     {/* Contact */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            Contact
+                            {t('footer.contact')}
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
                             <p>{settings.footer_email || ''}</p>
@@ -74,7 +74,7 @@ const Footer = () => {
                     {hasSocials && (
                         <div>
                             <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                                Follow Us
+                                {t('footer.followUs')}
                             </h3>
                             <SocialIcons settings={settings} size="md" />
                         </div>

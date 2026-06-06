@@ -261,30 +261,49 @@ const ProductsPage = () => {
                                     {t('product.color')}
                                 </h3>
                                 <div className="flex gap-2 flex-wrap">
-                                    {availableColors.map(color => (
-                                        <button
-                                            key={color.colorName}
-                                            onClick={() => {
-                                                setSelectedColor(prev => prev === color.colorName ? '' : color.colorName);
-                                                setPage(0);
-                                            }}
-                                            className={`w-7 h-7 rounded-full border-1 border-gray-300 hover:border-gray-500 transition-colors tooltip-container`}
-                                            style={{ backgroundColor: color.colorHex }}
-                                            title={color.colorName}
-                                        >
-                                            {selectedColor === color.colorName && (
-                                                <span className="flex items-center justify-center h-full">
-                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
-                                                        <polyline points="20 6 9 17 4 12"/>
+                                    {availableColors.map(color => {
+                                        const isNoColor = color.colorName === 'No Color';
+                                        const isMultiColor = color.colorName === 'Multi-Color';
+                                        const isSelected = selectedColor === color.colorName;
+                                        const lightColors = ['#FFFFFF', '#FFFF00', '#FFD700', '#FFC0CB', '#F5F5DC', '#C0C0C0'];
+                                        const checkStroke = isNoColor || lightColors.includes(color.colorHex) ? 'black' : 'white';
+                                        const buttonStyle = isMultiColor
+                                            ? { background: 'conic-gradient(red, yellow, lime, cyan, blue, magenta, red)' }
+                                            : isNoColor
+                                            ? { backgroundColor: 'white' }
+                                            : { backgroundColor: color.colorHex };
+
+                                        return (
+                                            <button
+                                                key={color.colorName}
+                                                onClick={() => { setSelectedColor(prev => prev === color.colorName ? '' : color.colorName); setPage(0); }}
+                                                className={`w-7 h-7 rounded-full transition-colors relative overflow-hidden border ${isSelected ? 'border-black border-2' : 'border-gray-300 hover:border-gray-500'}`}
+                                                style={buttonStyle}
+                                                title={color.colorName}
+                                            >
+                                                {isNoColor && (
+                                                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 24 24">
+                                                        <line x1="5" y1="5" x2="19" y2="19" stroke="#ef4444" strokeWidth="2.5"/>
                                                     </svg>
-                                                </span>
-                                            )}
-                                        </button>
-                                    ))}
+                                                )}
+                                                {isSelected && (
+                                                    <span className="absolute inset-0 flex items-center justify-center">
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={checkStroke} strokeWidth="4">
+                                                            <polyline points="20 6 9 17 4 12"/>
+                                                        </svg>
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                                 {selectedColor && (
                                     <p className="text-xs text-gray-500 mt-2">
-                                        {t('product.selected')}: <span className="font-medium text-black">{selectedColor}</span>
+                                        {t('product.selected')}: <span className="font-medium text-black">
+                                            {selectedColor === 'No Color' ? t('product.noColor')
+                                            : selectedColor === 'Multi-Color' ? t('product.multiColor')
+                                            : selectedColor}
+                                        </span>
                                     </p>
                                 )}
                             </div>
@@ -328,7 +347,7 @@ const ProductsPage = () => {
                                         type="number"
                                         value={minPrice}
                                         onChange={(e) => setMinPrice(e.target.value)}
-                                        placeholder="Min"
+                                        placeholder={t('common.min')}
                                         className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
                                     />
                                     <span className="text-gray-400 text-sm">—</span>
@@ -336,7 +355,7 @@ const ProductsPage = () => {
                                         type="number"
                                         value={maxPrice}
                                         onChange={(e) => setMaxPrice(e.target.value)}
-                                        placeholder="Max"
+                                        placeholder={t('common.max')}
                                         className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
                                     />
                                 </div>
@@ -431,7 +450,7 @@ const ProductsPage = () => {
                     {/* Search result label */}
                     {searchQuery && (
                         <p className="text-sm text-gray-500 mb-6">
-                            Results for: <span className="font-semibold text-black">"{searchQuery}"</span>
+                            {t('product.resultsFor', { query: searchQuery })}
                         </p>
                     )}
 
@@ -468,12 +487,12 @@ const ProductsPage = () => {
                                                 className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                             />
                                         ) : (
-                                            <span className="text-gray-400 text-xs">No image</span>
+                                            <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                         )}
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-400 mb-0.5">
-                                            {product.categoryName || 'Uncategorized'}
+                                            {product.categoryName || t('product.uncategorized')}
                                         </p>
                                         <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                             {product.name}

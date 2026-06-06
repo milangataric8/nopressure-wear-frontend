@@ -50,7 +50,7 @@ const HomePage = () => {
             {categories.length > 0 && (
                 <div className="max-w-7xl mx-auto px-6 py-16">
                     <h2 className="text-xl font-black uppercase tracking-tight text-black mb-8">
-                        Shop By Category
+                        {t('product.shopByCategory')}
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {categories.slice(0, 4).map(cat => (
@@ -106,7 +106,7 @@ const HomePage = () => {
                                 </div>
                                 <div>
                                     <p className="text-xs text-gray-400 mb-0.5">
-                                        {product.categoryName || 'Uncategorized'}
+                                        {product.categoryName || t('product.uncategorized')}
                                     </p>
                                     <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                         {product.name}

@@ -128,7 +128,13 @@
     "memberSince": "Member Since",
     "itemsCount": "{{count}} items",
     "customersTotal": "{{count}} customers total",
-    "filterType": "{{type}} filter"
+    "filterType": "{{type}} filter",
+    "sectionManagement": "Management",
+    "sectionCatalog": "Catalog",
+    "sectionSales": "Sales",
+    "sectionMarketing": "Marketing",
+    "sectionStore": "Store",
+    "locations": "Locations"
   },
   "product": {
     "allProducts": "All Products",
@@ -352,6 +358,7 @@
     "uploadLogo": "Upload Logo",
     "notSet": "Not set",
     "order": "Order",
+    "socialMedia": "Social Media",
     "features": "Features",
     "store_name": "Store Name",
     "store_logo_url": "Logo Image URL",
@@ -402,7 +409,6 @@
     "cardAdded": "Card added successfully!",
     "cardRemoved": "Card removed",
     "addressSaved": "Address saved",
-    "loginSuccess": "Welcome back!",
     "registerSuccess": "Account created!",
     "logoutSuccess": "Signed out",
     "passwordChanged": "Password changed",

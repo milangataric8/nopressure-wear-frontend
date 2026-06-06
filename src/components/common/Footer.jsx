@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getSettingsMap } from '../../api/settingsApi';
 import { useTranslation } from 'react-i18next';
+import SocialIcons from "./SocialIcons.jsx";
 
 const Footer = () => {
     const { t } = useTranslation();
@@ -24,32 +25,36 @@ const Footer = () => {
 
     const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(settings.footer_map_address || 'Novi Sad, Serbia')}&z=15&output=embed`;
 
+    const hasSocials = settings.social_instagram || settings.social_facebook ||
+        settings.social_x || settings.social_threads ||
+        settings.social_tiktok || settings.social_youtube;
+
     return (
         <footer className="border-t border-gray-200 mt-20">
             <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                <div className={`grid grid-cols-1 md:grid-cols-2 ${hasSocials ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-12 mb-12`}>
                     {/* Brand */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            {settings.store_name}
+                            {settings.store_name || 'WEBSHOP'}
                         </h3>
                         <p className="text-sm text-gray-500 leading-relaxed">
-                            {settings.store_tagline}
+                            {settings.store_tagline || ''}
                         </p>
                     </div>
 
                     {/* Visit Us */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            {t('footer.visitUs')}
+                            Visit Us
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
-                            <p>{settings.footer_address}</p>
-                            <p>{settings.footer_city}</p>
+                            <p>{settings.footer_address || ''}</p>
+                            <p>{settings.footer_city || ''}</p>
                             <div className="pt-2 space-y-1">
-                                <p>{settings.footer_hours_weekday}</p>
-                                <p>{settings.footer_hours_saturday}</p>
-                                <p>{settings.footer_hours_sunday}</p>
+                                <p>{settings.footer_hours_weekday || ''}</p>
+                                <p>{settings.footer_hours_saturday || ''}</p>
+                                <p>{settings.footer_hours_sunday || ''}</p>
                             </div>
                         </div>
                     </div>
@@ -57,13 +62,23 @@ const Footer = () => {
                     {/* Contact */}
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            {t('footer.contact')}
+                            Contact
                         </h3>
                         <div className="space-y-1 text-sm text-gray-500">
-                            <p>{settings.footer_email}</p>
-                            <p>{settings.footer_phone}</p>
+                            <p>{settings.footer_email || ''}</p>
+                            <p>{settings.footer_phone || ''}</p>
                         </div>
                     </div>
+
+                    {/* Follow Us — only if any social link exists */}
+                    {hasSocials && (
+                        <div>
+                            <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
+                                Follow Us
+                            </h3>
+                            <SocialIcons settings={settings} size="md" />
+                        </div>
+                    )}
                 </div>
 
                 {/* Map */}

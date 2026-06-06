@@ -23,7 +23,6 @@ const LoginPage = () => {
             const response = await login(formData);
             const { id, token, firstName, lastName, email, role } = response.data;
             loginUser({ id, firstName, lastName, email, role }, token);
-            toast.success(t('messages.loginSuccess'));
             navigate('/');
         } catch (error) {
             toast.error(error.response?.data?.message || 'Login failed');

@@ -33,6 +33,10 @@ const AdminSettings = () => {
             keys: ['footer_email', 'footer_phone']
         },
         {
+            title: t('settings.socialMedia'),
+            keys: ['social_instagram', 'social_facebook', 'social_x', 'social_threads', 'social_tiktok', 'social_youtube']
+        },
+        {
             title: t('settings.payment'),
             keys: ['payment_card_enabled', 'payment_cod_enabled']
         },
@@ -191,7 +195,7 @@ const AdminSettings = () => {
                                         ) : setting.key === 'store_logo_url' ? (
                                                 <div className="flex-1 flex items-center gap-4">
                                                     {setting.value && (
-                                                        <img
+                                                         <img
                                                             src={setting.value.startsWith('http')
                                                                 ? setting.value
                                                                 : `${import.meta.env.VITE_API_URL}${setting.value}`}

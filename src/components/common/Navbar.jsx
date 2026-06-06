@@ -8,6 +8,7 @@ import { getImageUrl } from '../../utils/imageUtils';
 import { getSettingsMap } from "../../api/settingsApi.js";
 import { useTranslation } from 'react-i18next';
 import useFormatPrice from '../../hooks/useFormatPrice';
+import SocialIcons from "./SocialIcons.jsx";
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount, favoriteCount } = useAuth();
@@ -23,6 +24,7 @@ const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const { t, i18n } = useTranslation();
+    const [socialSettings, setSocialSettings] = useState({});
     const formatPrice = useFormatPrice();
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
@@ -73,6 +75,16 @@ const Navbar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        getSettingsMap().then(r => setSocialSettings(r.data)).catch(() => {});
+
+        const handler = () => {
+            getSettingsMap().then(r => setSocialSettings(r.data)).catch(() => {});
+        };
+        window.addEventListener('settings-updated', handler);
+        return () => window.removeEventListener('settings-updated', handler);
+    }, []);
+
     const toggleLanguage = () => {
         const newLang = i18n.language === 'en' ? 'sr' : 'en';
         i18n.changeLanguage(newLang);
@@ -107,34 +119,41 @@ const Navbar = () => {
         <div ref={dropdownRef} className="fixed top-0 left-0 right-0 z-50">
             {/* Top mini navbar */}
             <div className="bg-gray-100 border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-end gap-6">
-                    {/* Language switcher */}
-                    <button
-                        onClick={toggleLanguage}
-                        className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
-                    >
-                        {i18n.language === 'en' ? 'SR' : 'EN'}
-                    </button>
+                <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-between">
+                    {/* Social icons — left */}
+                    <div className="flex items-center">
+                        <SocialIcons settings={socialSettings} size="sm" />
+                    </div>
 
-                    {isAuthenticated() ? (
-                        <>
-                            <Link to="/profile" className="text-xs text-black hover:text-black transition-colors">
-                                {user?.firstName} {user?.lastName}
-                            </Link>
-                            <button onClick={handleLogout} className="text-xs text-black hover:text-black transition-colors">
-                                {t('nav.signOut')}
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <Link to="/login" className="text-xs text-black hover:text-black transition-colors">
-                                {t('nav.signIn')}
-                            </Link>
-                            <Link to="/register" className="text-xs text-black hover:text-black transition-colors">
-                                {t('nav.joinUs')}
-                            </Link>
-                        </>
-                    )}
+                    {/* Auth links + language — right */}
+                    <div className="flex items-center gap-6 ml-auto">
+                        <button
+                            onClick={toggleLanguage}
+                            className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
+                        >
+                            {i18n.language === 'en' ? 'SR' : 'EN'}
+                        </button>
+
+                        {isAuthenticated() ? (
+                            <>
+                                <Link to="/profile" className="text-xs text-black hover:text-black transition-colors">
+                                    {user?.firstName} {user?.lastName}
+                                </Link>
+                                <button onClick={handleLogout} className="text-xs text-black hover:text-black transition-colors">
+                                    {t('nav.signOut')}
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="text-xs text-black hover:text-black transition-colors">
+                                    {t('nav.signIn')}
+                                </Link>
+                                <Link to="/register" className="text-xs text-black hover:text-black transition-colors">
+                                    {t('nav.joinUs')}
+                                </Link>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -287,85 +306,82 @@ const Navbar = () => {
                                     </Link>
 
                                     {activeDropdown === 'admin' && (
-                                        <div className="absolute top-full right-0 mt-0 bg-white border border-gray-200 shadow-lg z-50 py-2 w-48">
-                                            <Link
-                                                to="/admin/products"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.products')}
-                                            </Link>
-                                            <Link
-                                                to="/admin/categories"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.categories')}
-                                            </Link>
-                                            <Link
-                                                to="/admin/orders"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.orders')}
-                                            </Link>
-                                            <Link
-                                                to="/admin/coupons"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.coupons')}
-                                            </Link>
-                                            {isAdmin() && (
-                                                <Link
-                                                    to="/admin/employees"
-                                                    onClick={() => setActiveDropdown(null)}
-                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                                >
-                                                    {t('admin.employees')}
+                                        <div className="absolute top-full left-0 pt-4 z-50">
+                                            <div className="bg-white border border-gray-200 shadow-lg w-56">
+                                                {/* Admin only */}
+                                                {isAdmin() && (
+                                                    <>
+                                                        <div className="border-t border-gray-100 mt-1" />
+                                                        <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                            {t('admin.sectionManagement')}
+                                                        </p>
+                                                        <Link to="/admin/settings" onClick={() => setActiveDropdown(null)}
+                                                              className="block px-4 py-2 text-sm font-bold text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                            {t('admin.settings')}
+                                                        </Link>
+                                                        <Link to="/admin/employees" onClick={() => setActiveDropdown(null)}
+                                                              className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                            {t('admin.employees')}
+                                                        </Link>
+                                                    </>
+                                                )}
+                                                {/* Catalog */}
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                    {t('admin.sectionCatalog')}
+                                                </p>
+                                                <Link to="/admin/products" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.products')}
                                                 </Link>
-                                            )}
-                                            <Link
-                                                to="/admin/banners"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.banners')}
-                                            </Link>
-                                            <Link
-                                                to="/admin/customers"
-                                                onClick={() => setActiveDropdown(null)}
-                                                className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                            >
-                                                {t('admin.customers')}
-                                            </Link>
-                                            {isAdmin() && (
-                                                <Link
-                                                    to="/admin/settings"
-                                                    onClick={() => setActiveDropdown(null)}
-                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                                >
-                                                    {t('admin.settings')}
+                                                <Link to="/admin/categories" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.categories')}
                                                 </Link>
-                                            )}
-                                            {isAdmin() && (
-                                                <Link
-                                                    to="/admin/popups"
-                                                    onClick={() => setActiveDropdown(null)}
-                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                                >
+
+                                                {/* Sales */}
+                                                <div className="border-t border-gray-100 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                    {t('admin.sectionSales')}
+                                                </p>
+                                                <Link to="/admin/orders" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.orders')}
+                                                </Link>
+                                                <Link to="/admin/customers" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.customers')}
+                                                </Link>
+                                                <Link to="/admin/coupons" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.coupons')}
+                                                </Link>
+
+                                                {/* Marketing */}
+                                                <div className="border-t border-gray-100 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                    {t('admin.sectionMarketing')}
+                                                </p>
+                                                <Link to="/admin/banners" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.banners')}
+                                                </Link>
+                                                <Link to="/admin/popups" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                     {t('admin.popups')}
                                                 </Link>
-                                            )}
-                                            {isAdmin() && (
-                                                <Link
-                                                    to="/admin/stores"
-                                                    onClick={() => setActiveDropdown(null)}
-                                                    className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors"
-                                                >
-                                                    {t('admin.storeLocations')}
+
+                                                {/* Store */}
+                                                <div className="border-t border-gray-100 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                    {t('admin.sectionStore')}
+                                                </p>
+                                                <Link to="/admin/stores" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.locations')}
                                                 </Link>
-                                            )}
+
+                                                <div className="h-1" />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -545,56 +561,63 @@ const Navbar = () => {
                             </button>
                         </div>
 
-                        {/* Mobile menu */}
+                        {/* Mobile menu — fixed full-screen overlay below the navbar */}
                         {mobileMenuOpen && (
-                            <div className="md:hidden border-t border-gray-200 py-4 space-y-3">
-                                {/* Search */}
-                                <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">
-                                    <input
-                                        type="text"
-                                        value={searchInput}
-                                        onChange={(e) => setSearchInput(e.target.value)}
-                                        placeholder={t('nav.search')}
-                                        className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
-                                    />
-                                    <button type="submit" className="bg-black text-white px-3 flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                            <circle cx="11" cy="11" r="8"/>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                                        </svg>
-                                    </button>
-                                </form>
+                            <div className="md:hidden fixed left-0 right-0 top-24 bottom-0 bg-white z-40 overflow-y-auto border-t border-gray-200">
+                                <div className="px-6 py-4 space-y-3">
+                                    {/* Search */}
+                                    <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">
+                                        <input
+                                            type="text"
+                                            value={searchInput}
+                                            onChange={(e) => setSearchInput(e.target.value)}
+                                            placeholder={t('nav.search')}
+                                            className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                        />
+                                        <button type="submit" className="bg-black text-white px-3 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                <circle cx="11" cy="11" r="8"/>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                            </svg>
+                                        </button>
+                                    </form>
 
-                                {/* Links */}
-                                <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.products')}</Link>
-                                {isAuthenticated() && (
-                                    <>
-                                        <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.orders')}</Link>
-                                        <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">
-                                            {t('favorite.favorites')} {favoriteCount > 0 && `(${favoriteCount})`}
-                                        </Link>
-                                        <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('cart.title')}</Link>
-                                    </>
-                                )}
+                                    {/* Links */}
+                                    <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.products')}</Link>
+                                    {isAuthenticated() && (
+                                        <>
+                                            <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.orders')}</Link>
+                                        </>
+                                    )}
 
-                                {(isAdmin() || isEmployee()) && (
-                                    <div className="border-t border-gray-200 pt-3">
-                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">{t('nav.admin')}</p>
-                                        <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.products')}</Link>
-                                        <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.categories')}</Link>
-                                        <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.orders')}</Link>
-                                        <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.coupons')}</Link>
-                                        <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.customers')}</Link>
-                                        <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.banners')}</Link>
-                                        {isAdmin() && (
-                                            <>
-                                                <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.employees')}</Link>
-                                                <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.settings')}</Link>
-                                                <Link to="/admin/popups" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.popups')}</Link>
-                                            </>
-                                        )}
-                                    </div>
-                                )}
+                                    {(isAdmin() || isEmployee()) && (
+                                        <div className="border-t border-gray-200 pt-3">
+                                            {isAdmin() && (
+                                                <>
+                                                    <p className="text-xs font-black uppercase tracking-wide text-gray-300 mt-3 mb-2">{t('admin.sectionManagement')}</p>
+                                                    <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-bold text-gray-600 hover:text-black py-1">{t('admin.settings')}</Link>
+                                                    <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1 mb-3">{t('admin.employees')}</Link>
+                                                </>
+                                            )}
+
+                                            <p className="text-xs font-black uppercase tracking-wide text-gray-300 mb-2">{t('admin.sectionCatalog')}</p>
+                                            <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.products')}</Link>
+                                            <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.categories')}</Link>
+
+                                            <p className="text-xs font-black uppercase tracking-wide text-gray-300 mt-3 mb-2">{t('admin.sectionSales')}</p>
+                                            <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.orders')}</Link>
+                                            <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.customers')}</Link>
+                                            <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.coupons')}</Link>
+
+                                            <p className="text-xs font-black uppercase tracking-wide text-gray-300 mt-3 mb-2">{t('admin.sectionMarketing')}</p>
+                                            <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.banners')}</Link>
+                                            <Link to="/admin/popups" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.popups')}</Link>
+
+                                            <p className="text-xs font-black uppercase tracking-wide text-gray-300 mt-3 mb-2">{t('admin.sectionStore')}</p>
+                                            <Link to="/admin/stores" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.locations')}</Link>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>

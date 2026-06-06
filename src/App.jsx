@@ -1,7 +1,8 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { getCart } from './api/cartApi';
+import { getFavoriteCount } from './api/favoriteApi';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import HomePage from './pages/HomePage';
@@ -32,7 +33,6 @@ import AdminCustomerDetail from './pages/admin/AdminCustomerDetail';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminPopups from './pages/admin/AdminPopups';
 import AdminStores from "./pages/admin/AdminStores.jsx";
-import { getFavoriteCount } from './api/favoriteApi';
 import FavoritesPage from './pages/FavoritesPage';
 
 function App() {
@@ -67,6 +67,11 @@ function App() {
         };
         initData();
     }, [user?.id]);
+
+    const location = useLocation();
+
+    const hideFooter = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname)
+        || location.pathname.startsWith('/admin');
 
     return (
         <>
@@ -147,7 +152,7 @@ function App() {
                     } />
                 </Routes>
             </div>
-            <Footer />
+            {!hideFooter && <Footer />}
         </>
     );
 }

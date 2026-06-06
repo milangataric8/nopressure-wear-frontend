@@ -398,7 +398,7 @@ const Navbar = () => {
                                         value={searchInput}
                                         onChange={(e) => setSearchInput(e.target.value)}
                                         placeholder={t('nav.search')}
-                                        className="border border-gray-300 px-3 py-0 text-sm w-40 h-8 focus:outline-none focus:border-black transition-colors pr-6"
+                                        className="bg-gray-100 border-none px-3 py-0 text-sm w-40 h-8 focus:outline-none text-gray-600 placeholder-gray-400"
                                     />
                                     {searchInput && (
                                         <button
@@ -412,7 +412,7 @@ const Navbar = () => {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="bg-black text-white px-3 h-8 hover:bg-gray-800 transition-colors flex items-center justify-center"
+                                    className="bg-gray-100 text-gray-500 px-3 h-8 hover:text-black transition-colors flex items-center justify-center"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="11" cy="11" r="8"/>
@@ -466,7 +466,7 @@ const Navbar = () => {
                             </div>
 
                             {/* Favorites heart icon */}
-                            {isAuthenticated() && (
+                            {isAuthenticated() && socialSettings.favorites_enabled !== 'false' && (
                                 <Link to="/favorites" className="relative flex items-center text-gray-600 hover:text-black transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>

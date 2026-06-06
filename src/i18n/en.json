@@ -270,6 +270,22 @@
     "noFavorites": "No favorites yet",
     "browseProducts": "Browse Products"
   },
+  "review": {
+    "description": "Description",
+    "reviews": "Reviews",
+    "writeReview": "+ Write a Review",
+    "cancelReview": "− Cancel Review",
+    "shareExperience": "Share your experience... (optional)",
+    "submitReview": "Submit Review",
+    "submitting": "Submitting...",
+    "noReviews": "No reviews yet. Be the first to review!",
+    "delete": "Delete",
+    "signInToReview": "Please sign in to leave a review",
+    "selectRating": "Please select a rating",
+    "failedToSubmit": "Failed to submit review",
+    "failedToDelete": "Failed to delete review",
+    "reviewDeleted": "Review deleted"
+  },
   "auth": {
     "login": "Sign In",
     "register": "Create Account",
@@ -374,6 +390,8 @@
     "payment_card_enabled": "Card Payment",
     "payment_cod_enabled": "Cash on Delivery",
     "find_in_store_enabled": "Find in Store",
+    "reviews_enabled": "Reviews",
+    "favorites_enabled": "Favorites",
     "filterCategories": "Categories",
     "filterColor": "Color",
     "filterBrand": "Brand",

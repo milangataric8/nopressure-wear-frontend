@@ -270,6 +270,22 @@
     "noFavorites": "Nema omiljenih proizvoda",
     "browseProducts": "Pregledaj proizvode"
   },
+  "review": {
+    "description": "Opis",
+    "reviews": "Recenzije",
+    "writeReview": "+ Napiši recenziju",
+    "cancelReview": "− Otkaži recenziju",
+    "shareExperience": "Podelite vaše iskustvo... (opciono)",
+    "submitReview": "Pošalji recenziju",
+    "submitting": "Slanje...",
+    "noReviews": "Još nema recenzija. Budite prvi koji ocenjuje!",
+    "delete": "Obriši",
+    "signInToReview": "Prijavite se da biste ostavili recenziju",
+    "selectRating": "Molimo odaberite ocenu",
+    "failedToSubmit": "Greška pri slanju recenzije",
+    "failedToDelete": "Greška pri brisanju recenzije",
+    "reviewDeleted": "Recenzija obrisana"
+  },
   "auth": {
     "login": "Prijava",
     "register": "Kreiraj nalog",
@@ -374,6 +390,8 @@
     "payment_card_enabled": "Plaćanje karticom",
     "payment_cod_enabled": "Plaćanje pouzećem",
     "find_in_store_enabled": "Pronađi u prodavnici",
+    "reviews_enabled": "Recenzije",
+    "favorites_enabled": "Omiljeno",
     "filterCategories": "Kategorije",
     "filterColor": "Boja",
     "filterBrand": "Brend",

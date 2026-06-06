@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
 import useFormatPrice from '../hooks/useFormatPrice';
+import StarRating from '../components/common/StarRating';
 
 const ProductsPage = () => {
     const { t } = useTranslation();
@@ -529,6 +530,8 @@ const ProductsPage = () => {
                                                 {product.stockQuantity > 0 ? t('product.inStock') : t('product.soldOut')}
                                             </span>
                                         </div>
+
+                                        <StarRating rating={product.averageRating || 0} count={product.ratingCount || 0} size="sm" />
                                     </div>
                                 </Link>
                             ))}

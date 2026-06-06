@@ -5,12 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { getUserFavorites, toggleFavorite } from '../api/favoriteApi';
 import { getImageUrl } from '../utils/imageUtils';
+import useFormatPrice from "../hooks/useFormatPrice.js";
+import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const FavoritesPage = () => {
     const { t } = useTranslation();
     const { user, setFavoriteCount } = useAuth();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
+    const formatPrice = useFormatPrice();
 
     const fetchFavorites = useCallback(async () => {
         setLoading(true);
@@ -107,9 +110,12 @@ const FavoritesPage = () => {
                                         {fav.productName}
                                     </h3>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-bold text-black">
-                                            ${fav.productPrice}
-                                        </span>
+                                        <PriceDisplay
+                                            price={fav.productPrice}
+                                            discountPrice={fav.productDiscountPrice}
+                                            discountPercentage={fav.productDiscountPercentage}
+                                            size="md"
+                                        />
                                         <span className={`text-xs ${
                                             fav.productInStock ? 'text-green-600' : 'text-red-500'
                                         }`}>

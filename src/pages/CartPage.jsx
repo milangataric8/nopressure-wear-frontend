@@ -15,6 +15,7 @@ import { createPaymentIntent } from '../api/paymentApi';
 import { getAddressByUser, createAddress } from '../api/addressApi';
 import useFormatPrice from '../hooks/useFormatPrice';
 import { getSettingsMap } from '../api/settingsApi';
+import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const CartPage = () => {
     const { t } = useTranslation();
@@ -263,10 +264,14 @@ const CartPage = () => {
                                     </span>
                                 </div>
                                 <p className="text-xs text-gray-400 mb-1">SKU: {item.productSku}</p>
-                                <p className="text-xs text-gray-500 mb-4">
-                                    {formatPrice(item.productPrice)} {t('order.perItem')}
+                                <p className="text-xs text-gray-400 mb-1">
+                                    <PriceDisplay
+                                        price={item.productPrice}
+                                        discountPrice={item.discountPrice}
+                                        discountPercentage={item.discountPercentage}
+                                        size="sm"
+                                    />
                                 </p>
-
                                 <div className="flex items-center justify-between">
                                     {/* Quantity */}
                                     <div className="flex items-center border border-gray-300">

@@ -9,6 +9,7 @@ import {getImageUrl} from "../utils/imageUtils.js";
 import {toast} from "react-toastify";
 import HeroBanner from "../components/common/HeroBanner.jsx";
 import HomePopup from "../components/common/HomePopup.jsx";
+import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const HomePage = () => {
     const { t } = useTranslation();
@@ -155,9 +156,12 @@ const HomePage = () => {
                                         </div>
                                     )}
                                     <div className="flex items-center justify-between">
-                                        <span className="text-md font-bold text-black">
-                                            {formatPrice(product.price)}
-                                        </span>
+                                        <PriceDisplay
+                                            price={product.price}
+                                            discountPrice={product.discountPrice}
+                                            discountPercentage={product.discountPercentage}
+                                            size="md"
+                                        />
                                         <span className={`text-xs ${
                                             product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                                         }`}>

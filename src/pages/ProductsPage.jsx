@@ -10,6 +10,7 @@ import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
 import useFormatPrice from '../hooks/useFormatPrice';
 import StarRating from '../components/common/StarRating';
+import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const ProductsPage = () => {
     const { t } = useTranslation();
@@ -521,9 +522,12 @@ const ProductsPage = () => {
                                         )}
 
                                         <div className="flex items-center justify-between">
-                                            <span className="text-md font-bold text-black">
-                                                {formatPrice(product.price)}
-                                            </span>
+                                            <PriceDisplay
+                                                price={product.price}
+                                                discountPrice={product.discountPrice}
+                                                discountPercentage={product.discountPercentage}
+                                                size="md"
+                                            />
                                             <span className={`text-xs ${
                                                 product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                                             }`}>

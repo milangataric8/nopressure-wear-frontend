@@ -57,6 +57,7 @@ const AdminProducts = () => {
         imageUrl: '',
         videoUrl: '',
         categoryId: '',
+        discountPercentage: '',
     });
     const COLOR_PALETTE = [
         { name: 'White', hex: '#FFFFFF', key: 'white' },
@@ -189,6 +190,7 @@ const AdminProducts = () => {
             colorName: product.colorName || '',
             colorHex: product.colorHex || '',
             brand: product.brand || '',
+            discountPercentage: product.discountPercentage || '',
         });
         setShowForm(true);
 
@@ -221,6 +223,7 @@ const AdminProducts = () => {
             colorHex: '',
             brand: '',
             categoryId: '',
+            discountPercentage: '',
         });
         setEditingProduct(null);
         setPendingImages([]);
@@ -476,6 +479,21 @@ const AdminProducts = () => {
                                 placeholder="0.00"
                                 step="0.01"
                                 required
+                            />
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Discount %</label>
+                            <input
+                                type="number"
+                                name="discountPercentage"
+                                value={formData.discountPercentage || ''}
+                                onChange={handleChange}
+                                className={inputClass}
+                                placeholder="0"
+                                min="0"
+                                max="100"
+                                step="1"
                             />
                         </div>
 

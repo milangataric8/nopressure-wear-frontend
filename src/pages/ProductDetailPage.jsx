@@ -13,10 +13,10 @@ import { checkFavorite, toggleFavorite } from '../api/favoriteApi';
 import {getReviews, addReview, deleteReview} from '../api/reviewApi';
 import StarRating from '../components/common/StarRating';
 import useFormatPrice from '../hooks/useFormatPrice';
+import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated, setCartCount, cartCount, setFavoriteCount } = useAuth();
@@ -290,9 +290,12 @@ const ProductDetailPage = () => {
                     </p>
 
                     <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200">
-                        <span className="text-2xl font-bold text-black">
-                            {formatPrice(product.price)}
-                        </span>
+                        <PriceDisplay
+                            price={product.price}
+                            discountPrice={product.discountPrice}
+                            discountPercentage={product.discountPercentage}
+                            size="lg"
+                        />
                         <span className={`text-xs font-semibold uppercase tracking-wide ${
                             product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
                         }`}>

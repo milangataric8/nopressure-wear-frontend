@@ -52,7 +52,7 @@ const CartPage = () => {
             setCart(response.data);
             setCartCount(response.data.items.length);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load cart');
+            toast.error(e.response?.data?.message || t('messages.failedToLoadCart'));
         } finally {
             setLoading(false);
         }

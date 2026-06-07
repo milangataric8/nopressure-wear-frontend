@@ -28,7 +28,7 @@ const AddressPage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load addresses');
+            toast.error(e.response?.data?.message || t('messages.failedToLoadAddresses'));
         } finally {
             setLoading(false);
         }

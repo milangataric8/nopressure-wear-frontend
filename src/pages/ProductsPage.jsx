@@ -14,7 +14,7 @@ import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const ProductsPage = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    useFormatPrice();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,6 +42,8 @@ const ProductsPage = () => {
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
     const [filterConfig, setFilterConfig] = useState([]);
+    const [selectedMaterial, setSelectedMaterial] = useState('');
+    const [availableMaterials, setAvailableMaterials] = useState([]);
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -65,6 +67,7 @@ const ProductsPage = () => {
             if (appliedMaxPrice !== '') params.maxPrice = appliedMaxPrice;
             if (selectedBrand) params.brand = selectedBrand;
             if (selectedColor) params.colorName = selectedColor;
+            if (selectedMaterial) params.material = selectedMaterial;
 
             const response = await searchActiveProducts(params);
 
@@ -72,7 +75,7 @@ const ProductsPage = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load products');
+            toast.error(e.response?.data?.message || t('messages.failedToLoadProducts'));
         } finally {
             setLoading(false);
         }
@@ -83,7 +86,7 @@ const ProductsPage = () => {
             const response = await getCategories();
             setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || 'Failed to load categories', {});
+            console.log(e.response?.data?.message || t('messages.failedToLoadCategories'));
         }
     }, []);
 
@@ -166,6 +169,7 @@ const ProductsPage = () => {
         getProductFilters().then(r => {
             setAvailableBrands(r.data.brands || []);
             setAvailableColors(r.data.colors || []);
+            setAvailableMaterials(r.data.materials || []);
         }).catch(() => {});
     }, []);
 
@@ -336,11 +340,38 @@ const ProductsPage = () => {
                             </div>
                         )}
 
+                        {/* Material filter */}
+                        {isFilterVisible('material') && availableMaterials.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                                    {t('product.material')}
+                                </h3>
+                                <div className="space-y-1">
+                                    {availableMaterials.map(material => (
+                                        <button
+                                            key={material}
+                                            onClick={() => {
+                                                setSelectedMaterial(prev => prev === material ? '' : material);
+                                                setPage(0);
+                                            }}
+                                            className={`block w-full text-left text-sm py-1 transition-colors ${
+                                                selectedMaterial === material
+                                                    ? 'font-semibold text-black'
+                                                    : 'text-gray-500 hover:text-black'
+                                            }`}
+                                        >
+                                            {material}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Price filter */}
                         {isFilterVisible('price') && (
                             <div className="mb-8">
                                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    Price
+                                    {t('product.price')}
                                 </h3>
                                 <div className="flex items-center gap-2 mb-3">
                                     <input

@@ -84,7 +84,7 @@ const AdminSettings = () => {
             const response = await getAllFilters();
             setFilters(response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || 'Failed to load filters');
+            console.log(e.response?.data?.message || t('messages.failedToLoadFilters'));
         }
     }, []);
 

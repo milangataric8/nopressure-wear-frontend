@@ -39,7 +39,7 @@ const ProfilePage = () => {
                 email: u.email,
             });
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load profile');
+            toast.error(e.response?.data?.message || t('messages.failedToLoadProfile'));
         } finally {
             setLoading(false);
         }
@@ -50,7 +50,7 @@ const ProfilePage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to load addresses');
+            toast.error(e.response?.data?.message || t('messages.failedToLoadAddresses'));
         }
     }, [user.id]);
 

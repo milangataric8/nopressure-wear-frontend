@@ -58,6 +58,7 @@ const AdminProducts = () => {
         videoUrl: '',
         categoryId: '',
         discountPercentage: '',
+        material: '',
     });
     const COLOR_PALETTE = [
         { name: 'White', hex: '#FFFFFF', key: 'white' },
@@ -113,7 +114,7 @@ const AdminProducts = () => {
             const response = await getCategories();
             setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || 'Failed to load categories, error');
+            console.log(e.response?.data?.message || t('messages.failedToLoadCategories'));
         }
     };
 
@@ -191,6 +192,7 @@ const AdminProducts = () => {
             colorHex: product.colorHex || '',
             brand: product.brand || '',
             discountPercentage: product.discountPercentage || '',
+            material: product.material || '',
         });
         setShowForm(true);
 
@@ -224,6 +226,7 @@ const AdminProducts = () => {
             brand: '',
             categoryId: '',
             discountPercentage: '',
+            material: '',
         });
         setEditingProduct(null);
         setPendingImages([]);
@@ -552,6 +555,18 @@ const AdminProducts = () => {
                                 onChange={handleChange}
                                 className={inputClass}
                                 placeholder="Apple, Samsung..."
+                            />
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Material</label>
+                            <input
+                                type="text"
+                                name="material"
+                                value={formData.material || ''}
+                                onChange={handleChange}
+                                className={inputClass}
+                                placeholder="Silicone, Leather, Plastic..."
                             />
                         </div>
 

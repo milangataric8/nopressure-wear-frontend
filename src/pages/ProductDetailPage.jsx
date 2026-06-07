@@ -441,6 +441,13 @@ const ProductDetailPage = () => {
                         </>
                     )}
 
+                    {product.material && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Material:</span>
+                            <span>{product.material}</span>
+                        </div>
+                    )}
+
                     {/* Accordion sections */}
                     <div className="mt-8 border-t border-gray-200">
                         {/* Description */}

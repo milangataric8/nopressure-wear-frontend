@@ -442,8 +442,8 @@ const ProductDetailPage = () => {
                     )}
 
                     {product.material && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Material:</span>
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-8">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('product.material')}:</span>
                             <span>{product.material}</span>
                         </div>
                     )}
@@ -472,9 +472,10 @@ const ProductDetailPage = () => {
                                 </button>
                                 {openSection === 'description' && (
                                     <div className="pb-6">
-                                        <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                                            {product.description}
-                                        </p>
+                                        <div
+                                            className="product-description text-sm text-gray-600"
+                                            dangerouslySetInnerHTML={{ __html: product.description }}
+                                        />
                                     </div>
                                 )}
                             </div>

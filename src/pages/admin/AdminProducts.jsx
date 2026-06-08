@@ -23,6 +23,7 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import RichTextEditor from '../../components/common/RichTextEditor';
 
 const AdminProducts = () => {
     const { t } = useTranslation();
@@ -905,13 +906,10 @@ const AdminProducts = () => {
 
                         <div className="md:col-span-2">
                             <label className={labelClass}>{t('admin.description')}</label>
-                            <textarea
-                                name="description"
+                            <RichTextEditor
                                 value={formData.description}
-                                onChange={handleChange}
-                                className={inputClass}
-                                placeholder="Product description"
-                                rows={3}
+                                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                                placeholder="Product description..."
                             />
                         </div>
 

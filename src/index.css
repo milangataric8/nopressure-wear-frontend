@@ -120,3 +120,87 @@
 .animate-fade-in {
     animation: fadeIn 0.3s ease-out;
 }
+
+/* Rich Text Editor */
+.rich-editor .ql-toolbar {
+    border: 1px solid #d1d5db !important;
+    border-bottom: none !important;
+    background: #f9fafb;
+}
+
+.rich-editor .ql-container {
+    border: 1px solid #d1d5db !important;
+    min-height: 150px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+}
+
+.rich-editor .ql-container:focus-within {
+    border-color: #000000 !important;
+}
+
+.rich-editor .ql-editor {
+    min-height: 150px;
+}
+
+.rich-editor .ql-editor.ql-blank::before {
+    color: #9ca3af;
+    font-style: normal;
+}
+
+/* Product description rendered HTML */
+.product-description h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.product-description h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.product-description h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.product-description p {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.product-description ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-description ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-description li {
+    margin-bottom: 0.25rem;
+}
+
+.product-description strong {
+    font-weight: 600;
+}
+
+.product-description em {
+    font-style: italic;
+}
+
+.product-description a {
+    color: #000;
+    text-decoration: underline;
+}
+
+.product-description s {
+    text-decoration: line-through;
+}

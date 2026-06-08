@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {useParams, useNavigate, Link} from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
@@ -11,9 +11,9 @@ import { getStoresForProduct } from '../api/storeApi';
 import { getSettingsMap } from '../api/settingsApi';
 import { checkFavorite, toggleFavorite } from '../api/favoriteApi';
 import {getReviews, addReview, deleteReview} from '../api/reviewApi';
+import { getSimilarProducts } from '../api/productApi';
 import StarRating from '../components/common/StarRating';
-import useFormatPrice from '../hooks/useFormatPrice';
-import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import PriceDisplay from '../components/common/PriceDisplay';
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -39,6 +39,7 @@ const ProductDetailPage = () => {
     const [submittingReview, setSubmittingReview] = useState(false);
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [openSection, setOpenSection] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState([]);
 
     const fetchProduct = useCallback(async () => {
         try {
@@ -81,6 +82,14 @@ const ProductDetailPage = () => {
         if (product?.id) {
             getReviews(product.id)
                 .then(r => setReviews(r.data))
+                .catch(() => {});
+        }
+    }, [product?.id]);
+
+    useEffect(() => {
+        if (product?.id) {
+            getSimilarProducts(product.id, 4)
+                .then(r => setSimilarProducts(r.data))
                 .catch(() => {});
         }
     }, [product?.id]);
@@ -583,10 +592,62 @@ const ProductDetailPage = () => {
                                     )}
                                 </div>
                             )}
-                        </div>}
+                        </div>
+                        }
                     </div>
                 </div>
             </div>
+
+            {/* Similar Products */}
+            {similarProducts.length > 0 && (
+                <div className="mt-12 border-t border-gray-200 pt-10">
+                    <h2 className="text-xl font-black uppercase tracking-tight text-black mb-6">
+                        {t('product.mayAlsoLike')}
+                    </h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8">
+                        {similarProducts.map(sp => (
+                            <Link
+                                key={sp.id}
+                                to={`/products/${sp.id}`}
+                                className="group"
+                            >
+                                <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
+                                    {sp.imageUrl ? (
+                                        <img
+                                            src={getImageUrl(sp.imageUrl)}
+                                            alt={sp.name}
+                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="text-xs text-gray-400 mb-0.5">
+                                        {sp.categoryName || t('product.uncategorized')}
+                                    </p>
+                                    <h3 className="text-sm font-semibold text-black mb-1 truncate">
+                                        {sp.name}
+                                    </h3>
+                                    <StarRating
+                                        rating={sp.averageRating || 0}
+                                        count={sp.ratingCount || 0}
+                                        size="sm"
+                                    />
+                                    <div className="mt-1">
+                                        <PriceDisplay
+                                            price={sp.price}
+                                            discountPrice={sp.discountPrice}
+                                            discountPercentage={sp.discountPercentage}
+                                            size="md"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

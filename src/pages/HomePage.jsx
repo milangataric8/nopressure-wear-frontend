@@ -13,7 +13,7 @@ import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const HomePage = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    useFormatPrice();
     const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -76,7 +76,7 @@ const HomePage = () => {
                 <div className="max-w-7xl mx-auto px-6 py-16 border-t border-gray-200">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-xl font-black uppercase tracking-tight text-black">
-                            {t('product.featuredProducts')}
+                            {t('product.bestSelling')}
                         </h2>
                         <Link
                             to="/products"

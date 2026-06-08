@@ -149,7 +149,7 @@
     "soldOut": "Rasprodato",
     "shopNow": "Kupi odmah",
     "viewAll": "Pogledaj sve",
-    "featuredProducts": "Istaknuti proizvodi",
+    "bestSelling": "Najprodavaniji",
     "addToCart": "Dodaj u korpu",
     "adding": "Dodajem...",
     "quantity": "Količina",
@@ -175,6 +175,7 @@
     "resultsFor": "Rezultati za: \"{{query}}\"",
     "noColor": "Bez boje",
     "multiColor": "Više boja",
+    "mayAlsoLike": "Možda će vam se svideti",
     "colors": {
       "white": "Bela",
       "black": "Crna",

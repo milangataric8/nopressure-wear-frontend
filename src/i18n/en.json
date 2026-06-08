@@ -149,7 +149,7 @@
     "soldOut": "Sold Out",
     "shopNow": "Shop Now",
     "viewAll": "View All",
-    "featuredProducts": "Featured Products",
+    "bestSelling": "Best-selling",
     "addToCart": "Add to Cart",
     "adding": "Adding...",
     "quantity": "Quantity",
@@ -175,6 +175,7 @@
     "resultsFor": "Results for: \"{{query}}\"",
     "noColor": "No Color",
     "multiColor": "Multi-Color",
+    "mayAlsoLike": "You May Also Like",
     "colors": {
       "white": "White",
       "black": "Black",

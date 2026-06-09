@@ -34,6 +34,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminPopups from './pages/admin/AdminPopups';
 import AdminStores from "./pages/admin/AdminStores.jsx";
 import FavoritesPage from './pages/FavoritesPage';
+import AdminReports from "./pages/admin/AdminReports.jsx";
 
 function App() {
     const { user, isAuthenticated, setCartCount, setFavoriteCount } = useAuth();
@@ -149,6 +150,9 @@ function App() {
                     } />
                     <Route path="/favorites" element={
                         <ProtectedRoute><FavoritesPage /></ProtectedRoute>
+                    } />
+                    <Route path="/admin/reports" element={
+                        <ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>
                     } />
                 </Routes>
             </div>

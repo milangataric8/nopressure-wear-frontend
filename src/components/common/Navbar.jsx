@@ -355,6 +355,10 @@ const Navbar = () => {
                                                       className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                     {t('admin.coupons')}
                                                 </Link>
+                                                <Link to="/admin/reports" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    Reports
+                                                </Link>
 
                                                 {/* Marketing */}
                                                 <div className="border-t border-gray-100 mt-1" />

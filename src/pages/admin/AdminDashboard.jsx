@@ -18,6 +18,7 @@ const AdminDashboard = () => {
             title: t('admin.sectionManagement'),
             items: [
                 { to: '/admin/settings', title: t('admin.settings'), desc: t('admin.manageSettings') },
+                { to: '/admin/reports', title: t('admin.reports'), desc: t('admin.reportDescription') },
                 { to: '/admin/employees', title: t('admin.employees'), desc: t('admin.manageEmployees') },
             ]
         }] : []),
@@ -61,7 +62,7 @@ const AdminDashboard = () => {
                 <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
                     Admin Dashboard
                 </h1>
-                <p className="text-sm text-gray-500">Manage your store</p>
+                <p className="text-sm text-gray-500">{t('admin.manageStore')}</p>
             </div>
 
             <div className="border-t border-gray-200">

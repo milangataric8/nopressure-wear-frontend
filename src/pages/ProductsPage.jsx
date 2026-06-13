@@ -11,6 +11,7 @@ import Pagination from "../components/common/Pagination.jsx";
 import useFormatPrice from '../hooks/useFormatPrice';
 import StarRating from '../components/common/StarRating';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import ActiveFilters from "../components/common/ActiveFilters.jsx";
 
 const ProductsPage = () => {
     const { t } = useTranslation();
@@ -405,7 +406,12 @@ const ProductsPage = () => {
                                 >
                                     {t('common.apply')}
                                 </button>
-                                {(selectedCategory !== '' || appliedMinPrice !== '' || searchQuery !== '') && (
+                                {(selectedCategory !== ''
+                                    || appliedMinPrice !== ''
+                                    || searchQuery !== ''
+                                    || selectedBrand !== ''
+                                    || selectedColor !== ''
+                                    || selectedMaterial !== '') && (
                                     <button
                                         onClick={() => {
                                             setSelectedCategory('');
@@ -415,6 +421,9 @@ const ProductsPage = () => {
                                             setAppliedMaxPrice('');
                                             setSearchQuery('');
                                             setSearchInput('');
+                                            setSelectedBrand('');
+                                            setSelectedColor('');
+                                            setSelectedMaterial('');
                                             setPage(0);
                                             navigate('/products');
                                         }}
@@ -484,6 +493,30 @@ const ProductsPage = () => {
                             {t('product.resultsFor', { query: searchQuery })}
                         </p>
                     )}
+
+                    {/* Active filters chips */}
+                    <ActiveFilters
+                        selectedCategory={selectedCategory}
+                        categories={categories}
+                        selectedColor={selectedColor}
+                        availableColors={availableColors}
+                        selectedBrand={selectedBrand}
+                        selectedMaterial={selectedMaterial}
+                        appliedMinPrice={appliedMinPrice}
+                        appliedMaxPrice={appliedMaxPrice}
+                        searchQuery={searchQuery}
+                        onRemoveCategory={() => { setSelectedCategory(''); setPage(0); }}
+                        onRemoveColor={() => { setSelectedColor(''); setPage(0); }}
+                        onRemoveBrand={() => { setSelectedBrand(''); setPage(0); }}
+                        onRemoveMaterial={() => { setSelectedMaterial(''); setPage(0); }}
+                        onRemovePrice={() => { setMinPrice(''); setMaxPrice(''); setAppliedMinPrice(''); setAppliedMaxPrice(''); setPage(0); }}
+                        onRemoveSearch={() => { setSearchQuery(''); setSearchInput(''); setPage(0); navigate('/products'); }}
+                        onClearAll={() => {
+                            setSelectedCategory(''); setSelectedColor(''); setSelectedBrand('');
+                            setSelectedMaterial(''); setAppliedMinPrice(''); setAppliedMaxPrice('');
+                            setMinPrice(''); setMaxPrice(''); setSearchQuery(''); setSearchInput('');
+                        }}
+                    />
 
                     {/* Products grid */}
                     {loading ? (

@@ -481,6 +481,7 @@
     "failedToLoadAddresses": "Greška pri učitavanju adresa",
     "failedToLoadCart": "Greška pri učitavanju korpe",
     "failedToLoadProducts": "Greška pri učitavanju proizvoda",
+    "failedToDownloadReport":"Greška pri preuzimanju izveštaja",
     "failedToLoadProfile": "Greška pri učitavanju profila",
     "failedToSave": "Greška pri čuvanju",
     "invalidCoupon": "Nevažeći kupon",

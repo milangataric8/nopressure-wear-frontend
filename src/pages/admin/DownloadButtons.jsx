@@ -1,26 +1,31 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import {t} from "i18next";
 
-const DownloadButtons = ({ pdfFn, excelFn }) => {
+const DownloadButtons = ({ pdfFn,
+                           excelFn,
+                           pdfClass = 'border-red-800 text-red-800 hover:bg-red-800 hover:text-white',
+                           excelClass = 'border-green-800 text-green-800 hover:bg-green-800 hover:text-white',
+                           layout = 'flex gap-2 w-full' }) => {
     const [downloading, setDownloading] = useState('');
 
     const handleDownload = async (fn, key) => {
         setDownloading(key);
         try {
             await fn();
-        } catch (_) {
-            toast.error('Failed to download report');
+        } catch (e) {
+            toast.error(e.response?.data?.message || t('messages.failedToDownloadReport'));
         } finally {
             setDownloading('');
         }
     };
 
     return (
-        <div className="flex gap-2">
+        <div className={layout}>
             <button
                 onClick={() => handleDownload(pdfFn, 'pdf')}
                 disabled={downloading === 'pdf'}
-                className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-red-700 hover:text-black transition-colors disabled:opacity-50"
+                className={`flex-1 flex items-center justify-center gap-2 py-2 border text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-50 ${pdfClass}`}
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -33,7 +38,7 @@ const DownloadButtons = ({ pdfFn, excelFn }) => {
             <button
                 onClick={() => handleDownload(excelFn, 'excel')}
                 disabled={downloading === 'excel'}
-                className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-green-700 hover:text-black transition-colors disabled:opacity-50"
+                className={`flex-1 flex items-center justify-center gap-2 py-2 border text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-50 ${excelClass}`}
             >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>

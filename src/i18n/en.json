@@ -482,6 +482,7 @@
     "failedToLoadCart": "Failed to load cart",
     "failedToLoadProducts": "Failed to load products",
     "failedToLoadProfile": "Failed to load profile",
+    "failedToDownloadReport":"Failed to download report",
     "failedToSave": "Failed to save",
     "invalidCoupon": "Invalid coupon",
     "signInFirst": "Please sign in first",

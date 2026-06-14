@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import {useParams, useNavigate, Link} from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
 import { useAuth } from '../hooks/useAuth';
+import { GuestCartContext } from '../context/GuestCartContext';
 import { getImageUrl } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,7 @@ const ProductDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated, setCartCount, cartCount, setFavoriteCount } = useAuth();
+    const { addToGuestCart } = useContext(GuestCartContext);
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
@@ -113,8 +115,8 @@ const ProductDetailPage = () => {
 
     const handleAddToCart = async () => {
         if (!isAuthenticated()) {
-            toast.info(t('messages.signInFirst'));
-            navigate('/login');
+            addToGuestCart(product, quantity);
+            toast.success(t('messages.addedToCart'));
             return;
         }
         setAddingToCart(true);

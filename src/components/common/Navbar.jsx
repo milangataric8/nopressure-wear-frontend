@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { GuestCartContext } from '../../context/GuestCartContext';
 import { getCart } from '../../api/cartApi';
 import { getOrders } from '../../api/orderApi';
 import { getActiveCategories } from '../../api/categoryApi';
@@ -12,6 +13,8 @@ import SocialIcons from "./SocialIcons.jsx";
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount, favoriteCount } = useAuth();
+    const { guestCart } = useContext(GuestCartContext);
+    const displayCartCount = isAuthenticated() ? cartCount : guestCart.length;
     const navigate = useNavigate();
     const [searchInput, setSearchInput] = useState('');
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -502,28 +505,28 @@ const Navbar = () => {
                             )}
 
                             {/* Cart */}
-                            {isAuthenticated() && (
-                                <div
-                                    className="relative"
-                                    onMouseEnter={() => setActiveDropdown('cart')}
-                                    onMouseLeave={() => setActiveDropdown(null)}
-                                >
-                                    <Link to="/cart" className="relative flex items-center text-gray-600 hover:text-black transition-colors">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                                            <line x1="3" y1="6" x2="21" y2="6"/>
-                                            <path d="M16 10a4 4 0 0 1-8 0"/>
-                                        </svg>
-                                        {cartCount > 0 && (
-                                            <span className="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-4 h-4 flex items-center justify-center">
-                                                {cartCount}
-                                            </span>
-                                        )}
-                                    </Link>
+                            <div
+                                className="relative"
+                                onMouseEnter={() => setActiveDropdown('cart')}
+                                onMouseLeave={() => setActiveDropdown(null)}
+                            >
+                                <Link to="/cart" className="relative flex items-center text-gray-600 hover:text-black transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                                        <line x1="3" y1="6" x2="21" y2="6"/>
+                                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                                    </svg>
+                                    {displayCartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-black text-white text-xs font-bold w-4 h-4 flex items-center justify-center">
+                                            {displayCartCount}
+                                        </span>
+                                    )}
+                                </Link>
 
-                                    {activeDropdown === 'cart' && (
-                                        <div className="absolute top-full right-0 mt-0 bg-white border border-gray-200 shadow-lg z-50 p-4 w-72">
-                                            {!cart || cart.items.length === 0 ? (
+                                {activeDropdown === 'cart' && (
+                                    <div className="absolute top-full right-0 mt-0 bg-white border border-gray-200 shadow-lg z-50 p-4 w-72">
+                                        {isAuthenticated() ? (
+                                            !cart || cart.items.length === 0 ? (
                                                 <p className="text-xs text-gray-400 text-center py-4">{t('nav.cartEmpty')}</p>
                                             ) : (
                                                 <>
@@ -557,11 +560,49 @@ const Navbar = () => {
                                                         {t('nav.viewCart')}
                                                     </Link>
                                                 </>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                            )
+                                        ) : (
+                                            guestCart.length === 0 ? (
+                                                <p className="text-xs text-gray-400 text-center py-4">{t('nav.cartEmpty')}</p>
+                                            ) : (
+                                                <>
+                                                    <div className="space-y-3 mb-4">
+                                                        {guestCart.slice(0, 3).map(item => (
+                                                            <div key={item.productId} className="flex gap-3 items-center">
+                                                                <div className="bg-gray-100 w-12 h-12 flex-shrink-0 flex items-center justify-center">
+                                                                    {item.imageUrl ? (
+                                                                        <img src={getImageUrl(item.imageUrl)} className="w-full h-full object-contain p-1" alt={item.productName} />
+                                                                    ) : (
+                                                                        <span className="text-gray-400 text-xs">No img</span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <p className="text-xs font-semibold text-black truncate">{item.productName}</p>
+                                                                    <p className="text-xs text-gray-400">{t('order.qty')}: {item.quantity} × {formatPrice(item.discountPrice ?? item.price)}</p>
+                                                                </div>
+                                                                <span className="text-xs font-bold text-black">{formatPrice((item.discountPrice ?? item.price) * item.quantity)}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="border-t border-gray-200 pt-3 flex justify-between items-center mb-3">
+                                                        <span className="text-xs font-semibold text-black">{t('cart.total')}</span>
+                                                        <span className="text-sm font-bold text-black">
+                                                            {formatPrice(guestCart.reduce((sum, item) => sum + (item.discountPrice ?? item.price) * item.quantity, 0))}
+                                                        </span>
+                                                    </div>
+                                                    <Link
+                                                        to="/cart"
+                                                        onClick={() => setActiveDropdown(null)}
+                                                        className="block w-full text-center bg-black text-white text-xs font-semibold uppercase tracking-wide py-2 hover:bg-gray-800 transition-colors"
+                                                    >
+                                                        {t('nav.viewCart')}
+                                                    </Link>
+                                                </>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Mobile hamburger */}
                             <button

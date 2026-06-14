@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
+import { GuestCartProvider } from './context/GuestCartContext';
 import { getSettingsMap } from './api/settingsApi';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
@@ -22,7 +23,9 @@ createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
             <AuthProvider>
+                <GuestCartProvider>
                 <App />
+                </GuestCartProvider>
                 <ToastContainer
                     position="top-center"
                     autoClose={4000}

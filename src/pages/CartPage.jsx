@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { getCart, updateCartItem, removeCartItem, clearCart } from '../api/cartApi';
-import { checkout } from '../api/orderApi';
+import { checkout, guestCheckout } from '../api/orderApi';
 import { useAuth } from '../hooks/useAuth';
 import { validateCoupon } from '../api/couponApi';
 import Skeleton from '../components/common/Skeleton';
-import {getImageUrl} from "../utils/imageUtils.js";
+import { getImageUrl } from "../utils/imageUtils.js";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../components/common/CheckoutForm';
@@ -16,13 +16,15 @@ import { getAddressByUser, createAddress } from '../api/addressApi';
 import useFormatPrice from '../hooks/useFormatPrice';
 import { getSettingsMap } from '../api/settingsApi';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import { GuestCartContext } from '../context/GuestCartContext';
 
 const CartPage = () => {
     const { t } = useTranslation();
     const formatPrice = useFormatPrice();
-    const { user, setCartCount } = useAuth();
+    const { user, setCartCount, isAuthenticated } = useAuth();
+    const { guestCart, clearGuestCart, updateGuestCartItem, removeFromGuestCart } = useContext(GuestCartContext);
     const [cart, setCart] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(isAuthenticated());
     const [checkingOut, setCheckingOut] = useState(false);
     const [couponCode, setCouponCode] = useState('');
     const [couponData, setCouponData] = useState(null);
@@ -45,6 +47,11 @@ const CartPage = () => {
         postalCode: '',
         country: '',
     });
+    const [guestInfo, setGuestInfo] = useState({
+        fullName: '',
+        email: '',
+        phone: ''
+    });
 
     const fetchCart = async () => {
         try {
@@ -59,7 +66,9 @@ const CartPage = () => {
     };
 
     useEffect(() => {
-        fetchCart();
+        if (isAuthenticated()) {
+            fetchCart();
+        }
     }, []);
 
     useEffect(() => {
@@ -82,8 +91,31 @@ const CartPage = () => {
         if (!cardEnabled && codEnabled) setPaymentMethod('cod');
     }, [cardEnabled, codEnabled]);
 
+    const displayItems = isAuthenticated()
+        ? (cart?.items ?? [])
+        : guestCart.map(item => ({
+            id: item.productId,
+            productId: item.productId,
+            productName: item.productName,
+            imageUrl: item.imageUrl,
+            productSku: null,
+            productPrice: item.price,
+            discountPrice: item.discountPrice ?? null,
+            discountPercentage: null,
+            subtotal: (item.discountPrice ?? item.price) * item.quantity,
+            quantity: item.quantity,
+        }));
+
+    const displayTotal = isAuthenticated()
+        ? (cart?.totalAmount ?? 0)
+        : guestCart.reduce((sum, item) => sum + (item.discountPrice ?? item.price) * item.quantity, 0);
+
     const handleUpdateQuantity = async (cartItemId, productId, quantity) => {
         if (quantity < 1) return;
+        if (!isAuthenticated()) {
+            updateGuestCartItem(productId, quantity);
+            return;
+        }
         try {
             const response = await updateCartItem(user.id, cartItemId, { productId, quantity });
             setCart(response.data);
@@ -93,6 +125,10 @@ const CartPage = () => {
     };
 
     const handleRemoveItem = async (cartItemId) => {
+        if (!isAuthenticated()) {
+            removeFromGuestCart(cartItemId);
+            return;
+        }
         try {
             const response = await removeCartItem(user.id, cartItemId);
             setCart(response.data);
@@ -104,6 +140,10 @@ const CartPage = () => {
     };
 
     const handleClearCart = async () => {
+        if (!isAuthenticated()) {
+            clearGuestCart();
+            return;
+        }
         try {
             await clearCart(user.id);
             setCart({ ...cart, items: [], totalAmount: 0 });
@@ -164,10 +204,7 @@ const CartPage = () => {
             return;
         }
         try {
-            const response = await createPaymentIntent(
-                user.id,
-                couponData?.code || null
-            );
+            const response = await createPaymentIntent(user.id, couponData?.code || null);
             setClientSecret(response.data.clientSecret);
             setShowPayment(true);
         } catch (error) {
@@ -179,7 +216,7 @@ const CartPage = () => {
         if (!couponCode.trim()) return;
         setApplyingCoupon(true);
         try {
-            const response = await validateCoupon(couponCode, user.id);
+            const response = await validateCoupon(couponCode, user?.id);
             setCouponData(response.data);
             toast.success(response.data.message);
         } catch (error) {
@@ -187,6 +224,38 @@ const CartPage = () => {
             setCouponData(null);
         } finally {
             setApplyingCoupon(false);
+        }
+    };
+
+    const handleGuestCheckout = async () => {
+        if (!newAddress.street) {
+            toast.error('Please enter shipping address');
+            return;
+        }
+
+        const orderData = {
+            customerFullName: guestInfo.fullName,
+            customerEmail: guestInfo.email,
+            customerPhone: guestInfo.phone,
+            street: newAddress.street,
+            city: newAddress.city,
+            postalCode: newAddress.postalCode,
+            country: newAddress.country,
+            items: guestCart.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+            })),
+            couponCode: couponData?.code || null,
+            paymentMethod: paymentMethod === 'card' ? 'CARD' : 'COD',
+        };
+
+        try {
+            await guestCheckout(orderData);
+            clearGuestCart();
+            toast.success('Order placed successfully!');
+            navigate('/order-confirmation');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to place order');
         }
     };
 
@@ -216,7 +285,11 @@ const CartPage = () => {
         );
     }
 
-    if (!cart || cart.items.length === 0) {
+    const isEmpty = isAuthenticated()
+        ? (!cart || cart.items.length === 0)
+        : guestCart.length === 0;
+
+    if (isEmpty) {
         return (
             <div className="max-w-7xl mx-auto px-6 py-20 text-center">
                 <h2 className="text-3xl font-black uppercase tracking-tight mb-4">{t('cart.title')}</h2>
@@ -238,14 +311,14 @@ const CartPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Cart items */}
                 <div className="lg:col-span-2 space-y-6">
-                    {cart.items.map(item => (
+                    {displayItems.map(item => (
                         <div key={item.id} className="flex gap-6 pb-6 border-b border-gray-200">
                             {/* Image */}
                             <div className="bg-gray-100 w-28 h-28 flex-shrink-0 flex items-center justify-center">
                                 {item.imageUrl ? (
                                     <img
                                         src={getImageUrl(item.imageUrl)}
-                                        alt={item.name}
+                                        alt={item.productName}
                                         className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                                     />
                                 ) : (
@@ -263,7 +336,9 @@ const CartPage = () => {
                                         {formatPrice(item.subtotal)}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-400 mb-1">{t('cart.sku')}: {item.productSku}</p>
+                                {item.productSku && (
+                                    <p className="text-xs text-gray-400 mb-1">{t('cart.sku')}: {item.productSku}</p>
+                                )}
                                 <p className="text-xs text-gray-400 mb-1">
                                     <PriceDisplay
                                         price={item.productPrice}
@@ -322,7 +397,7 @@ const CartPage = () => {
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
-                                <span className="font-medium">{formatPrice(cart.totalAmount)}</span>
+                                <span className="font-medium">{formatPrice(displayTotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
@@ -330,7 +405,7 @@ const CartPage = () => {
                             </div>
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
                                 <span className="font-semibold text-black">{t('cart.total')}</span>
-                                <span className="font-bold text-black">{formatPrice(cart.totalAmount)}</span>
+                                <span className="font-bold text-black">{formatPrice(displayTotal)}</span>
                             </div>
                         </div>
 
@@ -340,8 +415,8 @@ const CartPage = () => {
                                 {t('cart.shippingAddress')}
                             </h3>
 
-                            {/* Existing addresses */}
-                            {addresses.length > 0 && (
+                            {/* Existing addresses (authenticated only) */}
+                            {isAuthenticated() && addresses.length > 0 && (
                                 <div className="space-y-3 mb-4">
                                     {addresses.map(address => (
                                         <button
@@ -402,29 +477,31 @@ const CartPage = () => {
                                         className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                                     />
 
-                                    {/* Save options */}
-                                    <div className="space-y-2 pt-2">
-                                        <label className="flex items-center gap-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                checked={saveAddress}
-                                                onChange={(e) => setSaveAddress(e.target.checked)}
-                                                className="w-3.5 h-3.5"
-                                            />
-                                            <span className="text-xs text-gray-500">{t('cart.saveAddress')}</span>
-                                        </label>
-                                        {saveAddress && (
-                                            <label className="flex items-center gap-2 cursor-pointer ml-5">
+                                    {/* Save options (authenticated only) */}
+                                    {isAuthenticated() && (
+                                        <div className="space-y-2 pt-2">
+                                            <label className="flex items-center gap-2 cursor-pointer">
                                                 <input
                                                     type="checkbox"
-                                                    checked={isMainAddress}
-                                                    onChange={(e) => setIsMainAddress(e.target.checked)}
+                                                    checked={saveAddress}
+                                                    onChange={(e) => setSaveAddress(e.target.checked)}
                                                     className="w-3.5 h-3.5"
                                                 />
-                                                <span className="text-xs text-gray-500">{t('cart.mainAddress')}</span>
+                                                <span className="text-xs text-gray-500">{t('cart.saveAddress')}</span>
                                             </label>
-                                        )}
-                                    </div>
+                                            {saveAddress && (
+                                                <label className="flex items-center gap-2 cursor-pointer ml-5">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isMainAddress}
+                                                        onChange={(e) => setIsMainAddress(e.target.checked)}
+                                                        className="w-3.5 h-3.5"
+                                                    />
+                                                    <span className="text-xs text-gray-500">{t('cart.mainAddress')}</span>
+                                                </label>
+                                            )}
+                                        </div>
+                                    )}
 
                                     <div className="flex gap-3">
                                         <button
@@ -456,6 +533,38 @@ const CartPage = () => {
                                 </div>
                             )}
                         </div>
+
+                        {/* Guest information */}
+                        {!isAuthenticated() && (
+                            <div className="border border-gray-200 p-6 mb-6">
+                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                                    Your Information
+                                </h3>
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        value={guestInfo.fullName}
+                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, fullName: e.target.value }))}
+                                        placeholder="Full name"
+                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="email"
+                                        value={guestInfo.email}
+                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, email: e.target.value }))}
+                                        placeholder="Email"
+                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
+                                    />
+                                    <input
+                                        type="tel"
+                                        value={guestInfo.phone}
+                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, phone: e.target.value }))}
+                                        placeholder="Phone"
+                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         {/* Payment method selection */}
                         {!showPayment ? (
@@ -510,8 +619,8 @@ const CartPage = () => {
 
                                 {paymentMethod === 'card' && (
                                     <button
-                                        onClick={handleProceedToPayment}
-                                        disabled={!cart || cart.items.length === 0}
+                                        onClick={isAuthenticated() ? handleProceedToPayment : handleGuestCheckout}
+                                        disabled={!displayItems.length}
                                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                                     >
                                         {t('cart.proceedToPayment')}
@@ -520,8 +629,8 @@ const CartPage = () => {
 
                                 {paymentMethod === 'cod' && (
                                     <button
-                                        onClick={handleCashOnDelivery}
-                                        disabled={!cart || cart.items.length === 0 || checkingOut}
+                                        onClick={isAuthenticated() ? handleCashOnDelivery : handleGuestCheckout}
+                                        disabled={!displayItems.length || checkingOut}
                                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                                     >
                                         {checkingOut ? t('cart.placingOrder') : t('cart.placeOrder')}
@@ -603,7 +712,7 @@ const CartPage = () => {
                     <div className="space-y-3 mb-6">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">{t('cart.subtotal')}</span>
-                            <span className="font-medium">{formatPrice(cart.totalAmount)}</span>
+                            <span className="font-medium">{formatPrice(displayTotal)}</span>
                         </div>
                         {couponData && (
                             <div className="flex justify-between text-sm">
@@ -620,7 +729,7 @@ const CartPage = () => {
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">
-                                {formatPrice(couponData ? couponData.finalTotal : cart.totalAmount)}
+                                {formatPrice(couponData ? couponData.finalTotal : displayTotal)}
                             </span>
                         </div>
                     </div>

@@ -7,6 +7,8 @@ export const checkout = (userId, couponCode, paymentMethod) =>
             ...(paymentMethod ? { paymentMethod } : {})
         }
     });
+export const guestCheckout = (data) =>
+    axiosInstance.post('/orders/guest-checkout', data);
 export const getOrders = (userId, params) =>
     axiosInstance.get(`/orders/${userId}`, { params });
 export const getOrderById = (userId, orderId) =>

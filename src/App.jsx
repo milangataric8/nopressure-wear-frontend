@@ -112,9 +112,7 @@ function App() {
                     <Route path="/products/:id" element={<ProductDetailPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
-                    <Route path="/cart" element={
-                        <ProtectedRoute><CartPage /></ProtectedRoute>
-                    } />
+                    <Route path="/cart" element={<CartPage />} />
                     <Route path="/orders" element={
                         <ProtectedRoute><OrdersPage /></ProtectedRoute>
                     } />

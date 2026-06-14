@@ -14,25 +14,35 @@ const AdminSettings = () => {
     const [editValue, setEditValue] = useState('');
     const [removeBg, setRemoveBg] = useState(false);
     const [filters, setFilters] = useState([]);
+    const [openSection, setOpenSection] = useState(null);
+
+    const toggleSection = (key) => {
+        setOpenSection(prev => prev === key ? null : key);
+    };
 
     const sections = [
         {
+            key: 'general',
             title: t('settings.general'),
             keys: ['store_name', 'store_logo_url', 'store_tagline']
         },
         {
+            key: 'location',
             title: t('settings.location'),
             keys: ['footer_address', 'footer_city', 'footer_map_address']
         },
         {
+            key: 'hours',
             title: t('settings.hours'),
             keys: ['footer_hours_weekday', 'footer_hours_saturday', 'footer_hours_sunday']
         },
         {
+            key: 'contact',
             title: t('settings.contact'),
             keys: ['footer_email', 'footer_phone']
         },
         {
+            key: 'social',
             title: t('settings.socialMedia'),
             keys: ['social_instagram',
                 'social_facebook',
@@ -42,10 +52,12 @@ const AdminSettings = () => {
                 'social_youtube']
         },
         {
+            key: 'payment',
             title: t('settings.payment'),
             keys: ['payment_card_enabled', 'payment_cod_enabled']
         },
         {
+            key: 'features',
             title: t('settings.features'),
             keys: ['find_in_store_enabled',
                 'reviews_enabled',
@@ -147,6 +159,22 @@ const AdminSettings = () => {
     {loading && <LoadingSpinner />}
     {loading && <LoadingSpinner height="h-32" />}
 
+    const chevron = (sectionKey) => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18" height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            className={`text-gray-400 transition-transform duration-200 ${
+                openSection === sectionKey ? 'rotate-90' : ''
+            }`}
+        >
+            <polyline points="9 18 15 12 9 6"/>
+        </svg>
+    );
+
     return (
         <div className="max-w-4xl mx-auto px-6 py-10">
             <div className="mb-10">
@@ -156,84 +184,91 @@ const AdminSettings = () => {
                 <p className="text-sm text-gray-500">{t('settings.subtitle')}</p>
             </div>
 
-            <div className="space-y-8">
+            <div className="border-t border-gray-200">
                 {sections.map(section => (
-                    <div key={section.title}>
-                        <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4 pb-2 border-b border-gray-200">
-                            {section.title}
-                        </h2>
-                        <div className="space-y-4">
-                            {section.keys.map(key => {
-                                const setting = settings.find(s => s.key === key);
-                                if (!setting) return null;
+                    <div key={section.key} className="border-b border-gray-200">
+                        <button
+                            onClick={() => toggleSection(section.key)}
+                            className="w-full flex items-center justify-between py-5 text-left"
+                        >
+                            <span className="text-sm font-semibold text-black uppercase tracking-wide">
+                                {section.title}
+                            </span>
+                            {chevron(section.key)}
+                        </button>
 
-                                return (
-                                    <div key={setting.id} className="flex items-center gap-4">
-                                        <div className="w-48 flex-shrink-0">
-                                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                                {t(`settings.${setting.key}`, { defaultValue: setting.label })}
-                                            </p>
-                                        </div>
+                        {openSection === section.key && (
+                            <div className="pb-6 space-y-4">
+                                {section.keys.map(key => {
+                                    const setting = settings.find(s => s.key === key);
+                                    if (!setting) return null;
 
-                                        {/* Boolean toggle for payment settings */}
-                                        {setting.key === 'default_language' ? (
-                                            <div className="flex-1">
-                                                <select
-                                                    value={setting.value}
-                                                    onChange={async (e) => {
-                                                        try {
-                                                            await updateSettings(setting.id, e.target.value);
-                                                            toast.success(t('messages.settingUpdated'));
-                                                            fetchSettings();
-                                                            window.dispatchEvent(new Event('settings-updated'));
-                                                        } catch (err) {
-                                                            toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
-                                                        }
-                                                    }}
-                                                    className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
-                                                >
-                                                    <option value="en">English</option>
-                                                    <option value="sr">Serbian (Srpski)</option>
-                                                </select>
+                                    return (
+                                        <div key={setting.id} className="flex items-center gap-4">
+                                            <div className="w-48 flex-shrink-0">
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                                    {t(`settings.${setting.key}`, { defaultValue: setting.label })}
+                                                </p>
                                             </div>
-                                        ) : ['payment_card_enabled',
-                                            'payment_cod_enabled',
-                                            'find_in_store_enabled',
-                                            'reviews_enabled',
-                                            'favorites_enabled',
-                                            'contact_enabled',
-                                            'multilanguage_enabled'].includes(setting.key) ? (
-                                            <div className="flex-1 flex items-center gap-3">
-                                                <button
-                                                    onClick={async () => {
-                                                        try {
-                                                            const newValue = setting.value === 'true' ? 'false' : 'true';
-                                                            await updateSettings(setting.id, newValue);
-                                                            toast.success(newValue === 'true'
-                                                                ? t('messages.settingEnabled', { name: setting.label })
-                                                                : t('messages.settingDisabled', { name: setting.label }));
-                                                            fetchSettings();
-                                                            window.dispatchEvent(new Event('settings-updated'));
-                                                        } catch (e) {
-                                                            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
-                                                        }
-                                                    }}
-                                                    className={`w-10 h-5 rounded-full transition-colors relative ${
-                                                        setting.value === 'true' ? 'bg-black' : 'bg-gray-300'
-                                                    }`}
-                                                >
-                                                    <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                                                        setting.value === 'true' ? 'left-5' : 'left-0.5'
-                                                    }`} />
-                                                </button>
-                                                <span className="text-sm text-gray-500">
-                                                    {setting.value === 'true' ? t('settings.enabled') : t('settings.disabled')}
-                                                </span>
-                                            </div>
-                                        ) : setting.key === 'store_logo_url' ? (
+
+                                            {setting.key === 'default_language' ? (
+                                                <div className="flex-1">
+                                                    <select
+                                                        value={setting.value}
+                                                        onChange={async (e) => {
+                                                            try {
+                                                                await updateSettings(setting.id, e.target.value);
+                                                                toast.success(t('messages.settingUpdated'));
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                                    >
+                                                        <option value="en">English</option>
+                                                        <option value="sr">Serbian (Srpski)</option>
+                                                    </select>
+                                                </div>
+                                            ) : ['payment_card_enabled',
+                                                'payment_cod_enabled',
+                                                'find_in_store_enabled',
+                                                'reviews_enabled',
+                                                'favorites_enabled',
+                                                'contact_enabled',
+                                                'multilanguage_enabled'].includes(setting.key) ? (
+                                                <div className="flex-1 flex items-center gap-3">
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                const newValue = setting.value === 'true' ? 'false' : 'true';
+                                                                await updateSettings(setting.id, newValue);
+                                                                toast.success(newValue === 'true'
+                                                                    ? t('messages.settingEnabled', { name: setting.label })
+                                                                    : t('messages.settingDisabled', { name: setting.label }));
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (e) {
+                                                                toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        className={`w-10 h-5 rounded-full transition-colors relative ${
+                                                            setting.value === 'true' ? 'bg-black' : 'bg-gray-300'
+                                                        }`}
+                                                    >
+                                                        <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                                                            setting.value === 'true' ? 'left-5' : 'left-0.5'
+                                                        }`} />
+                                                    </button>
+                                                    <span className="text-sm text-gray-500">
+                                                        {setting.value === 'true' ? t('settings.enabled') : t('settings.disabled')}
+                                                    </span>
+                                                </div>
+                                            ) : setting.key === 'store_logo_url' ? (
                                                 <div className="flex-1 flex items-center gap-4">
                                                     {setting.value && (
-                                                         <img
+                                                        <img
                                                             src={setting.value.startsWith('http')
                                                                 ? setting.value
                                                                 : `${import.meta.env.VITE_API_URL}${setting.value}`}
@@ -329,51 +364,63 @@ const AdminSettings = () => {
                                                 </div>
                                             )}
                                         </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 ))}
+
                 {/* Filter Configuration */}
-                <div>
-                    <h2 className="text-xs font-black uppercase tracking-wide text-black mb-4 pb-2 border-b border-gray-200">
-                        {t('settings.productFilters')}
-                    </h2>
-                    <p className="text-xs text-gray-400 mb-4">
-                        {t('settings.filterToggleDesc')}
-                    </p>
-                    <div className="space-y-3">
-                        {filters.map(filter => (
-                            <div key={filter.id} className="flex items-center justify-between py-2 border-b border-gray-100">
-                                <div className="flex items-center gap-3">
-                                    {/* Toggle */}
-                                    <button
-                                        onClick={() => handleFilterToggle(filter)}
-                                        className={`w-10 h-5 rounded-full transition-colors relative ${
-                                            filter.visible ? 'bg-black' : 'bg-gray-300'
-                                        }`}
-                                    >
-                                        <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                                            filter.visible ? 'left-5' : 'left-0.5'
-                                        }`} />
-                                    </button>
-                                    <div>
-                                        <p className="text-sm font-medium text-black">{translateFilterName(filter.displayName)}</p>
-                                        <p className="text-xs text-gray-400">{translateFilterType(filter.filterType)}</p>
+                <div className="border-b border-gray-200">
+                    <button
+                        onClick={() => toggleSection('filters')}
+                        className="w-full flex items-center justify-between py-5 text-left"
+                    >
+                        <span className="text-sm font-semibold text-black uppercase tracking-wide">
+                            {t('settings.productFilters')}
+                        </span>
+                        {chevron('filters')}
+                    </button>
+
+                    {openSection === 'filters' && (
+                        <div className="pb-6">
+                            <p className="text-xs text-gray-400 mb-4">
+                                {t('settings.filterToggleDesc')}
+                            </p>
+                            <div className="space-y-3">
+                                {filters.map(filter => (
+                                    <div key={filter.id} className="flex items-center justify-between py-2 border-b border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={() => handleFilterToggle(filter)}
+                                                className={`w-10 h-5 rounded-full transition-colors relative ${
+                                                    filter.visible ? 'bg-black' : 'bg-gray-300'
+                                                }`}
+                                            >
+                                                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
+                                                    filter.visible ? 'left-5' : 'left-0.5'
+                                                }`} />
+                                            </button>
+                                            <div>
+                                                <p className="text-sm font-medium text-black">{translateFilterName(filter.displayName)}</p>
+                                                <p className="text-xs text-gray-400">{translateFilterType(filter.filterType)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs text-gray-400">{t('settings.order')}:</span>
+                                            <input
+                                                type="number"
+                                                value={filter.displayOrder}
+                                                onChange={(e) => handleFilterReorder(filter, parseInt(e.target.value))}
+                                                className="w-12 border border-gray-300 px-2 py-1 text-xs text-center focus:outline-none focus:border-black"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="text-xs text-gray-400">{t('settings.order')}:</span>
-                                    <input
-                                        type="number"
-                                        value={filter.displayOrder}
-                                        onChange={(e) => handleFilterReorder(filter, parseInt(e.target.value))}
-                                        className="w-12 border border-gray-300 px-2 py-1 text-xs text-center focus:outline-none focus:border-black"
-                                    />
-                                </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

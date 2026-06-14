@@ -440,7 +440,10 @@
     "filterPrice": "Cena",
     "filterTypeSelect": "Filter po vrednosti",
     "filterTypeColor": "Filter po boji",
-    "filterTypeRange": "Filter po opsegu"
+    "filterTypeRange": "Filter po opsegu",
+    "contact_enabled": "Kontakt stranica",
+    "multilanguage_enabled": "Višejezičnost",
+    "default_language": "Podrazumevani jezik"
   },
   "messages": {
     "productCreated": "Proizvod kreiran",

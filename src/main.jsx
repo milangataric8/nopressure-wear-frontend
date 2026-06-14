@@ -4,9 +4,19 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
+import { getSettingsMap } from './api/settingsApi';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 import './i18n/i18n';
+import i18n from './i18n/i18n';
+
+getSettingsMap().then(r => {
+    const settings = r.data;
+    // If multilanguage disabled, force default language
+    if (settings.multilanguage_enabled === 'false' && settings.default_language) {
+        i18n.changeLanguage(settings.default_language);
+    }
+}).catch(() => {});
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

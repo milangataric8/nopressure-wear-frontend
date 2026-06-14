@@ -440,7 +440,10 @@
     "filterPrice": "Price",
     "filterTypeSelect": "Select filter",
     "filterTypeColor": "Color filter",
-    "filterTypeRange": "Range filter"
+    "filterTypeRange": "Range filter",
+    "contactPage": "Contact page",
+    "multiLanguage": "Multi-language",
+    "defaultLanguage": "Default language"
   },
   "messages": {
     "productCreated": "Product created",

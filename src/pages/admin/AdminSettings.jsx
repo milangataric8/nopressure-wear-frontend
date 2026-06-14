@@ -34,7 +34,12 @@ const AdminSettings = () => {
         },
         {
             title: t('settings.socialMedia'),
-            keys: ['social_instagram', 'social_facebook', 'social_x', 'social_threads', 'social_tiktok', 'social_youtube']
+            keys: ['social_instagram',
+                'social_facebook',
+                'social_x',
+                'social_threads',
+                'social_tiktok',
+                'social_youtube']
         },
         {
             title: t('settings.payment'),
@@ -42,7 +47,12 @@ const AdminSettings = () => {
         },
         {
             title: t('settings.features'),
-            keys: ['find_in_store_enabled', 'reviews_enabled', 'favorites_enabled']
+            keys: ['find_in_store_enabled',
+                'reviews_enabled',
+                'favorites_enabled',
+                'contact_enabled',
+                'multilanguage_enabled',
+                'default_language']
         }
     ];
 
@@ -166,14 +176,42 @@ const AdminSettings = () => {
                                         </div>
 
                                         {/* Boolean toggle for payment settings */}
-                                        {['payment_card_enabled', 'payment_cod_enabled', 'find_in_store_enabled', 'reviews_enabled', 'favorites_enabled'].includes(setting.key) ? (
+                                        {setting.key === 'default_language' ? (
+                                            <div className="flex-1">
+                                                <select
+                                                    value={setting.value}
+                                                    onChange={async (e) => {
+                                                        try {
+                                                            await updateSettings(setting.id, e.target.value);
+                                                            toast.success(t('messages.settingUpdated'));
+                                                            fetchSettings();
+                                                            window.dispatchEvent(new Event('settings-updated'));
+                                                        } catch (err) {
+                                                            toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                        }
+                                                    }}
+                                                    className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                                >
+                                                    <option value="en">English</option>
+                                                    <option value="sr">Serbian (Srpski)</option>
+                                                </select>
+                                            </div>
+                                        ) : ['payment_card_enabled',
+                                            'payment_cod_enabled',
+                                            'find_in_store_enabled',
+                                            'reviews_enabled',
+                                            'favorites_enabled',
+                                            'contact_enabled',
+                                            'multilanguage_enabled'].includes(setting.key) ? (
                                             <div className="flex-1 flex items-center gap-3">
                                                 <button
                                                     onClick={async () => {
                                                         try {
                                                             const newValue = setting.value === 'true' ? 'false' : 'true';
                                                             await updateSettings(setting.id, newValue);
-                                                            toast.success(newValue === 'true' ? t('messages.settingEnabled', { name: setting.label }) : t('messages.settingDisabled', { name: setting.label }));
+                                                            toast.success(newValue === 'true'
+                                                                ? t('messages.settingEnabled', { name: setting.label })
+                                                                : t('messages.settingDisabled', { name: setting.label }));
                                                             fetchSettings();
                                                             window.dispatchEvent(new Event('settings-updated'));
                                                         } catch (e) {

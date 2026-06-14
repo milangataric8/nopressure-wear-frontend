@@ -25,6 +25,7 @@ const Navbar = () => {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const { t, i18n } = useTranslation();
     const [socialSettings, setSocialSettings] = useState({});
+    const [storeSettings, setStoreSettings] = useState({});
     const formatPrice = useFormatPrice();
 
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
@@ -85,6 +86,16 @@ const Navbar = () => {
         return () => window.removeEventListener('settings-updated', handler);
     }, []);
 
+    useEffect(() => {
+        getSettingsMap().then(r => setStoreSettings(r.data)).catch(() => {});
+
+        const handler = () => {
+            getSettingsMap().then(r => setStoreSettings(r.data)).catch(() => {});
+        };
+        window.addEventListener('settings-updated', handler);
+        return () => window.removeEventListener('settings-updated', handler);
+    }, []);
+
     const toggleLanguage = () => {
         const newLang = i18n.language === 'en' ? 'sr' : 'en';
         i18n.changeLanguage(newLang);
@@ -127,12 +138,14 @@ const Navbar = () => {
 
                     {/* Auth links + language — right */}
                     <div className="flex items-center gap-6 ml-auto">
-                        <button
-                            onClick={toggleLanguage}
-                            className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
-                        >
-                            {i18n.language === 'en' ? 'SR' : 'EN'}
-                        </button>
+                        {storeSettings.multilanguage_enabled !== 'false' && (
+                            <button
+                                onClick={toggleLanguage}
+                                className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
+                            >
+                                {i18n.language === 'en' ? 'SR' : 'EN'}
+                            </button>
+                        )}
 
                         {isAuthenticated() ? (
                             <>
@@ -390,6 +403,11 @@ const Navbar = () => {
                                     )}
                                 </div>
                             )}
+                            {storeSettings.contact_enabled !== 'false' && (
+                                <Link to="/contact" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                    {t('admin.contact')}
+                                </Link>
+                            )}
                         </div>
 
                         {/* Mobile menu button + search + cart */}
@@ -568,7 +586,7 @@ const Navbar = () => {
                         {/* Mobile menu — fixed full-screen overlay below the navbar */}
                         {mobileMenuOpen && (
                             <div className="md:hidden fixed left-0 right-0 top-24 bottom-0 bg-white z-40 overflow-y-auto border-t border-gray-200">
-                                <div className="px-6 py-4 space-y-3">
+                                <div className="px-6 py-4 space-y-4">
                                     {/* Search */}
                                     <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">
                                         <input
@@ -621,6 +639,9 @@ const Navbar = () => {
                                             <Link to="/admin/stores" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.locations')}</Link>
                                         </div>
                                     )}
+                                    <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">
+                                        {t('admin.contact')}
+                                    </Link>
                                 </div>
                             </div>
                         )}

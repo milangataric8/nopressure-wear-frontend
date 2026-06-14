@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { getCart } from './api/cartApi';
+import { getSettingsMap } from './api/settingsApi';
 import { getFavoriteCount } from './api/favoriteApi';
 import Navbar from './components/common/Navbar';
 import ProtectedRoute from './components/common/ProtectedRoute';
@@ -35,6 +36,8 @@ import AdminPopups from './pages/admin/AdminPopups';
 import AdminStores from "./pages/admin/AdminStores.jsx";
 import FavoritesPage from './pages/FavoritesPage';
 import AdminReports from "./pages/admin/AdminReports.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
+import i18n from './i18n/i18n';
 
 function App() {
     const { user, isAuthenticated, setCartCount, setFavoriteCount } = useAuth();
@@ -68,6 +71,28 @@ function App() {
         };
         initData();
     }, [user?.id]);
+
+    useEffect(() => {
+        const applyLanguageSettings = () => {
+            getSettingsMap().then(r => {
+                const s = r.data;
+                if (s.multilanguage_enabled === 'false' && s.default_language) {
+                    // Multi-language off → force default language
+                    i18n.changeLanguage(s.default_language);
+                } else if (s.multilanguage_enabled !== 'false') {
+                    // Multi-language on → use saved choice, or default if none saved
+                    const saved = localStorage.getItem('i18nextLng');
+                    if (!saved && s.default_language) {
+                        i18n.changeLanguage(s.default_language);
+                    }
+                }
+            }).catch(() => {});
+        };
+
+        applyLanguageSettings();
+        window.addEventListener('settings-updated', applyLanguageSettings);
+        return () => window.removeEventListener('settings-updated', applyLanguageSettings);
+    }, []);
 
     const location = useLocation();
 
@@ -154,6 +179,7 @@ function App() {
                     <Route path="/admin/reports" element={
                         <ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>
                     } />
+                    <Route path="/contact" element={<ContactPage />} />
                 </Routes>
             </div>
             {!hideFooter && <Footer />}

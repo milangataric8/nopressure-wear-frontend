@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { getSettingsMap } from '../../api/settingsApi';
 import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
+import {Link} from "react-router-dom";
 
 const Footer = () => {
     const { t } = useTranslation();
     const [settings, setSettings] = useState({});
+    const [storeSettings] = useState({});
 
     useEffect(() => {
         getSettingsMap().then(r => setSettings(prev => ({ ...prev, ...r.data }))).catch(() => {});
@@ -14,8 +16,6 @@ const Footer = () => {
     useEffect(() => {
         getSettingsMap()
             .then(r => setSettings(r.data))
-            .catch(() => {});
-
         const handler = () => {
             getSettingsMap().then(r => setSettings(r.data)).catch(() => {});
         };
@@ -60,15 +60,17 @@ const Footer = () => {
                     </div>
 
                     {/* Contact */}
-                    <div>
-                        <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            {t('footer.contact')}
-                        </h3>
-                        <div className="space-y-1 text-sm text-gray-500">
-                            <p>{settings.footer_email || ''}</p>
-                            <p>{settings.footer_phone || ''}</p>
+                    {storeSettings.contact_enabled !== 'false' && (
+                        <div>
+                            <Link to="/contact" className="text-sm font-black uppercase tracking-wide text-black mb-3 block hover:underline">
+                                {t('footer.contact')}
+                            </Link>
+                            <div className="space-y-1 text-sm text-gray-500">
+                                <p>{settings.footer_email || ''}</p>
+                                <p>{settings.footer_phone || ''}</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Follow Us — only if any social link exists */}
                     {hasSocials && (

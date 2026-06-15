@@ -165,7 +165,26 @@
     "status": "Status",
     "payment": "Payment",
     "date": "Date",
-    "reportDescription": "Analytics, revenue, top products and customers"
+    "reportDescription": "Analytics, revenue, top products and customers",
+    "notifications": "Notifications",
+    "sendPromotionalNotifications": "Send promotional notifications to all customers",
+    "newNotification": "New Notification",
+    "channels": "Channels",
+    "notConfigured": "Not configured",
+    "imageOptional": "Image (optional)",
+    "uploadImage": "Upload Image",
+    "subjectEmailOnly": "Subject (email only)",
+    "subjectPlaceholder": "Summer Sale - 30% Off!",
+    "notificationMessage": "Message",
+    "messagePlaceholder": "Get 30% off all products this weekend! Use code SUMMER30 at checkout.",
+    "sending": "Sending...",
+    "sendNotification": "Send Notification",
+    "notificationHistory": "Notification History",
+    "noNotificationsSent": "No notifications sent yet",
+    "noSubject": "(No subject)",
+    "channelsLabel": "Channels: {{value}}",
+    "recipientsLabel": "Recipients: {{count}}",
+    "reuse": "Reuse"
   },
   "product": {
     "allProducts": "All Products",
@@ -538,7 +557,16 @@
     "itemRemoved": "Item removed",
     "cartCleared": "Cart cleared",
     "failedToRemoveItem": "Failed to remove item",
-    "failedToClearCart": "Failed to clear cart"
+    "failedToClearCart": "Failed to clear cart",
+    "messageRequired": "Message is required",
+    "selectChannel": "Select at least one channel",
+    "confirmSend": "Send to all customers via {{channels}}?",
+    "notificationSent": "Sent! Email: {{email}}, WhatsApp: {{whatsapp}}, Viber: {{viber}}",
+    "failedToSendNotification": "Failed to send notification",
+    "failedToDeleteNotification": "Failed to delete notification",
+    "notificationDeleted": "Notification deleted",
+    "loadedIntoForm": "Loaded into form — review and send",
+    "confirmDeleteBroadcast": "Delete this broadcast from history?"
   },
   "store": {
     "addStore": "Add Store"

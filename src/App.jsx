@@ -37,6 +37,7 @@ import AdminStores from "./pages/admin/AdminStores.jsx";
 import FavoritesPage from './pages/FavoritesPage';
 import AdminReports from "./pages/admin/AdminReports.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import AdminNotifications from "./pages/AdminNotifications.jsx";
 import i18n from './i18n/i18n';
 
 function App() {
@@ -178,6 +179,9 @@ function App() {
                         <ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>
                     } />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/admin/notifications" element={
+                        <ProtectedRoute adminOnly><AdminNotifications /></ProtectedRoute>
+                    } />
                 </Routes>
             </div>
             {!hideFooter && <Footer />}

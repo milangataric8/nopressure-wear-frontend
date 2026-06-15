@@ -327,8 +327,7 @@ const Navbar = () => {
                                                 {/* Admin only */}
                                                 {isAdmin() && (
                                                     <>
-                                                        <div className="border-t border-gray-100 mt-1" />
-                                                        <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                        <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
                                                             {t('admin.sectionManagement')}
                                                         </p>
                                                         <Link to="/admin/settings" onClick={() => setActiveDropdown(null)}
@@ -342,7 +341,8 @@ const Navbar = () => {
                                                     </>
                                                 )}
                                                 {/* Catalog */}
-                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                <div className="border-t text-gray-200 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
                                                     {t('admin.sectionCatalog')}
                                                 </p>
                                                 <Link to="/admin/products" onClick={() => setActiveDropdown(null)}
@@ -355,8 +355,8 @@ const Navbar = () => {
                                                 </Link>
 
                                                 {/* Sales */}
-                                                <div className="border-t border-gray-100 mt-1" />
-                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                <div className="border-t text-gray-200 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
                                                     {t('admin.sectionSales')}
                                                 </p>
                                                 <Link to="/admin/orders" onClick={() => setActiveDropdown(null)}
@@ -377,8 +377,8 @@ const Navbar = () => {
                                                 </Link>
 
                                                 {/* Marketing */}
-                                                <div className="border-t border-gray-100 mt-1" />
-                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                <div className="border-t text-gray-200 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
                                                     {t('admin.sectionMarketing')}
                                                 </p>
                                                 <Link to="/admin/banners" onClick={() => setActiveDropdown(null)}
@@ -389,10 +389,14 @@ const Navbar = () => {
                                                       className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                     {t('admin.popups')}
                                                 </Link>
+                                                <Link to="/admin/notifications" onClick={() => setActiveDropdown(null)}
+                                                      className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                    {t('admin.notifications')}
+                                                </Link>
 
                                                 {/* Store */}
-                                                <div className="border-t border-gray-100 mt-1" />
-                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-300">
+                                                <div className="border-t text-gray-200 mt-1" />
+                                                <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
                                                     {t('admin.sectionStore')}
                                                 </p>
                                                 <Link to="/admin/stores" onClick={() => setActiveDropdown(null)}
@@ -537,7 +541,7 @@ const Navbar = () => {
                                                                     {item.imageUrl ? (
                                                                         <img src={getImageUrl(item.imageUrl)} className="w-full h-full object-contain p-1" alt={item.productName} />
                                                                     ) : (
-                                                                        <span className="text-gray-400 text-xs">No img</span>
+                                                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                                                     )}
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
@@ -573,7 +577,7 @@ const Navbar = () => {
                                                                     {item.imageUrl ? (
                                                                         <img src={getImageUrl(item.imageUrl)} className="w-full h-full object-contain p-1" alt={item.productName} />
                                                                     ) : (
-                                                                        <span className="text-gray-400 text-xs">No img</span>
+                                                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
                                                                     )}
                                                                 </div>
                                                                 <div className="flex-1 min-w-0">
@@ -657,26 +661,27 @@ const Navbar = () => {
                                         <div className="border-t border-gray-200 pt-3">
                                             {isAdmin() && (
                                                 <>
-                                                    <p className="text-xs font-black uppercase tracking-wide text-gray-300 mt-3 mb-2">{t('admin.sectionManagement')}</p>
+                                                    <p className="text-xs font-black text-gray-500 uppercase tracking-wide mt-3 mb-2">{t('admin.sectionManagement')}</p>
                                                     <Link to="/admin/settings" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-bold text-gray-600 hover:text-black py-1">{t('admin.settings')}</Link>
                                                     <Link to="/admin/employees" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1 mb-3">{t('admin.employees')}</Link>
                                                 </>
                                             )}
 
-                                            <p className="text-xs font-black uppercase tracking-wide mb-2">{t('admin.sectionCatalog')}</p>
+                                            <p className="text-xs font-black text-gray-500 uppercase tracking-wide mb-2">{t('admin.sectionCatalog')}</p>
                                             <Link to="/admin/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.products')}</Link>
                                             <Link to="/admin/categories" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.categories')}</Link>
 
-                                            <p className="text-xs font-black uppercase tracking-wide mt-3 mb-2">{t('admin.sectionSales')}</p>
+                                            <p className="text-xs font-black text-gray-500 uppercase tracking-wide mt-3 mb-2">{t('admin.sectionSales')}</p>
                                             <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.orders')}</Link>
                                             <Link to="/admin/customers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.customers')}</Link>
                                             <Link to="/admin/coupons" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.coupons')}</Link>
 
-                                            <p className="text-xs font-black uppercase tracking-wide mt-3 mb-2">{t('admin.sectionMarketing')}</p>
+                                            <p className="text-xs font-black text-gray-500 uppercase tracking-wide mt-3 mb-2">{t('admin.sectionMarketing')}</p>
                                             <Link to="/admin/banners" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.banners')}</Link>
                                             <Link to="/admin/popups" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.popups')}</Link>
+                                            <Link to="/admin/notifications" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.notifications')}</Link>
 
-                                            <p className="text-xs font-black uppercase tracking-wide mt-3 mb-2">{t('admin.sectionStore')}</p>
+                                            <p className="text-xs font-black text-gray-500 uppercase tracking-wide mt-3 mb-2">{t('admin.sectionStore')}</p>
                                             <Link to="/admin/stores" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-gray-600 hover:text-black py-1">{t('admin.locations')}</Link>
                                         </div>
                                     )}

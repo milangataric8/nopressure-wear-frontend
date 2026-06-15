@@ -165,7 +165,26 @@
     "status": "Status",
     "payment": "Plaćanje",
     "date": "Datum",
-    "reportDescription": "Analitika, prihodi, najbolji proizvodi i kupci"
+    "reportDescription": "Analitika, prihodi, najbolji proizvodi i kupci",
+    "notifications": "Obaveštenja",
+    "sendPromotionalNotifications": "Pošaljite promotivna obaveštenja svim kupcima",
+    "newNotification": "Novo obaveštenje",
+    "channels": "Kanali",
+    "notConfigured": "Nije konfigurisano",
+    "imageOptional": "Slika (opciono)",
+    "uploadImage": "Otpremi sliku",
+    "subjectEmailOnly": "Naslov (samo za email)",
+    "subjectPlaceholder": "Letnja rasprodaja - 30% popusta!",
+    "notificationMessage": "Poruka",
+    "messagePlaceholder": "Dobijte 30% popusta na sve proizvode ovog vikenda! Koristite kod SUMMER30 pri plaćanju.",
+    "sending": "Slanje...",
+    "sendNotification": "Pošalji obaveštenje",
+    "notificationHistory": "Istorija obaveštenja",
+    "noNotificationsSent": "Još nema poslatih obaveštenja",
+    "noSubject": "(Bez naslova)",
+    "channelsLabel": "Kanali: {{value}}",
+    "recipientsLabel": "Primaoci: {{count}}",
+    "reuse": "Ponovi"
   },
   "product": {
     "allProducts": "Svi proizvodi",
@@ -538,7 +557,16 @@
     "itemRemoved": "Artikal uklonjen",
     "cartCleared": "Korpa ispražnjena",
     "failedToRemoveItem": "Greška pri uklanjanju artikla",
-    "failedToClearCart": "Greška pri pražnjenju korpe"
+    "failedToClearCart": "Greška pri pražnjenju korpe",
+    "messageRequired": "Poruka je obavezna",
+    "selectChannel": "Odaberite barem jedan kanal",
+    "confirmSend": "Poslati svim kupcima putem {{channels}}?",
+    "notificationSent": "Poslato! Email: {{email}}, WhatsApp: {{whatsapp}}, Viber: {{viber}}",
+    "failedToSendNotification": "Greška pri slanju obaveštenja",
+    "failedToDeleteNotification": "Greška pri uklanjanju obaveštenja",
+    "notificationDeleted": "Obaveštenje obrisano",
+    "loadedIntoForm": "Učitano u formu — pregledajte i pošaljite",
+    "confirmDeleteBroadcast": "Obrisati ovo obaveštenje iz istorije?"
   },
   "store": {
     "addStore": "Dodaj prodavnicu"

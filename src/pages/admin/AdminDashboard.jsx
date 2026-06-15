@@ -45,6 +45,7 @@ const AdminDashboard = () => {
             items: [
                 { to: '/admin/banners', title: t('admin.banners'), desc: t('admin.manageBanners') },
                 { to: '/admin/popups', title: t('admin.popups'), desc: t('admin.managePopups') },
+                { to: '/admin/notifications', title: t('admin.notifications'), desc: t('admin.sendPromotionalNotifications') },
             ]
         },
         {

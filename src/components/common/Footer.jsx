@@ -32,26 +32,35 @@ const Footer = () => {
     return (
         <footer className="border-t border-gray-200 mt-20">
             <div className="max-w-7xl mx-auto px-6 py-12">
-                <div className={`grid grid-cols-1 md:grid-cols-2 ${hasSocials ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-12 mb-12`}>
-                    {/* Brand */}
+                <div className={`grid grid-cols-1 gap-12 mb-12`}>
+                    {/* Brand store tagline */}
                     <div>
-                        <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
-                            {settings.store_name || 'WEBSHOP'}
-                        </h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">
-                            {settings.store_tagline || ''}
-                        </p>
+                        {/*<h3 className="text-sm font-black uppercase tracking-wide text-black mb-3 text-center">*/}
+                        {/*    {settings.store_name || 'NoPressure'}*/}
+                        {/*</h3>*/}
+                        <div className="w-full max-w-10xl mx-auto px-4">
+                            <div
+                                className="product-description text-sm text-gray-900 text-center"
+                                style={{
+                                    maxWidth: '100%',
+                                    overflowWrap: 'break-word',
+                                    wordBreak: 'break-word',
+                                }}
+                                dangerouslySetInnerHTML={{ __html: settings.store_tagline }}
+                            />
+                        </div>
                     </div>
-
+                </div>
+                <div className={`grid grid-cols-1 md:grid-cols-2 ${hasSocials ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} justify-items-center gap-12 mb-12`}>
                     {/* Visit Us */}
-                    <div>
+                    <div className="justify-items-center">
                         <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
                             {t('footer.visitUs')}
                         </h3>
-                        <div className="space-y-1 text-sm text-gray-500">
+                        <div className="space-y-1 text-sm justify-items-center text-gray-500">
                             <p>{settings.footer_address || ''}</p>
                             <p>{settings.footer_city || ''}</p>
-                            <div className="pt-2 space-y-1">
+                            <div className="pt-2 space-y-1 justify-items-center">
                                 <p>{settings.footer_hours_weekday || ''}</p>
                                 <p>{settings.footer_hours_saturday || ''}</p>
                                 <p>{settings.footer_hours_sunday || ''}</p>
@@ -61,11 +70,11 @@ const Footer = () => {
 
                     {/* Contact */}
                     {storeSettings.contact_enabled !== 'false' && (
-                        <div>
+                        <div className="justify-items-center">
                             <Link to="/contact" className="text-sm font-black uppercase tracking-wide text-black mb-3 block hover:underline">
                                 {t('footer.contact')}
                             </Link>
-                            <div className="space-y-1 text-sm text-gray-500">
+                            <div className="space-y-1 text-sm justify-items-center text-gray-500">
                                 <p>{settings.footer_email || ''}</p>
                                 <p>{settings.footer_phone || ''}</p>
                             </div>
@@ -74,7 +83,7 @@ const Footer = () => {
 
                     {/* Follow Us — only if any social link exists */}
                     {hasSocials && (
-                        <div>
+                        <div className="justify-items-center">
                             <h3 className="text-sm font-black uppercase tracking-wide text-black mb-3">
                                 {t('footer.followUs')}
                             </h3>
@@ -84,10 +93,12 @@ const Footer = () => {
                 </div>
 
                 {/* Map */}
-                <div className="border-t border-gray-200 pt-8">
-                    <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                <div className="border-t border-gray-200 justify-items-center pt-8">
+                    <h3 className="text-xs font-black uppercase text-black">
                         {t('footer.findUs')}
                     </h3>
+                </div>
+                <div className="pt-4">
                     <div className="h-48 overflow-hidden">
                         <iframe
                             src={mapUrl}

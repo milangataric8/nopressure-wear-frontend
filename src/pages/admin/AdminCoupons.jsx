@@ -9,11 +9,11 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../../hooks/useFormatPrice';
+import {useCurrency} from "../../context/CurrencyContext.jsx";
 
 const AdminCoupons = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const [coupons, setCoupons] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -242,7 +242,7 @@ const AdminCoupons = () => {
                                 <td className="px-4 py-3 text-sm font-semibold text-black">
                                     {coupon.discountType === 'PERCENTAGE'
                                         ? `${coupon.discountValue}%`
-                                        : formatPrice(coupon.discountValue)}
+                                        : format(coupon.discountValue)}
                                 </td>
                                 <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {coupon.usageCount} / {coupon.usageLimit}

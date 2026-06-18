@@ -364,7 +364,12 @@
     "oneNumber": "At least one number",
     "oneSpecial": "At least one special character",
     "passwordsMatch": "Passwords match",
-    "passwordsNoMatch": "Passwords do not match"
+    "passwordsNoMatch": "Passwords do not match",
+    "loginSubtitle": "Enter your details to continue",
+    "joinHeroLine1": "Join",
+    "joinHeroLine2": "Us",
+    "joinTagline": "Become a member today",
+    "registerSubtitle": "Fill in your details to get started"
   },
   "profile": {
     "title": "My Profile",

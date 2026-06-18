@@ -5,6 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
 import { GuestCartProvider } from './context/GuestCartContext';
+import { CurrencyProvider } from './context/CurrencyProvider';
 import { getSettingsMap } from './api/settingsApi';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
@@ -24,7 +25,9 @@ createRoot(document.getElementById('root')).render(
         <BrowserRouter>
             <AuthProvider>
                 <GuestCartProvider>
+                <CurrencyProvider>
                 <App />
+                </CurrencyProvider>
                 </GuestCartProvider>
                 <ToastContainer
                     position="top-center"

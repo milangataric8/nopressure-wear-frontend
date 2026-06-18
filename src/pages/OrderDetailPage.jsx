@@ -6,12 +6,12 @@ import { useAuth } from '../hooks/useAuth';
 import { getImageUrl } from "../utils/imageUtils.js";
 import { useTranslation } from 'react-i18next';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
-import useFormatPrice from '../hooks/useFormatPrice';
+import {useCurrency} from "../context/CurrencyContext.jsx";
 
 const OrderDetailPage = () => {
     const { t, i18n } = useTranslation();
     const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const getStatusLabel = (status) => ({
         PENDING: t('order.pending'),
         CONFIRMED: t('order.confirmed'),
@@ -204,11 +204,11 @@ const OrderDetailPage = () => {
                                             {item.productName}
                                         </h3>
                                         <span className="text-sm font-bold text-black">
-                                            {formatPrice(item.subtotal)}
+                                            {format(item.subtotal)}
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-400 mt-1">
-                                        {t('order.qty')}: {item.quantity} × {formatPrice(item.priceAtPurchase)}
+                                        {t('order.qty')}: {item.quantity} × {format(item.priceAtPurchase)}
                                     </p>
                                 </div>
                             </div>
@@ -225,7 +225,7 @@ const OrderDetailPage = () => {
                         <div className="space-y-3 mb-4">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
-                                <span>{formatPrice(order.totalAmount)}</span>
+                                <span>{format(order.totalAmount)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
@@ -234,7 +234,7 @@ const OrderDetailPage = () => {
                         </div>
                         <div className="border-t border-gray-200 pt-4 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
-                            <span className="font-bold text-black">{formatPrice(order.totalAmount)}</span>
+                            <span className="font-bold text-black">{format(order.totalAmount)}</span>
                         </div>
                     </div>
 

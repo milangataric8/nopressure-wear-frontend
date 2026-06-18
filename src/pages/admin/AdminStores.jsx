@@ -163,7 +163,7 @@ const AdminStores = () => {
                         <div>
                             <label className={labelClass}>{t('auth.email')}</label>
                             <input type="email" name="email" value={formData.email} onChange={handleChange}
-                                   className={inputClass} placeholder="store@webshop.com" />
+                                   className={inputClass} placeholder="store@nopressure.com" />
                         </div>
                         <div>
                             <label className={labelClass}>{t('admin.workingHours')}</label>

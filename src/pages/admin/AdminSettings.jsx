@@ -5,6 +5,7 @@ import {uploadImage} from "../../api/uploadApi.js";
 import { getAllFilters, updateFilter } from '../../api/filterApi';
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
+import RichTextEditor from "../../components/common/RichTextEditor.jsx";
 
 const AdminSettings = () => {
     const { t } = useTranslation();
@@ -65,6 +66,15 @@ const AdminSettings = () => {
                 'contact_enabled',
                 'multilanguage_enabled',
                 'default_language']
+        },
+        {
+            key: 'currency',
+            title: 'Currency',
+            keys: ['base_currency',
+                'currency_en',
+                'currency_sr',
+                'exchange_rate_eur',
+                'exchange_rate_usd']
         }
     ];
 
@@ -211,7 +221,34 @@ const AdminSettings = () => {
                                                 </p>
                                             </div>
 
-                                            {setting.key === 'default_language' ? (
+                                            {setting.key === 'store_tagline' ? (
+                                                <div className="flex-1">
+                                                    <RichTextEditor
+                                                        value={setting.value}
+                                                        onChange={async (html) => {
+                                                            setSettings(prev => prev.map(s =>
+                                                                s.id === setting.id ? { ...s, value: html } : s
+                                                            ));
+                                                        }}
+                                                        placeholder={t('settings.store_tagline')}
+                                                    />
+                                                    <button
+                                                        onClick={async () => {
+                                                            try {
+                                                                await updateSettings(setting.id, setting.value);
+                                                                toast.success(t('messages.settingUpdated'));
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToSave'));
+                                                            }
+                                                        }}
+                                                        className="mt-2 bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
+                                                    >
+                                                        {t('common.save')}
+                                                    </button>
+                                                </div>
+                                            ) : setting.key === 'default_language' ? (
                                                 <div className="flex-1">
                                                     <select
                                                         value={setting.value}
@@ -294,7 +331,7 @@ const AdminSettings = () => {
                                                             </div>
                                                             <input
                                                                 type="file"
-                                                                accept="image/*"
+                                                                accept=".jpg,.jpeg,.png,.gif,.webp,.bmp"
                                                                 className="hidden"
                                                                 onChange={async (e) => {
                                                                     const file = e.target.files[0];

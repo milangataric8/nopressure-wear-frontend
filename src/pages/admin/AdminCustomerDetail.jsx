@@ -7,11 +7,10 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../../hooks/useFormatPrice';
+import {useCurrency} from "../../context/CurrencyContext.jsx";
 
 const AdminCustomerDetail = () => {
     const { t, i18n } = useTranslation();
-    const formatPrice = useFormatPrice();
     const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
     const getStatusLabel = (status) => ({
         PENDING: t('order.pending'),
@@ -29,6 +28,7 @@ const AdminCustomerDetail = () => {
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [totalOrders, setTotalOrders] = useState(0);
+    const { format } = useCurrency();
 
     const fetchCustomer = useCallback(async () => {
         try {
@@ -196,7 +196,7 @@ const AdminCustomerDetail = () => {
                                         {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
                                     </td>
                                     <td className="px-4 py-3 text-sm font-semibold text-black">
-                                        {formatPrice(order.totalAmount)}
+                                        {format(order.totalAmount)}
                                     </td>
                                     <td className="px-4 py-3">
                                             <span className={`text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(order.status)}`}>

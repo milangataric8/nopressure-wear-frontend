@@ -15,6 +15,7 @@ import {getReviews, addReview, deleteReview} from '../api/reviewApi';
 import { getSimilarProducts } from '../api/productApi';
 import StarRating from '../components/common/StarRating';
 import PriceDisplay from '../components/common/PriceDisplay';
+import ProductReviews from "../components/product/ProductReviews.jsx";
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -39,8 +40,7 @@ const ProductDetailPage = () => {
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
-    const [showReviewForm, setShowReviewForm] = useState(false);
-    const [openSection, setOpenSection] = useState(null);
+    const [openSection, setOpenSection] = useState('description');
     const [similarProducts, setSimilarProducts] = useState([]);
 
     const fetchProduct = useCallback(async () => {
@@ -458,146 +458,82 @@ const ProductDetailPage = () => {
                             <span>{product.material}</span>
                         </div>
                     )}
+                </div>
+            </div>
 
-                    {/* Accordion sections */}
-                    <div className="mt-8 border-t border-gray-200">
-                        {/* Description */}
-                        {product.description && (
-                            <div className="border-b border-gray-200">
-                                <button
-                                    onClick={() => toggleSection('description')}
-                                    className="w-full flex items-center justify-between py-4 text-left"
-                                >
-                                    <span className="text-sm font-semibold text-black">{t('review.description')}</span>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="18" height="18"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.5"
-                                        className={`transition-transform duration-200 ${openSection === 'description' ? 'rotate-90' : ''}`}
-                                    >
-                                        <polyline points="9 18 15 12 9 6"/>
-                                    </svg>
-                                </button>
-                                {openSection === 'description' && (
-                                    <div className="pb-6">
-                                        <div
-                                            className="product-description text-sm text-gray-600"
-                                            dangerouslySetInnerHTML={{ __html: product.description }}
-                                        />
-                                    </div>
-                                )}
+            <div className="mt-8 border-t border-gray-200">
+                {/* Description */}
+                {product.description && (
+                    <div className="border-b border-gray-200 mt-5">
+                        <button
+                            onClick={() => toggleSection('description')}
+                            className="w-full flex items-center justify-between py-4 text-left"
+                        >
+                            <span className="text-sm font-semibold text-black">{t('review.description')}</span>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18" height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                className={`transition-transform duration-200 ${openSection === 'description' ? 'rotate-90' : ''}`}
+                            >
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </button>
+                        {openSection === 'description' && (
+                            <div className="pb-6">
+                                <div
+                                    className="product-description text-sm text-gray-600 max-w-full overflow-hidden break-words"
+                                    dangerouslySetInnerHTML={{ __html: product.description }}
+                                />
                             </div>
                         )}
-
-                        {/* Reviews */}
-                        {reviewsEnabled && <div className="border-b border-gray-200">
-                            <button
-                                onClick={() => toggleSection('reviews')}
-                                className="w-full flex items-center justify-between py-4 text-left"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-black">{t('review.reviews')}</span>
-                                    {reviews.length > 0 && (
-                                        <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">
-                        {reviews.length}
-                    </span>
-                                    )}
-                                </div>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="18" height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    className={`transition-transform duration-200 ${openSection === 'reviews' ? 'rotate-90' : ''}`}
-                                >
-                                    <polyline points="9 18 15 12 9 6"/>
-                                </svg>
-                            </button>
-                            {openSection === 'reviews' && (
-                                <div className="pb-6">
-                                    {/* Write review */}
-                                    {isAuthenticated() && !reviews.some(r => r.userName === `${user.firstName} ${user.lastName}`) && (
-                                        <div className="mb-6">
-                                            <button
-                                                onClick={() => setShowReviewForm(!showReviewForm)}
-                                                className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
-                                            >
-                                                {showReviewForm ? t('review.cancelReview') : t('review.writeReview')}
-                                            </button>
-
-                                            {showReviewForm && (
-                                                <div className="border border-gray-200 p-6 mt-3">
-                                                    <div className="mb-3">
-                                                        <StarRating
-                                                            rating={myRating}
-                                                            size="lg"
-                                                            interactive
-                                                            onRate={setMyRating}
-                                                        />
-                                                    </div>
-                                                    <textarea
-                                                        value={myComment}
-                                                        onChange={(e) => setMyComment(e.target.value)}
-                                                        placeholder={t('review.shareExperience')}
-                                                        className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors mb-3"
-                                                        rows={3}
-                                                    />
-                                                    <button
-                                                        onClick={handleSubmitReview}
-                                                        disabled={submittingReview || myRating === 0}
-                                                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-30"
-                                                    >
-                                                        {submittingReview ? t('review.submitting') : t('review.submitReview')}
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Reviews list */}
-                                    {reviews.length === 0 ? (
-                                        <p className="text-sm text-gray-400">{t('review.noReviews')}</p>
-                                    ) : (
-                                        <div className="space-y-4">
-                                            {reviews.map(review => (
-                                                <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <div className="flex items-center gap-3">
-                                                            <StarRating rating={review.rating} size="sm" />
-                                                            <span className="text-xs font-semibold text-black">{review.userName}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-3">
-                                                            <span className="text-xs text-gray-400">
-                                                                {new Date(review.createdAt).toLocaleDateString()}
-                                                            </span>
-                                                            {isAuthenticated() && review.userName === `${user.firstName} ${user.lastName}` && (
-                                                                <button
-                                                                    onClick={() => handleDeleteReview(review.id)}
-                                                                    className="text-xs text-red-400 hover:text-red-600 underline"
-                                                                >
-                                                                    {t('review.delete')}
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {review.comment && (
-                                                        <p className="text-sm text-gray-600">{review.comment}</p>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                    </div>
+                )}
+                {/* Reviews */}
+                {reviewsEnabled && <div className="border-b border-gray-200">
+                    <button
+                        onClick={() => toggleSection('reviews')}
+                        className="w-full flex items-center justify-between py-4 text-left"
+                    >
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-black">{t('review.reviews')}</span>
+                            {reviews.length > 0 && (
+                                <span className="bg-gray-100 text-gray-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                                            {reviews.length}
+                                        </span>
                             )}
                         </div>
-                        }
-                    </div>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18" height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            className={`transition-transform duration-200 ${openSection === 'reviews' ? 'rotate-90' : ''}`}
+                        >
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </button>
+                    {openSection === 'reviews' && (
+                        <ProductReviews
+                            reviews={reviews}
+                            isAuthenticated={isAuthenticated}
+                            user={user}
+                            myRating={myRating}
+                            setMyRating={setMyRating}
+                            myComment={myComment}
+                            setMyComment={setMyComment}
+                            submittingReview={submittingReview}
+                            onSubmitReview={handleSubmitReview}
+                            onDeleteReview={handleDeleteReview}
+                        />
+                    )}
                 </div>
+                }
             </div>
 
             {/* Similar Products */}

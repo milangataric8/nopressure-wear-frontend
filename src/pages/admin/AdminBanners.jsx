@@ -101,7 +101,7 @@ const AdminBanners = () => {
     const handleEdit = (banner) => {
         setEditingBanner(banner);
         setFormData({
-            title: banner.title,
+            title: banner.title || '',
             subtitle: banner.subtitle || '',
             mediaUrl: banner.mediaUrl || '',
             mediaType: banner.mediaType,
@@ -189,7 +189,6 @@ const AdminBanners = () => {
                                 onChange={handleChange}
                                 className={inputClass}
                                 placeholder="Summer Collection"
-                                required
                             />
                         </div>
 

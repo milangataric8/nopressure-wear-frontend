@@ -16,7 +16,6 @@ import { getImageUrl } from "../../utils/imageUtils.js";
 import { uploadImage, uploadVideo } from '../../api/uploadApi';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../../hooks/useFormatPrice';
 import { getAllStoresForProduct, addProductToStore, removeProductFromStore, toggleProductStoreStock } from '../../api/storeApi';
 import { getActiveStores } from '../../api/storeApi';
 import Pagination from "../../components/common/Pagination.jsx";
@@ -24,10 +23,11 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import RichTextEditor from '../../components/common/RichTextEditor';
+import {useCurrency} from "../../context/CurrencyContext.jsx";
 
 const AdminProducts = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -41,6 +41,7 @@ const AdminProducts = () => {
     const [searchInput, setSearchInput] = useState('');
     const [categoryFilter, setCategoryFilter] = useState(null);
     const [removeBg, setRemoveBg] = useState(false);
+    const [removeBgAdditional, setRemoveBgAdditional] = useState(false);
     const [activeFilter, setActiveFilter] = useState(null);
     const [brandFilter, setBrandFilter] = useState('');
     const [colorFilter, setColorFilter] = useState('');
@@ -202,7 +203,7 @@ const AdminProducts = () => {
             .catch(() => setProductStores([]));
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    }
 
     const handleToggle = async (id) => {
         try {
@@ -257,7 +258,7 @@ const AdminProducts = () => {
         e.target.value = '';
 
         try {
-            const uploadResponse = await uploadImage(file, removeBg);
+            const uploadResponse = await uploadImage(file, removeBgAdditional);
             const url = uploadResponse.data.url;
 
             if (editingProduct) {
@@ -382,7 +383,7 @@ const AdminProducts = () => {
                 </div>
                 <div className="flex w-10/12">
                     {!showForm && availableBrands.length > 0 && (
-                        <div className="flex gap-2 mb-4 flex-wrap">
+                        <div className="flex gap-2 mb-4 flex-wrap items-center">
                             <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">{t('product.brand')}:</span>
                             {availableBrands.map(brand => (
                                 <button
@@ -505,7 +506,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Discount %</label>
+                            <label className={labelClass}>{t('cart.discount')}</label>
                             <input
                                 type="number"
                                 name="discountPercentage"
@@ -811,7 +812,7 @@ const AdminProducts = () => {
                                 </div>
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept=".jpg,.jpeg,.png,.gif,.webp,.bmp"
                                     onChange={handleMainImageUpload}
                                     className="hidden"
                                 />
@@ -864,13 +865,28 @@ const AdminProducts = () => {
                                     ))
                                 )}
                             </div>
+
+                            <div className="flex items-center gap-3 mb-2">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={removeBgAdditional}
+                                        onChange={(e) => setRemoveBgAdditional(e.target.checked)}
+                                        className="w-3.5 h-3.5"
+                                    />
+                                    <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                        {t('admin.removeBackground')}
+                                    </span>
+                                </label>
+                            </div>
+
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
                                     {t('admin.addImage')}
                                 </div>
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept=".jpg,.jpeg,.png,.gif,.webp,.bmp"
                                     onChange={handleAddImage}
                                     className="hidden"
                                 />
@@ -979,7 +995,7 @@ const AdminProducts = () => {
                                     <p className="text-xs text-gray-400">{product.categoryName || t('admin.noCategory')}</p>
                                 </td>
                                 <td className="hidden md:table-cell px-3 py-3 text-xs text-gray-500">{product.sku}</td>
-                                <td className="px-3 py-3 text-xs font-semibold text-black">{formatPrice(product.price)}</td>
+                                <td className="px-3 py-3 text-xs font-semibold text-black">{format(product.price)}</td>
                                 <td className="hidden md:table-cell px-3 py-3 text-xs text-black">{product.stockQuantity}</td>
                                 <td className="px-3 py-3">
                                     <StatusBadge active={product.active} />

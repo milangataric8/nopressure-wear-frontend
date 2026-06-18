@@ -177,7 +177,7 @@ const AdminNotifications = () => {
                             </div>
                             <input
                                 type="file"
-                                accept="image/*"
+                                accept=".jpg,.jpeg,.png,.gif,.webp,.bmp"
                                 className="hidden"
                                 disabled={uploading}
                                 onChange={async (e) => {

@@ -13,14 +13,14 @@ import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../components/common/CheckoutForm';
 import { createPaymentIntent } from '../api/paymentApi';
 import { getAddressByUser, createAddress } from '../api/addressApi';
-import useFormatPrice from '../hooks/useFormatPrice';
 import { getSettingsMap } from '../api/settingsApi';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
 import { GuestCartContext } from '../context/GuestCartContext';
+import {useCurrency} from "../context/CurrencyContext.jsx";
 
 const CartPage = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const { user, setCartCount, isAuthenticated } = useAuth();
     const { guestCart, clearGuestCart, updateGuestCartItem, removeFromGuestCart } = useContext(GuestCartContext);
     const [cart, setCart] = useState(null);
@@ -333,7 +333,7 @@ const CartPage = () => {
                                         {item.productName}
                                     </h3>
                                     <span className="text-sm font-bold text-black">
-                                        {formatPrice(item.subtotal)}
+                                        {format(item.subtotal)}
                                     </span>
                                 </div>
                                 {item.productSku && (
@@ -397,7 +397,7 @@ const CartPage = () => {
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
-                                <span className="font-medium">{formatPrice(displayTotal)}</span>
+                                <span className="font-medium">{format(displayTotal)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
@@ -405,7 +405,7 @@ const CartPage = () => {
                             </div>
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
                                 <span className="font-semibold text-black">{t('cart.total')}</span>
-                                <span className="font-bold text-black">{formatPrice(displayTotal)}</span>
+                                <span className="font-bold text-black">{format(displayTotal)}</span>
                             </div>
                         </div>
 
@@ -712,13 +712,13 @@ const CartPage = () => {
                     <div className="space-y-3 mb-6">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">{t('cart.subtotal')}</span>
-                            <span className="font-medium">{formatPrice(displayTotal)}</span>
+                            <span className="font-medium">{format(displayTotal)}</span>
                         </div>
                         {couponData && (
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.discount', { code: couponData.code })}</span>
                                 <span className="font-medium text-green-600">
-                                    -{formatPrice(couponData.discountAmount)}
+                                    -{format(couponData.discountAmount)}
                                 </span>
                             </div>
                         )}
@@ -729,7 +729,7 @@ const CartPage = () => {
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">
-                                {formatPrice(couponData ? couponData.finalTotal : displayTotal)}
+                                {format(couponData ? couponData.finalTotal : displayTotal)}
                             </span>
                         </div>
                     </div>

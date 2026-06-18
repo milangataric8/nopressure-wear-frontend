@@ -53,7 +53,7 @@ const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
                 </div>
                 <input
                     type="file"
-                    accept="image/*"
+                    accept=".jpg,.jpeg,.png,.gif,.webp,.bmp"
                     onChange={handleFileChange}
                     className="hidden"
                     disabled={uploading}

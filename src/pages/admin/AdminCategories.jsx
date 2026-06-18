@@ -219,9 +219,9 @@ const AdminCategories = () => {
                     <table className="w-full">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.category')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.category')}</th>
+                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3 pl-6">{t('order.status')}</th>
+                            <th className="text-right text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3 pr-10">{t('admin.actions')}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -229,7 +229,7 @@ const AdminCategories = () => {
                             // Flat list when searching
                             categories.map(cat => (
                                 <tr key={cat.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                    <td className="px-4 py-3">
+                                    <td className="px-3 py-3">
                                         <div className="flex items-center gap-2">
                                             <p className="text-sm font-semibold text-black">{cat.name}</p>
                                             {cat.parentId && (
@@ -242,11 +242,11 @@ const AdminCategories = () => {
                                             <p className="text-xs text-gray-400">{cat.description}</p>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3">
+                                    <td className="px-3 py-3">
                                         <StatusBadge active={cat.active} />
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center gap-3">
+                                    <td className="px-3 py-3">
+                                        <div className="flex justify-end gap-3">
                                             <button
                                                 onClick={() => handleEdit(cat)}
                                                 className="text-xs text-gray-500 hover:text-black underline"
@@ -272,7 +272,7 @@ const AdminCategories = () => {
                                 return (
                                     <React.Fragment key={cat.id}>
                                         <tr key={cat.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-3">
+                                            <td className="px-3 py-3">
                                                 <div className="flex items-center gap-2">
                                                     <p className="text-sm font-semibold text-black">{cat.name}</p>
                                                     {subcategories.length > 0 && (
@@ -288,13 +288,10 @@ const AdminCategories = () => {
                                                         </button>
                                                     )}
                                                 </div>
-                                                {cat.description && (
-                                                    <p className="text-xs text-gray-400">{cat.description}</p>
-                                                )}
                                             </td>
-                                            <td className="px-4 py-3"><StatusBadge active={cat.active} /></td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
+                                            <td className="px-3 py-3"><StatusBadge active={cat.active} /></td>
+                                            <td className="px-3 py-3">
+                                                <div className="flex justify-end gap-3">
                                                     <button onClick={() => handleEdit(cat)} className="text-xs text-gray-500 hover:text-black underline">{t('admin.edit')}</button>
                                                     <button onClick={() => handleToggle(cat.id)} className="text-xs text-gray-500 hover:text-black underline">
                                                         {cat.active ? t('admin.deactivate') : t('admin.activate')}

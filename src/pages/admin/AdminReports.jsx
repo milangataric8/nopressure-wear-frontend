@@ -15,11 +15,7 @@ import {
 } from '../../api/reportApi.js';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import DownloadButtons from '../admin/DownloadButtons.jsx';
-
-const formatPrice = (value) => {
-    if (!value) return '0 RSD';
-    return Number(value).toLocaleString() + ' RSD';
-};
+import {useCurrency} from "../../context/CurrencyContext.jsx";
 
 const AdminReports = () => {
     const { t } = useTranslation();
@@ -33,6 +29,7 @@ const AdminReports = () => {
     const [paymentStats, setPaymentStats] = useState({});
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { format } = useCurrency();
 
     useEffect(() => {
         Promise.all([
@@ -91,7 +88,7 @@ const AdminReports = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.totalRevenue')}</p>
-                        <p className="text-xl font-black text-black">{formatPrice(overview.totalRevenue)}</p>
+                        <p className="text-xl font-black text-black">{format(overview.totalRevenue)}</p>
                     </div>
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.totalOrders')}</p>
@@ -103,7 +100,7 @@ const AdminReports = () => {
                     </div>
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.avgOrderValue')}</p>
-                        <p className="text-xl font-black text-black">{formatPrice(overview.averageOrderValue)}</p>
+                        <p className="text-xl font-black text-black">{format(overview.averageOrderValue)}</p>
                     </div>
                 </div>
             )}
@@ -113,7 +110,7 @@ const AdminReports = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.todayRevenue')}</p>
-                        <p className="text-lg font-bold text-black">{formatPrice(overview.todayRevenue)}</p>
+                        <p className="text-lg font-bold text-black">{format(overview.todayRevenue)}</p>
                     </div>
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.todayOrders')}</p>
@@ -121,7 +118,7 @@ const AdminReports = () => {
                     </div>
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.monthlyRevenue')}</p>
-                        <p className="text-lg font-bold text-black">{formatPrice(overview.monthlyRevenue)}</p>
+                        <p className="text-lg font-bold text-black">{format(overview.monthlyRevenue)}</p>
                     </div>
                     <div className="border border-gray-200 p-6">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">{t('admin.monthlyOrders')}</p>
@@ -150,7 +147,7 @@ const AdminReports = () => {
                                         />
                                     </div>
                                     <span className="text-xs font-semibold text-black w-28 text-right">
-                                        {formatPrice(item.revenue)}
+                                        {format(item.revenue)}
                                     </span>
                                 </div>
                             ))}
@@ -218,7 +215,7 @@ const AdminReports = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-semibold text-black truncate">{product.name}</p>
-                                        <p className="text-xs text-gray-400">{formatPrice(product.price)}</p>
+                                        <p className="text-xs text-gray-400">{format(product.price)}</p>
                                     </div>
                                     <span className="text-xs font-bold text-black">
                                         {t('admin.soldCount', { count: product.salescount })}
@@ -247,7 +244,7 @@ const AdminReports = () => {
                                         <p className="text-xs text-gray-400">{customer.email}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs font-bold text-black">{formatPrice(customer.total_spent)}</p>
+                                        <p className="text-xs font-bold text-black">{format(customer.total_spent)}</p>
                                         <p className="text-xs text-gray-400">
                                             {t('admin.ordersCount', { count: customer.orders })}
                                         </p>
@@ -279,7 +276,7 @@ const AdminReports = () => {
                                         />
                                     </div>
                                     <span className="text-xs font-semibold text-black w-28 text-right">
-                                        {formatPrice(item.revenue)}
+                                        {format(item.revenue)}
                                     </span>
                                 </div>
                             ))}
@@ -358,7 +355,7 @@ const AdminReports = () => {
                                 <tr key={order.id} className="border-b border-gray-100">
                                     <td className="py-3 text-xs font-semibold text-black">#{order.ordercode}</td>
                                     <td className="py-3 text-xs text-gray-600">{order.customername}</td>
-                                    <td className="py-3 text-xs font-semibold text-black">{formatPrice(order.totalamount)}</td>
+                                    <td className="py-3 text-xs font-semibold text-black">{format(order.totalamount)}</td>
                                     <td className="py-3">
                                         <span className={`text-xs font-semibold uppercase px-2 py-0.5 ${statusColors[order.status] || 'bg-gray-100'}`}>
                                             {order.status}

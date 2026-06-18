@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { getUserFavorites, toggleFavorite } from '../api/favoriteApi';
 import { getImageUrl } from '../utils/imageUtils';
-import useFormatPrice from "../hooks/useFormatPrice.js";
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
 
 const FavoritesPage = () => {
@@ -13,7 +12,6 @@ const FavoritesPage = () => {
     const { user, setFavoriteCount } = useAuth();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
-    const formatPrice = useFormatPrice();
 
     const fetchFavorites = useCallback(async () => {
         setLoading(true);

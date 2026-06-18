@@ -7,12 +7,12 @@ import Skeleton from '../components/common/Skeleton';
 import {getImageUrl} from "../utils/imageUtils.js";
 import Pagination from "../components/common/Pagination.jsx";
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../hooks/useFormatPrice';
+import {useCurrency} from "../context/CurrencyContext.jsx";
 
 const OrdersPage = () => {
     const { t, i18n } = useTranslation();
     const dateLocale = i18n.language === 'sr' ? 'sr-RS' : 'en-US';
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const getStatusLabel = (status) => ({
         PENDING: t('order.pending'),
         CONFIRMED: t('order.confirmed'),
@@ -143,7 +143,7 @@ const OrdersPage = () => {
                                             {getStatusLabel(order.status)}
                                         </span>
                                         <span className="text-sm font-bold text-black">
-                                            {formatPrice(order.totalAmount)}
+                                            {format(order.totalAmount)}
                                         </span>
                                     </div>
                                 </div>
@@ -172,12 +172,12 @@ const OrdersPage = () => {
                                                         {t('order.qty')}: {item.quantity}
                                                     </p>
                                                     <p className="text-xs text-gray-400">
-                                                        {formatPrice(item.priceAtPurchase)} {t('order.perItem')}
+                                                        {format(item.priceAtPurchase)} {t('order.perItem')}
                                                     </p>
                                                 </div>
                                             </div>
                                             <span className="text-sm font-bold text-black">
-                                                {formatPrice(item.subtotal)}
+                                                {format(item.subtotal)}
                                             </span>
                                         </div>
                                     ))}

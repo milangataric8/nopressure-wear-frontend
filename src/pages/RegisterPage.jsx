@@ -60,8 +60,8 @@ const RegisterPage = () => {
             {/* Left side */}
             <div className="hidden lg:flex w-1/2 bg-black items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-6xl font-black uppercase tracking-tighter text-white">Join<br/>Us</h1>
-                    <p className="text-gray-400 mt-4 text-sm">Become a member today</p>
+                    <h1 className="text-6xl font-black uppercase tracking-tighter text-white">{t('auth.joinHeroLine1')}<br/>{t('auth.joinHeroLine2')}</h1>
+                    <p className="text-gray-400 mt-4 text-sm">{t('auth.joinTagline')}</p>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@ const RegisterPage = () => {
                 <div className="w-full max-w-sm">
                     <div className="mb-10">
                         <h2 className="text-2xl font-bold text-black mb-1">{t('auth.register')}</h2>
-                        <p className="text-sm text-gray-500">Fill in your details to get started</p>
+                        <p className="text-sm text-gray-500">{t('auth.registerSubtitle')}</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -83,7 +83,7 @@ const RegisterPage = () => {
                                     value={formData.firstName}
                                     onChange={handleChange}
                                     className={inputClass}
-                                    placeholder="Milan"
+                                    placeholder="Mirko"
                                     required
                                 />
                             </div>
@@ -95,7 +95,7 @@ const RegisterPage = () => {
                                     value={formData.lastName}
                                     onChange={handleChange}
                                     className={inputClass}
-                                    placeholder="Gataric"
+                                    placeholder="Kopanja"
                                     required
                                 />
                             </div>

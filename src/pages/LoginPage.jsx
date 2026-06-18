@@ -38,8 +38,8 @@ const LoginPage = () => {
             {/* Left side — image/branding */}
             <div className="hidden lg:flex w-1/2 bg-gray-100 items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-6xl font-black uppercase tracking-tighter text-black">Web<br/>Shop</h1>
-                    <p className="text-gray-500 mt-4 text-sm">Your premium destination</p>
+                    <h1 className="text-6xl font-black uppercase tracking-tighter text-black">No Pressure<br/>Wear</h1>
+                    <h4 className="text-gray-500 mt-4 text-lg">Be relaxed. Shop easy.</h4>
                 </div>
             </div>
 
@@ -48,7 +48,7 @@ const LoginPage = () => {
                 <div className="w-full max-w-sm">
                     <div className="mb-10">
                         <h2 className="text-2xl font-bold text-black mb-1">{t('auth.login')}</h2>
-                        <p className="text-sm text-gray-500">Enter your details to continue</p>
+                        <p className="text-sm text-gray-500">{t('auth.loginSubtitle')}</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,7 +62,7 @@ const LoginPage = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className={inputClass}
-                                placeholder="you@example.com"
+                                placeholder="mirko.kopanja@email.com"
                                 required
                             />
                         </div>

@@ -197,7 +197,7 @@ const AdminEmployees = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 className={inputClass}
-                                placeholder="employee@webshop.com"
+                                placeholder="employee@nopressure.com"
                                 required
                             />
                         </div>

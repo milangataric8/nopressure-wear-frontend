@@ -52,7 +52,7 @@ const HeroBanner = () => {
     const banner = banners[currentIndex];
 
     return (
-        <div className="relative h-[500px] overflow-hidden">
+        <div className="relative h-[700px] overflow-hidden">
             {/* Media */}
             {banner.mediaType === 'VIDEO' ? (
                 <video
@@ -79,9 +79,6 @@ const HeroBanner = () => {
 
             {/* Content */}
             <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-center">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/80 mb-4">
-                    New Collection
-                </p>
                 <h1 className="text-6xl font-black uppercase tracking-tight text-white mb-4 leading-none">
                     {banner.title}
                 </h1>

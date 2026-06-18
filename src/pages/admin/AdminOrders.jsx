@@ -5,11 +5,11 @@ import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
 import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../../hooks/useFormatPrice';
+import {useCurrency} from "../../context/CurrencyContext.jsx";
 
 const AdminOrders = () => {
     const { t } = useTranslation();
-    const formatPrice = useFormatPrice();
+    const { format } = useCurrency();
     const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -170,7 +170,7 @@ const AdminOrders = () => {
                                     {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
                                 </td>
                                 <td className="px-4 py-3 text-sm font-bold text-black">
-                                    {formatPrice(order.totalAmount)}
+                                    {format(order.totalAmount)}
                                 </td>
                                 <td className="px-4 py-3">
                                         <span className={`text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(order.status)}`}>

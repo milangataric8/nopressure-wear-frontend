@@ -364,7 +364,12 @@
     "oneNumber": "Najmanje jedan broj",
     "oneSpecial": "Najmanje jedan specijalni karakter",
     "passwordsMatch": "Lozinke se poklapaju",
-    "passwordsNoMatch": "Lozinke se ne poklapaju"
+    "passwordsNoMatch": "Lozinke se ne poklapaju",
+    "loginSubtitle": "Unesite podatke za nastavak",
+    "joinHeroLine1": "Pridruži",
+    "joinHeroLine2": "nam se",
+    "joinTagline": "Postanite član danas",
+    "registerSubtitle": "Unesite podatke za početak"
   },
   "profile": {
     "title": "Moj profil",

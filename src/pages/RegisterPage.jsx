@@ -5,6 +5,7 @@ import { register } from '../api/authApi';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
 import { useTranslation } from 'react-i18next';
+import AuthBackground from "../components/auth/AuthBackground.jsx";
 
 const RegisterPage = () => {
     const { t } = useTranslation();
@@ -58,12 +59,7 @@ const RegisterPage = () => {
     return (
         <div className="min-h-screen flex">
             {/* Left side */}
-            <div className="hidden lg:flex w-1/2 bg-black items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-6xl font-black uppercase tracking-tighter text-white">{t('auth.joinHeroLine1')}<br/>{t('auth.joinHeroLine2')}</h1>
-                    <p className="text-gray-400 mt-4 text-sm">{t('auth.joinTagline')}</p>
-                </div>
-            </div>
+            <AuthBackground />
 
             {/* Right side */}
             <div className="w-full lg:w-1/2 flex items-center justify-center px-8">

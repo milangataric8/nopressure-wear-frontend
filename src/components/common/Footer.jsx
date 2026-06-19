@@ -3,6 +3,7 @@ import { getSettingsMap } from '../../api/settingsApi';
 import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
 import {Link} from "react-router-dom";
+import signature from '../../../../uploads/products/nopressure_signature_footer.png';
 
 const Footer = () => {
     const { t } = useTranslation();
@@ -35,19 +36,19 @@ const Footer = () => {
                 <div className={`grid grid-cols-1 gap-12 mb-12`}>
                     {/* Brand store tagline */}
                     <div>
-                        {/*<h3 className="text-sm font-black uppercase tracking-wide text-black mb-3 text-center">*/}
-                        {/*    {settings.store_name || 'NoPressure'}*/}
-                        {/*</h3>*/}
                         <div className="w-full max-w-10xl mx-auto px-4">
                             <div
-                                className="product-description text-sm text-gray-900 text-center"
+                                className="product-description text-sm text-gray-900 text-center w-full min-w-0"
                                 style={{
-                                    maxWidth: '100%',
+                                    whiteSpace: 'normal',
+                                    wordBreak: 'keep-all',
                                     overflowWrap: 'break-word',
-                                    wordBreak: 'break-word',
                                 }}
                                 dangerouslySetInnerHTML={{ __html: settings.store_tagline }}
                             />
+                            <div className="product-description text-sm text-gray-900 justify-items-center text-center">
+                                <img src={signature} alt="Logo" className="h-12 w-auto" />
+                            </div>
                         </div>
                     </div>
                 </div>

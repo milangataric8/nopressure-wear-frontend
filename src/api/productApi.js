@@ -20,7 +20,11 @@ export const addProductImage = (productId, data) =>
     axiosInstance.post(`/products/${productId}/images`, data);
 export const deleteProductImage = (imageId) =>
     axiosInstance.delete(`/products/images/${imageId}`);
-export const getFeaturedProducts = (limit = 8) =>
-    axiosInstance.get('/products/featured', { params: { limit } });
 export const getSimilarProducts = (productId, limit = 4) =>
     axiosInstance.get(`/products/${productId}/similar`, { params: { limit } });
+export const getColorVariants = (productId) =>
+    axiosInstance.get(`/products/${productId}/variants`);
+export const linkColorVariant = (productId, variantProductId) =>
+    axiosInstance.post(`/products/${productId}/variants/${variantProductId}`);
+export const unlinkColorVariant = (productId, variantProductId) =>
+    axiosInstance.delete(`/products/${productId}/variants/${variantProductId}`);

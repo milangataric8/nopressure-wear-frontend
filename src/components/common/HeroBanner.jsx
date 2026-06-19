@@ -74,9 +74,6 @@ const HeroBanner = () => {
                 <div className="absolute inset-0 bg-gray-100" />
             )}
 
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30" />
-
             {/* Content */}
             <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-center">
                 <h1 className="text-6xl font-black uppercase tracking-tight text-white mb-4 leading-none">

@@ -16,6 +16,7 @@ const AdminSettings = () => {
     const [removeBg, setRemoveBg] = useState(false);
     const [filters, setFilters] = useState([]);
     const [openSection, setOpenSection] = useState(null);
+    const [removeBgAuth, setRemoveBgAuth] = useState(false);
 
     const toggleSection = (key) => {
         setOpenSection(prev => prev === key ? null : key);
@@ -26,6 +27,11 @@ const AdminSettings = () => {
             key: 'general',
             title: t('settings.general'),
             keys: ['store_name', 'store_logo_url', 'store_tagline']
+        },
+        {
+            key: 'auth',
+            title: 'Login / Register Pages',
+            keys: ['auth_bg_type', 'auth_bg_image', 'auth_bg_color', 'auth_bg_heading', 'auth_bg_subtext']
         },
         {
             key: 'location',
@@ -221,7 +227,103 @@ const AdminSettings = () => {
                                                 </p>
                                             </div>
 
-                                            {setting.key === 'store_tagline' ? (
+                                            {setting.key === 'auth_bg_type' ? (
+                                                <div className="flex-1">
+                                                    <select
+                                                        value={setting.value}
+                                                        onChange={async (e) => {
+                                                            try {
+                                                                await updateSettings(setting.id, e.target.value);
+                                                                toast.success(t('messages.settingUpdated'));
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                                    >
+                                                        <option value="color">Solid Color + Text</option>
+                                                        <option value="image">Image</option>
+                                                        <option value="none">None (no background)</option>
+                                                    </select>
+                                                </div>
+                                            ) : setting.key === 'auth_bg_color' ? (
+                                                <div className="flex-1 flex items-center gap-3">
+                                                    <input
+                                                        type="color"
+                                                        value={setting.value || '#000000'}
+                                                        onChange={async (e) => {
+                                                            try {
+                                                                await updateSettings(setting.id, e.target.value);
+                                                                setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: e.target.value } : s));
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        className="w-12 h-9 border border-gray-300 cursor-pointer"
+                                                    />
+                                                    <span className="text-sm text-gray-500">{setting.value}</span>
+                                                </div>
+                                            ) : setting.key === 'auth_bg_image' ? (
+                                                <div className="flex-1 flex items-center gap-4">
+                                                    {setting.value && (
+                                                        <img
+                                                            src={setting.value.startsWith('http') ? setting.value : `${import.meta.env.VITE_API_URL}${setting.value}`}
+                                                            alt="Auth background"
+                                                            className="h-16 w-28 object-cover border border-gray-200"
+                                                        />
+                                                    )}
+                                                    <label className="flex items-center gap-2 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={removeBgAuth}
+                                                            onChange={(e) => setRemoveBgAuth(e.target.checked)}
+                                                            className="w-3.5 h-3.5"
+                                                        />
+                                                        <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                                            {t('admin.removeBackground')}
+                                                        </span>
+                                                    </label>
+                                                    <label className="cursor-pointer">
+                                                        <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
+                                                            {setting.value ? 'Change Image' : 'Upload Image'}
+                                                        </div>
+                                                        <input
+                                                            type="file"
+                                                            accept=".jpg,.jpeg,.png,.webp"
+                                                            className="hidden"
+                                                            onChange={async (e) => {
+                                                                const file = e.target.files[0];
+                                                                if (!file) return;
+                                                                e.target.value = '';
+                                                                try {
+                                                                    const response = await uploadImage(file, removeBgAuth);
+                                                                    await updateSettings(setting.id, response.data.url);
+                                                                    toast.success(t('messages.settingUpdated'));
+                                                                    fetchSettings();
+                                                                    window.dispatchEvent(new Event('settings-updated'));
+                                                                } catch (err) {
+                                                                    toast.error(err.response?.data?.message || t('messages.failedToUploadImage'));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                    {setting.value && (
+                                                        <button
+                                                            onClick={async () => {
+                                                                await updateSettings(setting.id, '');
+                                                                fetchSettings();
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            }}
+                                                            className="text-xs text-red-400 hover:text-red-600 underline"
+                                                        >
+                                                            {t('common.remove')}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ) : setting.key === 'store_tagline' ? (
                                                 <div className="flex-1">
                                                     <RichTextEditor
                                                         value={setting.value}

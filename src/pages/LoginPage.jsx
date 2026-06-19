@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { login } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
+import AuthBackground from "../components/auth/AuthBackground.jsx";
 
 const LoginPage = () => {
     const { t } = useTranslation();
@@ -36,15 +37,10 @@ const LoginPage = () => {
     return (
         <div className="min-h-screen flex">
             {/* Left side — image/branding */}
-            <div className="hidden lg:flex w-1/2 bg-gray-100 items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-6xl font-black uppercase tracking-tighter text-black">No Pressure<br/>Wear</h1>
-                    <h4 className="text-gray-500 mt-4 text-lg">Be relaxed. Shop easy.</h4>
-                </div>
-            </div>
+            <AuthBackground />
 
             {/* Right side — form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center px-8">
+            <div className="flex-1 flex items-center justify-center px-6 py-12">
                 <div className="w-full max-w-sm">
                     <div className="mb-10">
                         <h2 className="text-2xl font-bold text-black mb-1">{t('auth.login')}</h2>

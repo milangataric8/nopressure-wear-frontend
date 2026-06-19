@@ -184,7 +184,12 @@
     "noSubject": "(No subject)",
     "channelsLabel": "Channels: {{value}}",
     "recipientsLabel": "Recipients: {{count}}",
-    "reuse": "Reuse"
+    "reuse": "Reuse",
+    "colorVariants": "Color Variants",
+    "colorVariantsDesc": "Link other products as color variants. Customers can switch between them on the product page.",
+    "currentVariant": "(current)",
+    "noVariantsLinked": "No variants linked yet.",
+    "searchVariantPlaceholder": "Search product to link as variant..."
   },
   "product": {
     "allProducts": "All Products",
@@ -571,7 +576,11 @@
     "failedToDeleteNotification": "Failed to delete notification",
     "notificationDeleted": "Notification deleted",
     "loadedIntoForm": "Loaded into form — review and send",
-    "confirmDeleteBroadcast": "Delete this broadcast from history?"
+    "confirmDeleteBroadcast": "Delete this broadcast from history?",
+    "variantLinked": "Variant linked",
+    "variantUnlinked": "Variant unlinked",
+    "failedToLinkVariant": "Failed to link variant",
+    "failedToUnlinkVariant": "Failed to unlink variant"
   },
   "store": {
     "addStore": "Add Store"

@@ -184,7 +184,12 @@
     "noSubject": "(Bez naslova)",
     "channelsLabel": "Kanali: {{value}}",
     "recipientsLabel": "Primaoci: {{count}}",
-    "reuse": "Ponovi"
+    "reuse": "Ponovi",
+    "colorVariants": "Varijante boja",
+    "colorVariantsDesc": "Povežite druge proizvode kao varijante boja. Kupci mogu da biraju između njih na stranici proizvoda.",
+    "currentVariant": "(trenutno)",
+    "noVariantsLinked": "Nema povezanih varijanti.",
+    "searchVariantPlaceholder": "Pretražite proizvod za povezivanje kao varijanta..."
   },
   "product": {
     "allProducts": "Svi proizvodi",
@@ -571,7 +576,11 @@
     "failedToDeleteNotification": "Greška pri uklanjanju obaveštenja",
     "notificationDeleted": "Obaveštenje obrisano",
     "loadedIntoForm": "Učitano u formu — pregledajte i pošaljite",
-    "confirmDeleteBroadcast": "Obrisati ovo obaveštenje iz istorije?"
+    "confirmDeleteBroadcast": "Obrisati ovo obaveštenje iz istorije?",
+    "variantLinked": "Varijanta povezana",
+    "variantUnlinked": "Varijanta odvojena",
+    "failedToLinkVariant": "Greška pri povezivanju varijante",
+    "failedToUnlinkVariant": "Greška pri odvajanju varijante"
   },
   "store": {
     "addStore": "Dodaj prodavnicu"

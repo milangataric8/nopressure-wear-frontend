@@ -12,6 +12,7 @@ import useFormatPrice from '../hooks/useFormatPrice';
 import StarRating from '../components/common/StarRating';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
 import ActiveFilters from "../components/common/ActiveFilters.jsx";
+import {getSettingsMap} from "../api/settingsApi.js";
 
 const ProductsPage = () => {
     const { t } = useTranslation();
@@ -45,6 +46,7 @@ const ProductsPage = () => {
     const [filterConfig, setFilterConfig] = useState([]);
     const [selectedMaterial, setSelectedMaterial] = useState('');
     const [availableMaterials, setAvailableMaterials] = useState([]);
+    const [reviewsEnabled, setReviewsEnabled] = useState(true);
     const navigate = useNavigate();
 
     const rootCategories = categories.filter(cat => !cat.parentId);
@@ -171,6 +173,13 @@ const ProductsPage = () => {
             setAvailableBrands(r.data.brands || []);
             setAvailableColors(r.data.colors || []);
             setAvailableMaterials(r.data.materials || []);
+        }).catch(() => {});
+    }, []);
+
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            setReviewsEnabled(r.data.reviews_enabled !== 'false');
         }).catch(() => {});
     }, []);
 
@@ -618,7 +627,9 @@ const ProductsPage = () => {
                                             </span>
                                         </div>
 
-                                        <StarRating rating={product.averageRating || 0} count={product.ratingCount || 0} size="sm" />
+                                        {reviewsEnabled &&
+                                            <StarRating rating={product.averageRating || 0} count={product.ratingCount || 0} size="sm" />
+                                        }
                                     </div>
                                 </Link>
                             ))}

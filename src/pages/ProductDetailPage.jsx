@@ -16,6 +16,8 @@ import { getSimilarProducts } from '../api/productApi';
 import StarRating from '../components/common/StarRating';
 import PriceDisplay from '../components/common/PriceDisplay';
 import ProductReviews from "../components/product/ProductReviews.jsx";
+import { getColorVariants } from '../api/productApi';
+import signature from "../../../uploads/products/nopressure_signature_footer.png";
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -28,7 +30,7 @@ const ProductDetailPage = () => {
     const [quantity, setQuantity] = useState(1);
     const [addingToCart, setAddingToCart] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-    const [, setSelectedImageIndex] = useState(0);
+    const [setSelectedImageIndex] = useState(0);
     const [showFindInStore, setShowFindInStore] = useState(false);
     const [productStores, setProductStores] = useState([]);
     const [findInStoreEnabled, setFindInStoreEnabled] = useState(false);
@@ -42,6 +44,7 @@ const ProductDetailPage = () => {
     const [submittingReview, setSubmittingReview] = useState(false);
     const [openSection, setOpenSection] = useState('description');
     const [similarProducts, setSimilarProducts] = useState([]);
+    const [setVariants] = useState([]);
 
     const fetchProduct = useCallback(async () => {
         try {
@@ -93,6 +96,12 @@ const ProductDetailPage = () => {
             getSimilarProducts(product.id, 4)
                 .then(r => setSimilarProducts(r.data))
                 .catch(() => {});
+        }
+    }, [product?.id]);
+
+    useEffect(() => {
+        if (product?.id) {
+            getColorVariants(product.id).then(r => setVariants(r.data)).catch(() => {});
         }
     }, [product?.id]);
 
@@ -288,13 +297,15 @@ const ProductDetailPage = () => {
                         )}
                     </div>
 
-                    <div className="mb-4">
-                        <StarRating
-                            rating={product.averageRating || 0}
-                            count={product.ratingCount || 0}
-                            size="md"
-                        />
-                    </div>
+                    {reviewsEnabled &&
+                        <div className="mb-4">
+                            <StarRating
+                                rating={product.averageRating || 0}
+                                count={product.ratingCount || 0}
+                                size="md"
+                            />
+                        </div>
+                    }
 
                     <p className="text-xs text-gray-400 mb-6">
                         {t('product.productCode')}: {product.sku}
@@ -340,9 +351,9 @@ const ProductDetailPage = () => {
 
                                 {/* Variants */}
                                 {product.colorVariants.map(variant => (
-                                    <div key={variant.variantId}>
+                                    <div key={variant.productId}>
                                         <button
-                                            onClick={() => navigate(`/products/${variant.variantId}`)}
+                                            onClick={() => navigate(`/products/${variant.productId}`)}
                                             className="w-16 h-16 border-2 border-transparent hover:border-black transition-colors overflow-hidden block"
                                         >
                                             {variant.imageUrl ? (
@@ -461,10 +472,10 @@ const ProductDetailPage = () => {
                 </div>
             </div>
 
-            <div className="mt-8 border-t border-gray-200">
+            <div className="mt-8">
                 {/* Description */}
                 {product.description && (
-                    <div className="border-b border-gray-200 mt-5">
+                    <div className="border-t border-gray-200 mt-5">
                         <button
                             onClick={() => toggleSection('description')}
                             className="w-full flex items-center justify-between py-4 text-left"
@@ -485,15 +496,22 @@ const ProductDetailPage = () => {
                         {openSection === 'description' && (
                             <div className="pb-6">
                                 <div
-                                    className="product-description text-sm text-gray-600 max-w-full overflow-hidden break-words"
+                                    className="product-description text-sm text-gray-900 text-center"
+                                    style={{
+                                        maxWidth: '100%',
+                                        overflowWrap: 'anywhere',
+                                    }}
                                     dangerouslySetInnerHTML={{ __html: product.description }}
                                 />
+                                <div className="product-description text-sm text-gray-900 justify-items-center text-center">
+                                    <img src={signature} alt="Logo" className="h-12 w-auto" />
+                                </div>
                             </div>
                         )}
                     </div>
                 )}
                 {/* Reviews */}
-                {reviewsEnabled && <div className="border-b border-gray-200">
+                {reviewsEnabled && <div className=" border-t border-gray-200">
                     <button
                         onClick={() => toggleSection('reviews')}
                         className="w-full flex items-center justify-between py-4 text-left"
@@ -567,11 +585,15 @@ const ProductDetailPage = () => {
                                     <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                         {sp.name}
                                     </h3>
-                                    <StarRating
-                                        rating={sp.averageRating || 0}
-                                        count={sp.ratingCount || 0}
-                                        size="sm"
-                                    />
+
+                                    {reviewsEnabled &&
+                                        <StarRating
+                                            rating={sp.averageRating || 0}
+                                            count={sp.ratingCount || 0}
+                                            size="sm"
+                                        />
+                                    }
+
                                     <div className="mt-1">
                                         <PriceDisplay
                                             price={sp.price}

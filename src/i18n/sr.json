@@ -291,7 +291,8 @@
     "selectAddress": "Izaberite adresu za dostavu",
     "clearBag": "Isprazni korpu",
     "discount": "Popust ({{code}})",
-    "sku": "SKU"
+    "sku": "SKU",
+    "orderingDisabled": "Naručivanje trenutno nije dostupno"
   },
   "order": {
     "title": "Moje porudžbine",
@@ -472,7 +473,8 @@
     "filterTypeRange": "Filter po opsegu",
     "contact_enabled": "Kontakt stranica",
     "multilanguage_enabled": "Višejezičnost",
-    "default_language": "Podrazumevani jezik"
+    "default_language": "Podrazumevani jezik",
+    "add_to_cart_enabled": "Dodaj u korpu"
   },
   "messages": {
     "productCreated": "Proizvod kreiran",

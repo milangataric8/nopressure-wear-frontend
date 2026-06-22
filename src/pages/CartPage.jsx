@@ -45,6 +45,7 @@ const CartPage = () => {
     const [isMainAddress, setIsMainAddress] = useState(false);
     const [cardEnabled, setCardEnabled] = useState(true);
     const [codEnabled, setCodEnabled] = useState(true);
+    const [addToCartEnabled, setAddToCartEnabled] = useState(true);
     const [newAddress, setNewAddress] = useState({
         street: '',
         city: '',
@@ -87,6 +88,7 @@ const CartPage = () => {
         getSettingsMap().then(r => {
             setCardEnabled(r.data.payment_card_enabled !== 'false');
             setCodEnabled(r.data.payment_cod_enabled !== 'false');
+            setAddToCartEnabled(r.data.add_to_cart_enabled !== 'false');
         }).catch(() => {});
     }, []);
 
@@ -413,20 +415,23 @@ const CartPage = () => {
                             </div>
                         </div>
 
-                        <ShippingAddressSelector
-                            isAuthenticated={isAuthenticated}
-                            addresses={addresses}
-                            selectedAddress={selectedAddress}
-                            setSelectedAddress={setSelectedAddress}
-                            showNewAddress={showNewAddress}
-                            setShowNewAddress={setShowNewAddress}
-                            newAddress={newAddress}
-                            setNewAddress={setNewAddress}
-                            saveAddress={saveAddress}
-                            setSaveAddress={setSaveAddress}
-                            isMainAddress={isMainAddress}
-                            setIsMainAddress={setIsMainAddress}
-                        />
+                        {addToCartEnabled && (
+                            <ShippingAddressSelector
+                                isAuthenticated={isAuthenticated}
+                                addresses={addresses}
+                                selectedAddress={selectedAddress}
+                                setSelectedAddress={setSelectedAddress}
+                                showNewAddress={showNewAddress}
+                                setShowNewAddress={setShowNewAddress}
+                                newAddress={newAddress}
+                                setNewAddress={setNewAddress}
+                                saveAddress={saveAddress}
+                                setSaveAddress={setSaveAddress}
+                                isMainAddress={isMainAddress}
+                                setIsMainAddress={setIsMainAddress}
+                                orderingEnabled={addToCartEnabled}
+                            />
+                        )}
 
                         {!isAuthenticated() && (
                             <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} />
@@ -441,6 +446,7 @@ const CartPage = () => {
                                 isAuthenticated={isAuthenticated}
                                 displayItems={displayItems}
                                 checkingOut={checkingOut}
+                                orderingEnabled={addToCartEnabled}
                                 onProceedToPayment={handleProceedToPayment}
                                 onCashOnDelivery={handleCashOnDelivery}
                                 onGuestCheckout={handleGuestCheckout}
@@ -474,12 +480,14 @@ const CartPage = () => {
                             </>
                         )}
 
-                        <button
-                            onClick={() => navigate('/products')}
-                            className="w-full mt-3 border border-black text-black text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-50 transition-colors"
-                        >
-                            {t('cart.continueShopping')}
-                        </button>
+                        {addToCartEnabled && (
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="w-full mt-3 border border-black text-black text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-50 transition-colors"
+                            >
+                                {t('cart.continueShopping')}
+                            </button>
+                        )}
                     </div>
 
                     <CouponInput

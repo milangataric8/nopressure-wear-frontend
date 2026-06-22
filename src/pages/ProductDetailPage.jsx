@@ -39,6 +39,7 @@ const ProductDetailPage = () => {
     const [findInStoreEnabled, setFindInStoreEnabled] = useState(false);
     const [favoritesEnabled, setFavoritesEnabled] = useState(true);
     const [reviewsEnabled, setReviewsEnabled] = useState(true);
+    const [addToCartEnabled, setAddToCartEnabled] = useState(true);
     const [storesLoading, setStoresLoading] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
     const [reviews, setReviews] = useState([]);
@@ -75,6 +76,7 @@ const ProductDetailPage = () => {
             setFindInStoreEnabled(r.data.find_in_store_enabled !== 'false');
             setFavoritesEnabled(r.data.favorites_enabled !== 'false');
             setReviewsEnabled(r.data.reviews_enabled !== 'false');
+            setAddToCartEnabled(r.data.add_to_cart_enabled !== 'false');
         }).catch(() => {});
     }, []);
 
@@ -361,13 +363,22 @@ const ProductDetailPage = () => {
                         </div>
                     )}
 
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={product.stockQuantity === 0 || addingToCart}
-                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
-                    >
-                        {addingToCart ? t('product.adding') : t('product.addToCart')}
-                    </button>
+                    {addToCartEnabled ? (
+                        <button
+                            onClick={handleAddToCart}
+                            disabled={product.stockQuantity === 0 || addingToCart}
+                            className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
+                        >
+                            {product.stockQuantity === 0 ? t('product.soldOut') : addingToCart ? t('product.adding') : t('product.addToCart')}
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            className="w-full bg-gray-200 text-gray-400 text-sm font-semibold uppercase tracking-wide py-4 cursor-not-allowed"
+                        >
+                            {t('product.addToCart')}
+                        </button>
+                    )}
 
                     {findInStoreEnabled && (
                         <FindInStore

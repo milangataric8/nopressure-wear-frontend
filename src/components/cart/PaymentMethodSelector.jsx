@@ -8,6 +8,7 @@ const PaymentMethodSelector = ({
                                    isAuthenticated,
                                    displayItems,
                                    checkingOut,
+                                   orderingEnabled = true,
                                    onProceedToPayment,
                                    onCashOnDelivery,
                                    onGuestCheckout,
@@ -21,9 +22,11 @@ const PaymentMethodSelector = ({
 
     return (
         <div>
-            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                {t('cart.paymentMethod')}
-            </h3>
+            {orderingEnabled && (
+                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
+                    {t('cart.paymentMethod')}
+                </h3>
+            )}
             <div className="space-y-3 mb-6">
                 {cardEnabled && (
                     <button
@@ -41,7 +44,7 @@ const PaymentMethodSelector = ({
                     </button>
                 )}
 
-                {codEnabled && (
+                {orderingEnabled && codEnabled && (
                     <button
                         onClick={() => setPaymentMethod('cod')}
                         className={buttonClass(paymentMethod === 'cod')}
@@ -61,7 +64,13 @@ const PaymentMethodSelector = ({
                 )}
             </div>
 
-            {paymentMethod === 'card' && (
+            {!orderingEnabled && (
+                <p className="text-lg text-red-800 font-bold text-center py-2">
+                    {t('cart.orderingDisabled')}
+                </p>
+            )}
+
+            {orderingEnabled && paymentMethod === 'card' && (
                 <button
                     onClick={isAuthenticated() ? onProceedToPayment : onGuestCheckout}
                     disabled={!displayItems.length}
@@ -71,7 +80,7 @@ const PaymentMethodSelector = ({
                 </button>
             )}
 
-            {paymentMethod === 'cod' && (
+            {orderingEnabled && paymentMethod === 'cod' && (
                 <button
                     onClick={isAuthenticated() ? onCashOnDelivery : onGuestCheckout}
                     disabled={!displayItems.length || checkingOut}

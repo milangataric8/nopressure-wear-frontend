@@ -70,6 +70,7 @@ const AdminSettings = () => {
                 'reviews_enabled',
                 'favorites_enabled',
                 'contact_enabled',
+                'add_to_cart_enabled',
                 'multilanguage_enabled',
                 'default_language']
         },
@@ -376,6 +377,7 @@ const AdminSettings = () => {
                                                 'reviews_enabled',
                                                 'favorites_enabled',
                                                 'contact_enabled',
+                                                'add_to_cart_enabled',
                                                 'multilanguage_enabled'].includes(setting.key) ? (
                                                 <div className="flex-1 flex items-center gap-3">
                                                     <button

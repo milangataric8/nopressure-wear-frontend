@@ -291,7 +291,8 @@
     "selectAddress": "Please select a shipping address",
     "clearBag": "Clear Bag",
     "discount": "Discount ({{code}})",
-    "sku": "SKU"
+    "sku": "SKU",
+    "orderingDisabled": "Ordering is currently unavailable"
   },
   "order": {
     "title": "My Orders",
@@ -472,7 +473,8 @@
     "filterTypeRange": "Range filter",
     "contactPage": "Contact page",
     "multiLanguage": "Multi-language",
-    "defaultLanguage": "Default language"
+    "defaultLanguage": "Default language",
+    "add_to_cart_enabled": "Add to Cart"
   },
   "messages": {
     "productCreated": "Product created",

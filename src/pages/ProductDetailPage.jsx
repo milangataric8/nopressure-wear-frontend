@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
-import {useParams, useNavigate, Link} from 'react-router-dom';
+import {useParams, useNavigate} from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
@@ -17,7 +17,10 @@ import StarRating from '../components/common/StarRating';
 import PriceDisplay from '../components/common/PriceDisplay';
 import ProductReviews from "../components/product/ProductReviews.jsx";
 import { getColorVariants } from '../api/productApi';
-import signature from "../../../uploads/products/nopressure_signature_footer.png";
+import ProductDescription from "../components/product/ProductDescription.jsx";
+import SimilarProducts from "../components/product/SimilarProducts.jsx";
+import FindInStore from "../components/product/FindInStore.jsx";
+import ProductColorVariants from "../components/product/ProductColorVariants.jsx";
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -329,50 +332,7 @@ const ProductDetailPage = () => {
 
                     {/* Color variants */}
                     {product.colorVariants && product.colorVariants.length > 0 && (
-                        <div className="mb-6">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-black mb-3">
-                                {t('product.availableColors')}
-                            </p>
-                            <div className="flex gap-2 flex-wrap">
-                                {/* Current product */}
-                                <div className="relative">
-                                    <div className="w-16 h-16 border-2 border-black overflow-hidden">
-                                        {product.imageUrl ? (
-                                            <img
-                                                src={getImageUrl(product.imageUrl)}
-                                                alt={product.colorName || product.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full bg-gray-100" />
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Variants */}
-                                {product.colorVariants.map(variant => (
-                                    <div key={variant.productId}>
-                                        <button
-                                            onClick={() => navigate(`/products/${variant.productId}`)}
-                                            className="w-16 h-16 border-2 border-transparent hover:border-black transition-colors overflow-hidden block"
-                                        >
-                                            {variant.imageUrl ? (
-                                                <img
-                                                    src={getImageUrl(variant.imageUrl)}
-                                                    alt={variant.colorName || 'Variant'}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div
-                                                    className="w-full h-full"
-                                                    style={{ backgroundColor: variant.colorHex || '#ccc' }}
-                                                />
-                                            )}
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                        <ProductColorVariants product={product} />
                     )}
 
                     {/* Quantity */}
@@ -409,58 +369,13 @@ const ProductDetailPage = () => {
                         {addingToCart ? t('product.adding') : t('product.addToCart')}
                     </button>
 
-                    {/* Find in Store */}
                     {findInStoreEnabled && (
-                        <>
-                            <button
-                                onClick={handleFindInStore}
-                                disabled={storesLoading}
-                                className="w-full mt-3 border border-gray-300 text-black text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-50 transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                {storesLoading ? t('common.loading') : showFindInStore ? t('product.hideStores') : t('product.findInStore')}
-                            </button>
-
-                            {showFindInStore && (
-                                <div className="mt-4 border border-gray-200">
-                                    {productStores.length === 0 ? (
-                                        <div className="p-6 text-center">
-                                            <p className="text-sm text-gray-400">{t('product.noStores')}</p>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                                                    {productStores.length === 1
-                                                        ? t('product.availableInStore', { count: 1 })
-                                                        : t('product.availableInStores', { count: productStores.length })}
-                                                </p>
-                                            </div>
-                                            {productStores.map(ps => (
-                                                <div key={ps.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-b-0">
-                                                    <div>
-                                                        <p className="text-sm font-semibold text-black">{ps.storeName}</p>
-                                                        <p className="text-xs text-gray-500">{ps.storeStreet}, {ps.storeCity}</p>
-                                                        {ps.storePhone && (
-                                                            <p className="text-xs text-gray-400 mt-0.5">{ps.storePhone}</p>
-                                                        )}
-                                                        {ps.storeWorkingHours && (
-                                                            <p className="text-xs text-gray-400">{ps.storeWorkingHours}</p>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-xs font-semibold uppercase px-2 py-1 bg-green-100 text-green-700">
-                                                        {t('product.inStock')}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </>
+                        <FindInStore
+                            storesLoading={storesLoading}
+                            showFindInStore={showFindInStore}
+                            productStores={productStores}
+                            onFindInStore={handleFindInStore}
+                        />
                     )}
 
                     {product.material && (
@@ -473,42 +388,12 @@ const ProductDetailPage = () => {
             </div>
 
             <div className="mt-8">
-                {/* Description */}
                 {product.description && (
-                    <div className="border-t border-gray-200 mt-5">
-                        <button
-                            onClick={() => toggleSection('description')}
-                            className="w-full flex items-center justify-between py-4 text-left"
-                        >
-                            <span className="text-sm font-semibold text-black">{t('review.description')}</span>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="18" height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                className={`transition-transform duration-200 ${openSection === 'description' ? 'rotate-90' : ''}`}
-                            >
-                                <polyline points="9 18 15 12 9 6"/>
-                            </svg>
-                        </button>
-                        {openSection === 'description' && (
-                            <div className="pb-6">
-                                <div
-                                    className="product-description text-sm text-gray-900 text-center"
-                                    style={{
-                                        maxWidth: '100%',
-                                        overflowWrap: 'anywhere',
-                                    }}
-                                    dangerouslySetInnerHTML={{ __html: product.description }}
-                                />
-                                <div className="product-description text-sm text-gray-900 justify-items-center text-center">
-                                    <img src={signature} alt="Logo" className="h-12 w-auto" />
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                    <ProductDescription
+                        description={product.description}
+                        isOpen={openSection === 'description'}
+                        onToggle={() => toggleSection('description')}
+                    />
                 )}
                 {/* Reviews */}
                 {reviewsEnabled && <div className=" border-t border-gray-200">
@@ -536,6 +421,7 @@ const ProductDetailPage = () => {
                             <polyline points="9 18 15 12 9 6"/>
                         </svg>
                     </button>
+
                     {openSection === 'reviews' && (
                         <ProductReviews
                             reviews={reviews}
@@ -554,59 +440,8 @@ const ProductDetailPage = () => {
                 }
             </div>
 
-            {/* Similar Products */}
             {similarProducts.length > 0 && (
-                <div className="mt-12 border-t border-gray-200 pt-10">
-                    <h2 className="text-xl font-black uppercase tracking-tight text-black mb-6">
-                        {t('product.mayAlsoLike')}
-                    </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8">
-                        {similarProducts.map(sp => (
-                            <Link
-                                key={sp.id}
-                                to={`/products/${sp.id}`}
-                                className="group"
-                            >
-                                <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
-                                    {sp.imageUrl ? (
-                                        <img
-                                            src={getImageUrl(sp.imageUrl)}
-                                            alt={sp.name}
-                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                                        />
-                                    ) : (
-                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
-                                    )}
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-400 mb-0.5">
-                                        {sp.categoryName || t('product.uncategorized')}
-                                    </p>
-                                    <h3 className="text-sm font-semibold text-black mb-1 truncate">
-                                        {sp.name}
-                                    </h3>
-
-                                    {reviewsEnabled &&
-                                        <StarRating
-                                            rating={sp.averageRating || 0}
-                                            count={sp.ratingCount || 0}
-                                            size="sm"
-                                        />
-                                    }
-
-                                    <div className="mt-1">
-                                        <PriceDisplay
-                                            price={sp.price}
-                                            discountPrice={sp.discountPrice}
-                                            discountPercentage={sp.discountPercentage}
-                                            size="md"
-                                        />
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
+                <SimilarProducts similarProducts={similarProducts} reviewsEnabled={reviewsEnabled} />
             )}
         </div>
     );

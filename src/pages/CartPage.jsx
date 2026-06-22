@@ -18,6 +18,9 @@ import PriceDisplay from "../components/common/PriceDisplay.jsx";
 import { GuestCartContext } from '../context/GuestCartContext';
 import {useCurrency} from "../context/CurrencyContext.jsx";
 import ShippingAddressSelector from "../components/cart/ShippingAddressSelector.jsx";
+import GuestInfoForm from "../components/cart/GuestInfoForm.jsx";
+import PaymentMethodSelector from "../components/cart/PaymentMethodSelector.jsx";
+import CouponInput from "../components/cart/CouponInput.jsx";
 
 const CartPage = () => {
     const { t } = useTranslation();
@@ -425,109 +428,23 @@ const CartPage = () => {
                             setIsMainAddress={setIsMainAddress}
                         />
 
-                        {/* Guest information */}
                         {!isAuthenticated() && (
-                            <div className="border border-gray-200 p-6 mb-6">
-                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    Your Information
-                                </h3>
-                                <div className="space-y-3">
-                                    <input
-                                        type="text"
-                                        value={guestInfo.fullName}
-                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, fullName: e.target.value }))}
-                                        placeholder="Full name"
-                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                                    />
-                                    <input
-                                        type="email"
-                                        value={guestInfo.email}
-                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, email: e.target.value }))}
-                                        placeholder="Email"
-                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                                    />
-                                    <input
-                                        type="tel"
-                                        value={guestInfo.phone}
-                                        onChange={(e) => setGuestInfo(prev => ({ ...prev, phone: e.target.value }))}
-                                        placeholder="Phone"
-                                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                                    />
-                                </div>
-                            </div>
+                            <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} />
                         )}
 
-                        {/* Payment method selection */}
                         {!showPayment ? (
-                            <div>
-                                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
-                                    {t('cart.paymentMethod')}
-                                </h3>
-                                <div className="space-y-3 mb-6">
-                                    {cardEnabled && (
-                                        <button
-                                            onClick={() => setPaymentMethod('card')}
-                                            className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
-                                                paymentMethod === 'card'
-                                                    ? 'border-black bg-gray-50'
-                                                    : 'border-gray-200 hover:border-gray-400'
-                                            }`}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                                <line x1="1" y1="10" x2="23" y2="10"/>
-                                            </svg>
-                                            <div>
-                                                <p className="text-sm font-semibold text-black">{t('cart.payWithCard')}</p>
-                                                <p className="text-xs text-gray-400">{t('cart.cardDescription')}</p>
-                                            </div>
-                                        </button>
-                                    )}
-
-                                    {codEnabled && (
-                                        <button
-                                            onClick={() => setPaymentMethod('cod')}
-                                            className={`w-full flex items-center gap-3 p-4 border transition-colors text-left ${
-                                                paymentMethod === 'cod'
-                                                    ? 'border-black bg-gray-50'
-                                                    : 'border-gray-200 hover:border-gray-400'
-                                            }`}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                                <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                                            </svg>
-                                            <div>
-                                                <p className="text-sm font-semibold text-black">{t('cart.cashOnDelivery')}</p>
-                                                <p className="text-xs text-gray-400">{t('cart.codDescription')}</p>
-                                            </div>
-                                        </button>
-                                    )}
-
-                                    {!cardEnabled && !codEnabled && (
-                                        <p className="text-sm text-red-500">{t('cart.noPaymentMethods')}</p>
-                                    )}
-                                </div>
-
-                                {paymentMethod === 'card' && (
-                                    <button
-                                        onClick={isAuthenticated() ? handleProceedToPayment : handleGuestCheckout}
-                                        disabled={!displayItems.length}
-                                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
-                                    >
-                                        {t('cart.proceedToPayment')}
-                                    </button>
-                                )}
-
-                                {paymentMethod === 'cod' && (
-                                    <button
-                                        onClick={isAuthenticated() ? handleCashOnDelivery : handleGuestCheckout}
-                                        disabled={!displayItems.length || checkingOut}
-                                        className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
-                                    >
-                                        {checkingOut ? t('cart.placingOrder') : t('cart.placeOrder')}
-                                    </button>
-                                )}
-                            </div>
+                            <PaymentMethodSelector
+                                cardEnabled={cardEnabled}
+                                codEnabled={codEnabled}
+                                paymentMethod={paymentMethod}
+                                setPaymentMethod={setPaymentMethod}
+                                isAuthenticated={isAuthenticated}
+                                displayItems={displayItems}
+                                checkingOut={checkingOut}
+                                onProceedToPayment={handleProceedToPayment}
+                                onCashOnDelivery={handleCashOnDelivery}
+                                onGuestCheckout={handleGuestCheckout}
+                            />
                         ) : (
                             <>
                                 {clientSecret && (
@@ -565,39 +482,14 @@ const CartPage = () => {
                         </button>
                     </div>
 
-                    {/* Coupon input */}
-                    <div className="mb-4">
-                        <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                            {t('cart.promoCode')}
-                        </h3>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={couponCode}
-                                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                placeholder={t('cart.enterCode')}
-                                className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
-                            />
-                            <button
-                                onClick={handleApplyCoupon}
-                                disabled={applyingCoupon}
-                                className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors disabled:opacity-50"
-                            >
-                                {t('common.apply')}
-                            </button>
-                        </div>
-                        {couponData && (
-                            <div className="mt-2 p-2 bg-green-50 border border-green-200">
-                                <p className="text-xs text-green-700 font-medium">{couponData.message}</p>
-                                <button
-                                    onClick={() => { setCouponData(null); setCouponCode(''); }}
-                                    className="text-xs text-gray-400 hover:text-black underline mt-1"
-                                >
-                                    {t('common.remove')}
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <CouponInput
+                        couponCode={couponCode}
+                        setCouponCode={setCouponCode}
+                        couponData={couponData}
+                        setCouponData={setCouponData}
+                        applyingCoupon={applyingCoupon}
+                        onApplyCoupon={handleApplyCoupon}
+                    />
 
                     {/* Order summary amounts */}
                     <div className="space-y-3 mb-6">

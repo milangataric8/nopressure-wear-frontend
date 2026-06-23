@@ -180,7 +180,11 @@ const AdminOrders = () => {
                                 <td className="px-4 py-3">
                                     <select
                                         value={order.status}
-                                        onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            handleStatusUpdate(order.id, e.target.value)
+                                        }}
                                         className="text-xs border border-gray-300 px-2 py-1.5 focus:outline-none focus:border-black transition-colors"
                                     >
                                         <option value="PENDING">{t('order.pending')}</option>

@@ -14,6 +14,8 @@ export const createProduct = (data) =>
     axiosInstance.post('/products', data);
 export const updateProduct = (id, data) =>
     axiosInstance.put(`/products/${id}`, data);
+export const deleteProduct = (id) =>
+    axiosInstance.delete(`/products/${id}`);
 export const activateDeactivateProduct = (id) =>
     axiosInstance.patch(`/products/${id}/toggle`);
 export const addProductImage = (productId, data) =>

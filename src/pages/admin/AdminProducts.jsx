@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router-dom';
 import {useState, useEffect, useCallback} from 'react';
 import { toast } from 'react-toastify';
 import {
     getProducts,
     createProduct,
     updateProduct,
+    deleteProduct,
     activateDeactivateProduct,
     addProductImage,
     getProductFilters
@@ -17,7 +17,6 @@ import { getActiveStores } from '../../api/storeApi';
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import RichTextEditor from '../../components/common/RichTextEditor';
-import {useCurrency} from "../../context/CurrencyContext.jsx";
 import { getColorVariants } from '../../api/productApi';
 import ColorPicker from "../../components/admin/ColorPicker.jsx";
 import ColorVariantManager from "../../components/admin/ColorVariantManager.jsx";
@@ -212,6 +211,17 @@ const AdminProducts = () => {
             fetchProducts();
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.failedToToggleProduct'))
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) return;
+        try {
+            await deleteProduct(id);
+            toast.success('Product deleted');
+            fetchProducts();
+        } catch (e) {
+            toast.error('Failed to delete product, error: ' + e.message);
         }
     };
 
@@ -527,6 +537,7 @@ const AdminProducts = () => {
                     setPage={setPage}
                     onEdit={handleEdit}
                     onToggle={handleToggle}
+                    onDelete={handleDelete}
                 />
             )}
         </div>

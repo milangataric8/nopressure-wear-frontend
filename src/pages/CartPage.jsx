@@ -345,14 +345,14 @@ const CartPage = () => {
                                 {item.productSku && (
                                     <p className="text-xs text-gray-400 mb-1">{t('cart.sku')}: {item.productSku}</p>
                                 )}
-                                <p className="text-xs text-gray-400 mb-1">
+                                <div className="text-xs text-gray-400 mb-1">
                                     <PriceDisplay
                                         price={item.productPrice}
                                         discountPrice={item.discountPrice}
                                         discountPercentage={item.discountPercentage}
                                         size="sm"
                                     />
-                                </p>
+                                </div>
                                 <div className="flex items-center justify-between">
                                     {/* Quantity */}
                                     <div className="flex items-center border border-gray-300">

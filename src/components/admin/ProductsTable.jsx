@@ -5,7 +5,7 @@ import { useCurrency } from '../../context/CurrencyContext';
 import StatusBadge from '../common/StatusBadge';
 import Pagination from '../common/Pagination';
 
-const ProductsTable = ({ products, page, totalPages, setPage, onEdit, onToggle }) => {
+const ProductsTable = ({ products, page, totalPages, setPage, onEdit, onToggle, onDelete }) => {
     const { t } = useTranslation();
     const { format } = useCurrency();
     const navigate = useNavigate();
@@ -72,6 +72,12 @@ const ProductsTable = ({ products, page, totalPages, setPage, onEdit, onToggle }
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"
                                 >
                                     {product.active ? t('admin.deactivate') : t('admin.activate')}
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); onDelete(product.id); }}
+                                    className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
+                                >
+                                    {t('admin.delete')}
                                 </button>
                             </div>
                         </td>

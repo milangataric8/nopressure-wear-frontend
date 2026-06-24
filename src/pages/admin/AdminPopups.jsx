@@ -15,6 +15,7 @@ const AdminPopups = () => {
     const [showForm, setShowForm] = useState(false);
     const [editingPopup, setEditingPopup] = useState(null);
     const [uploading, setUploading] = useState(false);
+    const [removeBgPopup, setRemoveBgPopup] = useState(false);
     const [formData, setFormData] = useState({
         title: '',
         subtitle: '',
@@ -62,7 +63,7 @@ const AdminPopups = () => {
             if (formData.mediaType === 'VIDEO') {
                 response = await uploadVideo(file);
             } else {
-                response = await uploadImage(file);
+                response = await uploadImage(file, removeBgPopup);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
             toast.success(t('messages.fileUploaded'));
@@ -219,6 +220,19 @@ const AdminPopups = () => {
                             <label className={labelClass}>
                                 {t('common.upload')} {formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}
                             </label>
+                            {formData.mediaType === 'IMAGE' && (
+                                <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={removeBgPopup}
+                                        onChange={(e) => setRemoveBgPopup(e.target.checked)}
+                                        className="w-3.5 h-3.5"
+                                    />
+                                    <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                        {t('admin.removeBackground')}
+                                    </span>
+                                </label>
+                            )}
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
                                     {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}

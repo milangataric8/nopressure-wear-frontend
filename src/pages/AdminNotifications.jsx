@@ -17,6 +17,7 @@ const AdminNotifications = () => {
     const [loading, setLoading] = useState(true);
     const [imageUrl, setImageUrl] = useState('');
     const [uploading, setUploading] = useState(false);
+    const [removeBgNotification, setRemoveBgNotification] = useState(false);
 
 
     const fetchData = useCallback(async () => {
@@ -171,7 +172,19 @@ const AdminNotifications = () => {
                             </button>
                         </div>
                     ) : (
-                        <label className="cursor-pointer inline-block">
+                        <div>
+                            <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                <input
+                                    type="checkbox"
+                                    checked={removeBgNotification}
+                                    onChange={(e) => setRemoveBgNotification(e.target.checked)}
+                                    className="w-3.5 h-3.5"
+                                />
+                                <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                    {t('admin.removeBackground')}
+                                </span>
+                            </label>
+                            <label className="cursor-pointer inline-block">
                             <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-50 transition-colors">
                                 {uploading ? t('common.uploading') : t('admin.uploadImage')}
                             </div>
@@ -186,7 +199,7 @@ const AdminNotifications = () => {
                                     e.target.value = '';
                                     setUploading(true);
                                     try {
-                                        const response = await uploadImage(file);
+                                        const response = await uploadImage(file, removeBgNotification);
                                         setImageUrl(response.data.url);
                                         toast.success(t('messages.imageUploaded'));
                                     } catch (e) {
@@ -197,6 +210,7 @@ const AdminNotifications = () => {
                                 }}
                             />
                         </label>
+                        </div>
                     )}
                 </div>
 

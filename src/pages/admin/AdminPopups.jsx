@@ -7,6 +7,7 @@ import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
+import RichTextEditor from '../../components/common/RichTextEditor';
 
 const AdminPopups = () => {
     const { t } = useTranslation();
@@ -193,13 +194,10 @@ const AdminPopups = () => {
 
                         <div className="md:col-span-2">
                             <label className={labelClass}>{t('admin.content')}</label>
-                            <textarea
-                                name="content"
+                            <RichTextEditor
                                 value={formData.content}
-                                onChange={handleChange}
-                                className={inputClass}
+                                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
                                 placeholder="Get up to 50% off on all products..."
-                                rows={3}
                             />
                         </div>
 
@@ -355,7 +353,11 @@ const AdminPopups = () => {
                                         <p className="text-xs opacity-70 mb-2" style={{ color: formData.textColor }}>{formData.subtitle}</p>
                                     )}
                                     {formData.content && (
-                                        <p className="text-xs opacity-80 mb-4" style={{ color: formData.textColor }}>{formData.content}</p>
+                                        <div
+                                            className="product-description text-xs opacity-80 mb-4"
+                                            style={{ color: formData.textColor }}
+                                            dangerouslySetInnerHTML={{ __html: formData.content }}
+                                        />
                                     )}
                                     {formData.buttonText && (
                                         <span

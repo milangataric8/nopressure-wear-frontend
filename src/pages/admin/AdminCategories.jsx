@@ -238,9 +238,6 @@ const AdminCategories = () => {
                                                 </span>
                                             )}
                                         </div>
-                                        {cat.description && (
-                                            <p className="text-xs text-gray-400">{cat.description}</p>
-                                        )}
                                     </td>
                                     <td className="px-3 py-3">
                                         <StatusBadge active={cat.active} />

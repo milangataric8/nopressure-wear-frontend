@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
 import Pagination from "../../components/common/Pagination.jsx";
@@ -19,7 +19,8 @@ const AdminOrders = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [statusFilter, setStatusFilter] = useState('');
 
-    const fetchAllOrders = async () => {
+    const fetchAllOrders = useCallback(async () => {
+        setLoading(true);
         try {
             const params = { page, size: 10, sort: 'createdAt,desc' };
             if (searchQuery && searchQuery.trim() !== '') params.search = searchQuery;
@@ -33,11 +34,11 @@ const AdminOrders = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, searchQuery, statusFilter, t]);
 
     useEffect(() => {
         fetchAllOrders();
-    }, [page, searchQuery, statusFilter]);
+    }, [fetchAllOrders]);
 
     const handleStatusUpdate = async (orderId, status) => {
         try {
@@ -67,9 +68,6 @@ const AdminOrders = () => {
             default: return 'bg-gray-100 text-gray-800';
         }
     };
-
-    {loading && <LoadingSpinner />}
-    {loading && <LoadingSpinner height="h-32" />}
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
@@ -135,7 +133,9 @@ const AdminOrders = () => {
                 ))}
             </div>
 
-            {orders.length === 0 ? (
+            {loading ? (
+                <LoadingSpinner height="h-32" />
+            ) : orders.length === 0 ? (
                 <div className="text-center text-gray-400 py-20">
                     <p className="text-sm">{t('order.empty')}</p>
                 </div>

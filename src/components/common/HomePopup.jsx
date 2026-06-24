@@ -98,12 +98,11 @@ const HomePopup = () => {
                     )}
 
                     {popup.content && (
-                        <p
-                            className="text-sm leading-relaxed mb-6 opacity-80"
+                        <div
+                            className="product-description text-sm leading-relaxed mb-6 opacity-80"
                             style={{ color: popup.textColor || '#000000' }}
-                        >
-                            {popup.content}
-                        </p>
+                            dangerouslySetInnerHTML={{ __html: popup.content }}
+                        />
                     )}
 
                     {popup.buttonText && popup.buttonLink && (

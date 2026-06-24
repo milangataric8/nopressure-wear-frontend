@@ -5,6 +5,7 @@ import { sendNotification, getNotificationHistory, getChannelStatus, deleteNotif
 import { uploadImage } from '../api/uploadApi';
 import { getImageUrl } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import RichTextEditor from '../components/common/RichTextEditor';
 
 const AdminNotifications = () => {
     const { t } = useTranslation();
@@ -18,6 +19,8 @@ const AdminNotifications = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [uploading, setUploading] = useState(false);
     const [removeBgNotification, setRemoveBgNotification] = useState(false);
+    const [bgColor, setBgColor] = useState('#ffffff');
+    const [textColor, setTextColor] = useState('#111111');
 
 
     const fetchData = useCallback(async () => {
@@ -60,7 +63,7 @@ const AdminNotifications = () => {
 
         setSending(true);
         try {
-            const res = await sendNotification({ subject, message, imageUrl, channels: selectedChannels });
+            const res = await sendNotification({ subject, message, imageUrl, bgColor, textColor, channels: selectedChannels });
             toast.success(t('messages.notificationSent', {
                 email: res.data.emailSent,
                 whatsapp: res.data.whatsappSent,
@@ -69,6 +72,8 @@ const AdminNotifications = () => {
             setSubject('');
             setMessage('');
             setImageUrl('');
+            setBgColor('#ffffff');
+            setTextColor('#111111');
             fetchData();
         } catch (error) {
             toast.error(error.response?.data?.message || t('messages.failedToSendNotification'));
@@ -87,9 +92,9 @@ const AdminNotifications = () => {
         setSubject(broadcast.subject || '');
         setMessage(broadcast.message || '');
         setImageUrl(broadcast.imageUrl || '');
-
+        setBgColor(broadcast.bgColor || '#ffffff');
+        setTextColor(broadcast.textColor || '#111111');
         setSelectedChannels(broadcast.channels.split(',').map(c => c.trim()));
-
         window.scrollTo({ top: 0, behavior: 'smooth' });
         toast.info(t('messages.loadedIntoForm'));
     };
@@ -228,18 +233,76 @@ const AdminNotifications = () => {
                     />
                 </div>
 
+                {/* Colors */}
+                <div className="flex gap-6 mb-6">
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
+                            {t('admin.backgroundColor') || 'Background'}
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                value={bgColor}
+                                onChange={(e) => setBgColor(e.target.value)}
+                                className="w-12 h-9 border border-gray-300 cursor-pointer"
+                            />
+                            <span className="text-xs text-gray-500">{bgColor}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
+                            {t('admin.textColor') || 'Text'}
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="w-12 h-9 border border-gray-300 cursor-pointer"
+                            />
+                            <span className="text-xs text-gray-500">{textColor}</span>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Message */}
                 <div className="mb-6">
                     <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
                         {t('admin.notificationMessage')}
                     </label>
-                    <textarea
+                    <RichTextEditor
                         value={message}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={setMessage}
                         placeholder={t('admin.messagePlaceholder')}
-                        rows={5}
-                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
                     />
+                </div>
+
+                {/* Preview */}
+                <div className="mb-6">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                        {t('admin.preview') || 'Preview'}
+                    </label>
+                    <div className="border border-gray-200 p-2">
+                        <div style={{ backgroundColor: bgColor, padding: '32px', maxWidth: '560px', margin: '0 auto' }}>
+                            {imageUrl && (
+                                <img
+                                    src={getImageUrl(imageUrl)}
+                                    alt=""
+                                    style={{ width: '100%', height: 'auto', marginBottom: '20px', display: 'block' }}
+                                />
+                            )}
+                            {subject && (
+                                <h2 style={{ fontSize: '20px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '-0.5px', margin: '0 0 20px', color: textColor }}>
+                                    {subject}
+                                </h2>
+                            )}
+                            <div
+                                className="broadcast-content"
+                                style={{ fontSize: '14px', lineHeight: 1.6, color: textColor }}
+                                dangerouslySetInnerHTML={{ __html: message }}
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <button
@@ -285,7 +348,10 @@ const AdminNotifications = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                        <p className="text-xs text-gray-500 mb-2">{b.message}</p>
+                                        <div
+                                            className="text-xs text-gray-500 mb-2 line-clamp-2"
+                                            dangerouslySetInnerHTML={{ __html: b.message }}
+                                        />
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs text-gray-400">{t('admin.channelsLabel', { value: b.channels })}</span>
                                             <span className="text-xs text-gray-400">{t('admin.recipientsLabel', { count: b.recipients })}</span>

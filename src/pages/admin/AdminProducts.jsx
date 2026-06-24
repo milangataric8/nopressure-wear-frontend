@@ -447,7 +447,7 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>Material</label>
+                            <label className={labelClass}>{t('product.material')}</label>
                             <input
                                 type="text"
                                 name="material"

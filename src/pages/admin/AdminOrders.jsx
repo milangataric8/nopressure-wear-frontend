@@ -21,7 +21,7 @@ const AdminOrders = () => {
 
     const fetchAllOrders = async () => {
         try {
-            const params = { page, size: 10 };
+            const params = { page, size: 10, sort: 'createdAt,desc' };
             if (searchQuery && searchQuery.trim() !== '') params.search = searchQuery;
             if (statusFilter && statusFilter.trim() !== '') params.status = statusFilter;
 

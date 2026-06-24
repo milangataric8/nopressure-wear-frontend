@@ -12,7 +12,8 @@ const PaymentMethodSelector = ({
                                    onProceedToPayment,
                                    onCashOnDelivery,
                                    onGuestCheckout,
-                               }) => {
+                               }) =>
+{
     const { t } = useTranslation();
 
     const buttonClass = (active) =>

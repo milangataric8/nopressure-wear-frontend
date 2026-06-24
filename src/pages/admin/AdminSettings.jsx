@@ -30,7 +30,7 @@ const AdminSettings = () => {
         },
         {
             key: 'auth',
-            title: 'Login / Register Pages',
+            title: t('settings.auth'),
             keys: ['auth_bg_type', 'auth_bg_image', 'auth_bg_color', 'auth_bg_heading', 'auth_bg_subtext']
         },
         {
@@ -76,7 +76,7 @@ const AdminSettings = () => {
         },
         {
             key: 'currency',
-            title: 'Currency',
+            title: t('settings.currency'),
             keys: ['base_currency',
                 'currency_en',
                 'currency_sr',
@@ -158,6 +158,7 @@ const AdminSettings = () => {
             'Color': t('settings.filterColor'),
             'Brand': t('settings.filterBrand'),
             'Price': t('settings.filterPrice'),
+            'Material': t('settings.filterMaterial'),
         };
         return map[displayName] || displayName;
     };
@@ -244,9 +245,9 @@ const AdminSettings = () => {
                                                         }}
                                                         className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
                                                     >
-                                                        <option value="color">Solid Color + Text</option>
-                                                        <option value="image">Image</option>
-                                                        <option value="none">None (no background)</option>
+                                                        <option value="color">{t('settings.authBgTypeColor')}</option>
+                                                        <option value="image">{t('settings.authBgTypeImage')}</option>
+                                                        <option value="none">{t('settings.authBgTypeNone')}</option>
                                                     </select>
                                                 </div>
                                             ) : setting.key === 'auth_bg_color' ? (
@@ -289,7 +290,7 @@ const AdminSettings = () => {
                                                     </label>
                                                     <label className="cursor-pointer">
                                                         <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
-                                                            {setting.value ? 'Change Image' : 'Upload Image'}
+                                                            {setting.value ? t('settings.changeImage') : t('settings.uploadImage')}
                                                         </div>
                                                         <input
                                                             type="file"

@@ -76,9 +76,11 @@ const HeroBanner = () => {
 
             {/* Content */}
             <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-center">
-                <h1 className="text-6xl font-black uppercase tracking-tight text-white mb-4 leading-none">
-                    {banner.title}
-                </h1>
+                {(banner.displayTitle ?? true) && banner.title && (
+                    <h1 className="text-6xl font-black uppercase tracking-tight text-white mb-4 leading-none">
+                        {banner.title}
+                    </h1>
+                )}
                 {banner.subtitle && (
                     <p className="text-white/80 text-lg mb-8 max-w-md">
                         {banner.subtitle}

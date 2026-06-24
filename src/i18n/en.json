@@ -189,7 +189,12 @@
     "colorVariantsDesc": "Link other products as color variants. Customers can switch between them on the product page.",
     "currentVariant": "(current)",
     "noVariantsLinked": "No variants linked yet.",
-    "searchVariantPlaceholder": "Search product to link as variant..."
+    "searchVariantPlaceholder": "Search product to link as variant...",
+    "displayTitle": "Display Title",
+    "titleShown": "Title shown",
+    "titleHidden": "Title hidden",
+    "searchPopups": "Search popups...",
+    "searchBroadcasts": "Search broadcasts..."
   },
   "product": {
     "allProducts": "All Products",

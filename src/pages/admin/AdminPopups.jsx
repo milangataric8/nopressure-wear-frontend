@@ -4,6 +4,7 @@ import { getAllPopups, createPopup, updatePopup, togglePopup, deletePopup } from
 import { uploadImage, uploadVideo } from '../../api/uploadApi';
 import { getImageUrl } from '../../utils/imageUtils';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import AdminSearchFilter from './AdminSearchFilter';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,9 @@ const AdminPopups = () => {
     const [editingPopup, setEditingPopup] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [removeBgPopup, setRemoveBgPopup] = useState(false);
+    const [searchInput, setSearchInput] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilter, setActiveFilter] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         subtitle: '',
@@ -158,6 +162,18 @@ const AdminPopups = () => {
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newPopup')}
                 onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
             />
+
+            {!showForm && (
+                <AdminSearchFilter
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    activeFilter={activeFilter}
+                    setActiveFilter={setActiveFilter}
+                    searchPlaceholder={t('admin.searchPopups')}
+                />
+            )}
 
             {/* Form */}
             {showForm && (
@@ -394,13 +410,19 @@ const AdminPopups = () => {
             {/* Popups list */}
             {loading ? (
                 <LoadingSpinner />
-            ) : popups.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noPopups')}</p>
-                </div>
-            ) : (
+            ) : (() => {
+                const filteredPopups = popups.filter(p => {
+                    if (activeFilter !== null && p.active !== activeFilter) return false;
+                    if (searchQuery && !p.title?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                    return true;
+                });
+                return filteredPopups.length === 0 ? (
+                    <div className="text-center text-gray-400 py-20">
+                        <p className="text-sm">{t('admin.noPopups')}</p>
+                    </div>
+                ) : (
                 <div className="space-y-4">
-                    {popups.map(popup => (
+                    {filteredPopups.map(popup => (
                         <div key={popup.id} className="border border-gray-200 p-4 flex gap-4 items-center">
                             {/* Preview */}
                             <div
@@ -461,7 +483,8 @@ const AdminPopups = () => {
                         </div>
                     ))}
                 </div>
-            )}
+                );
+            })()}
         </div>
     );
 };

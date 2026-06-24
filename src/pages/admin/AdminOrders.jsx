@@ -165,7 +165,7 @@ const AdminOrders = () => {
                                 </td>
                                 <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {order.customerFullName}
-                                </td>
+                                </td>d
                                 <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
                                     {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
                                 </td>

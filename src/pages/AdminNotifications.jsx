@@ -21,6 +21,8 @@ const AdminNotifications = () => {
     const [removeBgNotification, setRemoveBgNotification] = useState(false);
     const [bgColor, setBgColor] = useState('#ffffff');
     const [textColor, setTextColor] = useState('#111111');
+    const [historySearch, setHistorySearch] = useState('');
+    const [channelFilter, setChannelFilter] = useState('');
 
 
     const fetchData = useCallback(async () => {
@@ -66,8 +68,8 @@ const AdminNotifications = () => {
             const res = await sendNotification({ subject, message, imageUrl, bgColor, textColor, channels: selectedChannels });
             toast.success(t('messages.notificationSent', {
                 email: res.data.emailSent,
-                whatsapp: res.data.whatsappSent,
-                viber: res.data.viberSent,
+                // whatsapp: res.data.whatsappSent,
+                // viber: res.data.viberSent,
             }));
             setSubject('');
             setMessage('');
@@ -319,11 +321,43 @@ const AdminNotifications = () => {
                 <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
                     {t('admin.notificationHistory')}
                 </h2>
-                {history.length === 0 ? (
-                    <p className="text-sm text-gray-400">{t('admin.noNotificationsSent')}</p>
-                ) : (
+                <div className="flex gap-2 mb-4 flex-wrap items-center">
+                    <input
+                        type="text"
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        placeholder={t('admin.searchBroadcasts')}
+                        className="flex-1 min-w-[200px] border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                    />
+                    {/*{['EMAIL', 'WHATSAPP', 'VIBER'].map(ch => (*/}
+                    {/*    <button*/}
+                    {/*        key={ch}*/}
+                    {/*        onClick={() => setChannelFilter(prev => prev === ch ? '' : ch)}*/}
+                    {/*        className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${*/}
+                    {/*            channelFilter === ch ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-500 hover:border-black'*/}
+                    {/*        }`}*/}
+                    {/*    >*/}
+                    {/*        {ch}*/}
+                    {/*    </button>*/}
+                    {/*))}*/}
+                </div>
+                {(() => {
+                    const stripHtml = (html) => (html || '').replace(/<[^>]*>/g, ' ');
+                    const filteredHistory = history.filter(b => {
+                        if (channelFilter && !b.channels?.includes(channelFilter)) return false;
+                        if (historySearch) {
+                            const q = historySearch.toLowerCase();
+                            const subjectMatch = (b.subject || '').toLowerCase().includes(q);
+                            const messageMatch = stripHtml(b.message).toLowerCase().includes(q);
+                            if (!subjectMatch && !messageMatch) return false;
+                        }
+                        return true;
+                    });
+                    return filteredHistory.length === 0 ? (
+                        <p className="text-sm text-gray-400">{t('admin.noNotificationsSent')}</p>
+                    ) : (
                     <div className="space-y-4">
-                        {history.map(b => (
+                        {filteredHistory.map(b => (
                             <div key={b.id} className="border-b border-gray-100 pb-4">
                                 <div className="flex gap-3">
                                     {b.imageUrl && (
@@ -361,7 +395,8 @@ const AdminNotifications = () => {
                             </div>
                         ))}
                     </div>
-                )}
+                    );
+                })()}
             </div>
         </div>
     );

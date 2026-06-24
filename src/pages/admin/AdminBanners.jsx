@@ -25,12 +25,15 @@ const AdminBanners = () => {
         buttonText: '',
         buttonLink: '',
         displayOrder: 0,
+        displayTitle: true,
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [activeFilter, setActiveFilter] = useState(null);
+    const [displayTitleFilter, setDisplayTitleFilter] = useState(null);
+    const [mediaTypeFilter, setMediaTypeFilter] = useState(null);
     const [removeBgBanner, setRemoveBgBanner] = useState(false);
 
     const fetchBanners = useCallback(async () => {
@@ -109,6 +112,7 @@ const AdminBanners = () => {
             buttonText: banner.buttonText || '',
             buttonLink: banner.buttonLink || '',
             displayOrder: banner.displayOrder,
+            displayTitle: banner.displayTitle ?? true,
         });
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -143,6 +147,7 @@ const AdminBanners = () => {
             buttonText: '',
             buttonLink: '',
             displayOrder: 0,
+            displayTitle: true,
         });
         setEditingBanner(null);
         setShowForm(false);
@@ -162,16 +167,56 @@ const AdminBanners = () => {
             />
 
             {!showForm && (
-                <AdminSearchFilter
-                    searchInput={searchInput}
-                    setSearchInput={setSearchInput}
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    activeFilter={activeFilter}
-                    setActiveFilter={setActiveFilter}
-                    setPage={setPage}
-                    searchPlaceholder={t('admin.searchBanners')}
-                />
+                <>
+                    <AdminSearchFilter
+                        searchInput={searchInput}
+                        setSearchInput={setSearchInput}
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        activeFilter={activeFilter}
+                        setActiveFilter={setActiveFilter}
+                        setPage={setPage}
+                        searchPlaceholder={t('admin.searchBanners')}
+                    />
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setDisplayTitleFilter(prev => prev === true ? null : true)}
+                                className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                    displayTitleFilter === true ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-500 hover:border-black'
+                                }`}
+                            >
+                                {t('admin.titleShown')}
+                            </button>
+                            <button
+                                onClick={() => setDisplayTitleFilter(prev => prev === false ? null : false)}
+                                className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                    displayTitleFilter === false ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-500 hover:border-black'
+                                }`}
+                            >
+                                {t('admin.titleHidden')}
+                            </button>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setMediaTypeFilter(prev => prev === 'IMAGE' ? null : 'IMAGE')}
+                                className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                    mediaTypeFilter === 'IMAGE' ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-500 hover:border-black'
+                                }`}
+                            >
+                                {t('admin.mediaImage')}
+                            </button>
+                            <button
+                                onClick={() => setMediaTypeFilter(prev => prev === 'VIDEO' ? null : 'VIDEO')}
+                                className={`flex-1 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                    mediaTypeFilter === 'VIDEO' ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-500 hover:border-black'
+                                }`}
+                            >
+                                {t('admin.mediaVideo')}
+                            </button>
+                        </div>
+                    </div>
+                </>
             )}
 
             {/* Form */}
@@ -228,6 +273,20 @@ const AdminBanners = () => {
                                 className={inputClass}
                                 placeholder="0"
                             />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.displayTitle}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, displayTitle: e.target.checked }))}
+                                    className="w-3.5 h-3.5"
+                                />
+                                <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                    {t('admin.displayTitle')}
+                                </span>
+                            </label>
                         </div>
 
                         <div className="md:col-span-2">
@@ -326,17 +385,21 @@ const AdminBanners = () => {
             )}
 
             {/* Banners list */}
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            { banners.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noBanners')}</p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {banners.map(banner => (
+            {(() => {
+                const filteredBanners = banners.filter(b => {
+                    if (displayTitleFilter !== null && (b.displayTitle ?? true) !== displayTitleFilter) return false;
+                    if (mediaTypeFilter !== null && b.mediaType !== mediaTypeFilter) return false;
+                    return true;
+                });
+                return loading ? (
+                    <LoadingSpinner height="h-32" />
+                ) : filteredBanners.length === 0 ? (
+                    <div className="text-center text-gray-400 py-20">
+                        <p className="text-sm">{t('admin.noBanners')}</p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                    {filteredBanners.map(banner => (
                         <div key={banner.id} className="border border-gray-200 p-4 flex gap-4 items-center">
                             {/* Preview */}
                             <div className="w-32 h-20 bg-gray-100 flex-shrink-0 overflow-hidden">
@@ -399,8 +462,9 @@ const AdminBanners = () => {
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
+                    </div>
+                );
+            })()}
 
             <Pagination page={page} totalPages={totalPages} setPage={setPage} />
         </div>

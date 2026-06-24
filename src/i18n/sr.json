@@ -189,7 +189,12 @@
     "colorVariantsDesc": "Povežite druge proizvode kao varijante boja. Kupci mogu da biraju između njih na stranici proizvoda.",
     "currentVariant": "(trenutno)",
     "noVariantsLinked": "Nema povezanih varijanti.",
-    "searchVariantPlaceholder": "Pretražite proizvod za povezivanje kao varijanta..."
+    "searchVariantPlaceholder": "Pretražite proizvod za povezivanje kao varijanta...",
+    "displayTitle": "Prikaži naslov",
+    "titleShown": "Naslov prikazan",
+    "titleHidden": "Naslov sakriven",
+    "searchPopups": "Pretraži iskačuće prozore...",
+    "searchBroadcasts": "Pretraži obaveštenja..."
   },
   "product": {
     "allProducts": "Svi proizvodi",

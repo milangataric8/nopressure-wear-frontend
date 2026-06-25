@@ -31,6 +31,7 @@ const ProductDetailPage = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
+    const [selectedSize, setSelectedSize] = useState(null);
     const [addingToCart, setAddingToCart] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [setSelectedImageIndex] = useState(0);
@@ -54,6 +55,8 @@ const ProductDetailPage = () => {
         try {
             const response = await getProductById(id);
             setProduct(response.data);
+            setSelectedSize(null);
+            setQuantity(1);
             if (response.data.images && response.data.images.length > 0) {
                 setSelectedImage(response.data.images[0].imageUrl);
             } else {
@@ -127,15 +130,23 @@ const ProductDetailPage = () => {
         }
     };
 
+    const selectedVariant = selectedSize && product?.variants
+        ? product.variants.find(v => v.size === selectedSize)
+        : null;
+
     const handleAddToCart = async () => {
+        if (!selectedSize) {
+            toast.error(t('product.selectSizeFirst'));
+            return;
+        }
         if (!isAuthenticated()) {
-            addToGuestCart(product, quantity);
+            addToGuestCart(product, quantity, selectedSize);
             toast.success(t('messages.addedToCart'));
             return;
         }
         setAddingToCart(true);
         try {
-            await addToCart(user.id, { productId: product.id, quantity });
+            await addToCart(user.id, { productId: product.id, quantity, size: selectedSize });
             setCartCount(cartCount + quantity);
             toast.success(t('messages.addedToCart'));
         } catch (error) {
@@ -324,10 +335,10 @@ const ProductDetailPage = () => {
                             size="lg"
                         />
                         <span className={`text-xs font-semibold uppercase tracking-wide ${
-                            product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
+                            (product.totalStock ?? product.stockQuantity) > 0 ? 'text-green-600' : 'text-red-500'
                         }`}>
-                            {product.stockQuantity > 0
-                                ? t('product.inStockCount', { count: product.stockQuantity })
+                            {(product.totalStock ?? product.stockQuantity) > 0
+                                ? t('product.inStockCount', { count: product.totalStock ?? product.stockQuantity })
                                 : t('product.soldOut')}
                         </span>
                     </div>
@@ -337,8 +348,43 @@ const ProductDetailPage = () => {
                         <ProductColorVariants product={product} />
                     )}
 
+                    {/* Size selector */}
+                    {product.variants && product.variants.length > 0 && (
+                        <div className="mb-6">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-black block mb-3">
+                                {t('product.size')}
+                            </span>
+                            <div className="flex gap-2 flex-wrap">
+                                {product.variants.map(v => (
+                                    <button
+                                        key={v.size}
+                                        onClick={() => {
+                                            if (v.inStock) {
+                                                setSelectedSize(v.size);
+                                                setQuantity(1);
+                                            }
+                                        }}
+                                        disabled={!v.inStock}
+                                        className={`w-14 h-10 text-sm font-semibold border transition-colors ${
+                                            selectedSize === v.size
+                                                ? 'border-black bg-black text-white'
+                                                : v.inStock
+                                                    ? 'border-gray-300 text-black hover:border-black'
+                                                    : 'border-gray-200 text-gray-300 cursor-not-allowed line-through'
+                                        }`}
+                                    >
+                                        {v.size}
+                                    </button>
+                                ))}
+                            </div>
+                            {!selectedSize && (
+                                <p className="text-xs text-gray-400 mt-2">{t('product.selectSizePrompt')}</p>
+                            )}
+                        </div>
+                    )}
+
                     {/* Quantity */}
-                    {product.stockQuantity > 0 && (
+                    {selectedVariant?.inStock && (
                         <div className="flex items-center gap-6 mb-6">
                             <span className="text-xs font-semibold uppercase tracking-wide text-black">
                                 {t('product.quantity')}
@@ -354,7 +400,7 @@ const ProductDetailPage = () => {
                                     {quantity}
                                 </span>
                                 <button
-                                    onClick={() => setQuantity(q => Math.min(product.stockQuantity, q + 1))}
+                                    onClick={() => setQuantity(q => Math.min(selectedVariant.stockQuantity, q + 1))}
                                     className="w-10 h-10 flex items-center justify-center text-black hover:bg-gray-100 transition-colors"
                                 >
                                     +
@@ -366,10 +412,16 @@ const ProductDetailPage = () => {
                     {addToCartEnabled ? (
                         <button
                             onClick={handleAddToCart}
-                            disabled={product.stockQuantity === 0 || addingToCart}
+                            disabled={(product.totalStock ?? product.stockQuantity) === 0 || !selectedSize || addingToCart}
                             className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
                         >
-                            {product.stockQuantity === 0 ? t('product.soldOut') : addingToCart ? t('product.adding') : t('product.addToCart')}
+                            {(product.totalStock ?? product.stockQuantity) === 0
+                                ? t('product.soldOut')
+                                : !selectedSize
+                                    ? t('product.selectSizeFirst')
+                                    : addingToCart
+                                        ? t('product.adding')
+                                        : t('product.addToCart')}
                         </button>
                     ) : (
                         <button

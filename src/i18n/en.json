@@ -198,7 +198,10 @@
     "displayDuration": "Display Duration",
     "seconds": "seconds",
     "bannerDurationHint": "How long each slide shows before advancing. 0 = no auto-rotate.",
-    "popupDurationHint": "How long the popup stays open. 0 = until manually closed."
+    "popupDurationHint": "How long the popup stays open. 0 = until manually closed.",
+    "sizesAndStock": "Sizes & Stock",
+    "sizesHint": "Set stock per size. Total stock is calculated automatically.",
+    "sizeSku": "Size SKU (optional)"
   },
   "product": {
     "allProducts": "All Products",
@@ -235,6 +238,10 @@
     "availableInStores": "Available in {{count}} stores",
     "uncategorized": "Uncategorized",
     "inStockCount": "{{count}} in stock",
+    "size": "Size",
+    "selectSizePrompt": "Select a size",
+    "selectSizeFirst": "Select a size to add to cart",
+    "sizeSoldOut": "Sold out",
     "shopByCategory": "Shop By Category",
     "resultsFor": "Results for: \"{{query}}\"",
     "noColor": "No Color",

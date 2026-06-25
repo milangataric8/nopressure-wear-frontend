@@ -12,12 +12,14 @@ export const GuestCartProvider = ({ children }) => {
         localStorage.setItem('guestCart', JSON.stringify(guestCart));
     }, [guestCart]);
 
-    const addToGuestCart = (product, quantity = 1) => {
+    const addToGuestCart = (product, quantity = 1, size = null) => {
         setGuestCart(prev => {
-            const existing = prev.find(item => item.productId === product.id);
+            const existing = prev.find(
+                item => item.productId === product.id && item.size === size
+            );
             if (existing) {
                 return prev.map(item =>
-                    item.productId === product.id
+                    item.productId === product.id && item.size === size
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 );
@@ -29,22 +31,27 @@ export const GuestCartProvider = ({ children }) => {
                 discountPrice: product.discountPrice,
                 imageUrl: product.imageUrl,
                 quantity,
+                size,
             }];
         });
     };
 
-    const updateGuestCartItem = (productId, quantity) => {
+    const updateGuestCartItem = (productId, quantity, size = null) => {
         if (quantity <= 0) {
-            removeFromGuestCart(productId);
+            removeFromGuestCart(productId, size);
             return;
         }
         setGuestCart(prev => prev.map(item =>
-            item.productId === productId ? { ...item, quantity } : item
+            item.productId === productId && item.size === size
+                ? { ...item, quantity }
+                : item
         ));
     };
 
-    const removeFromGuestCart = (productId) => {
-        setGuestCart(prev => prev.filter(item => item.productId !== productId));
+    const removeFromGuestCart = (productId, size = null) => {
+        setGuestCart(prev => prev.filter(
+            item => !(item.productId === productId && item.size === size)
+        ));
     };
 
     const clearGuestCart = () => setGuestCart([]);

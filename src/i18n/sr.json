@@ -198,7 +198,10 @@
     "displayDuration": "Trajanje prikaza",
     "seconds": "sekundi",
     "bannerDurationHint": "Koliko dugo se svaki slajd prikazuje pre prelaska na sledeći. 0 = bez automatske rotacije.",
-    "popupDurationHint": "Koliko dugo popap ostaje otvoren. 0 = dok se ručno ne zatvori."
+    "popupDurationHint": "Koliko dugo popap ostaje otvoren. 0 = dok se ručno ne zatvori.",
+    "sizesAndStock": "Veličine i zalihe",
+    "sizesHint": "Unesite zalihe po veličini. Ukupna zaliha se izračunava automatski.",
+    "sizeSku": "SKU veličine (opciono)"
   },
   "product": {
     "allProducts": "Svi proizvodi",
@@ -235,6 +238,10 @@
     "availableInStores": "Dostupno u {{count}} prodavnicama",
     "uncategorized": "Bez kategorije",
     "inStockCount": "{{count}} na stanju",
+    "size": "Veličina",
+    "selectSizePrompt": "Izaberi veličinu",
+    "selectSizeFirst": "Izaberi veličinu za dodavanje u korpu",
+    "sizeSoldOut": "Rasprodato",
     "shopByCategory": "Kupujte po kategoriji",
     "resultsFor": "Rezultati za: \"{{query}}\"",
     "noColor": "Bez boje",

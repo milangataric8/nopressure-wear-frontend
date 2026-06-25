@@ -100,7 +100,7 @@ const CartPage = () => {
     const displayItems = isAuthenticated()
         ? (cart?.items ?? [])
         : guestCart.map(item => ({
-            id: item.productId,
+            id: item.productId + (item.size || ''),
             productId: item.productId,
             productName: item.productName,
             imageUrl: item.imageUrl,
@@ -110,16 +110,17 @@ const CartPage = () => {
             discountPercentage: null,
             subtotal: (item.discountPrice ?? item.price) * item.quantity,
             quantity: item.quantity,
+            size: item.size ?? null,
         }));
 
     const displayTotal = isAuthenticated()
         ? (cart?.totalAmount ?? 0)
         : guestCart.reduce((sum, item) => sum + (item.discountPrice ?? item.price) * item.quantity, 0);
 
-    const handleUpdateQuantity = async (cartItemId, productId, quantity) => {
+    const handleUpdateQuantity = async (cartItemId, productId, quantity, size = null) => {
         if (quantity < 1) return;
         if (!isAuthenticated()) {
-            updateGuestCartItem(productId, quantity);
+            updateGuestCartItem(productId, quantity, size);
             return;
         }
         try {
@@ -130,9 +131,9 @@ const CartPage = () => {
         }
     };
 
-    const handleRemoveItem = async (cartItemId) => {
+    const handleRemoveItem = async (cartItemId, productId = null, size = null) => {
         if (!isAuthenticated()) {
-            removeFromGuestCart(cartItemId);
+            removeFromGuestCart(productId, size);
             return;
         }
         try {
@@ -345,6 +346,9 @@ const CartPage = () => {
                                 {item.productSku && (
                                     <p className="text-xs text-gray-400 mb-1">{t('cart.sku')}: {item.productSku}</p>
                                 )}
+                                {item.size && (
+                                    <p className="text-xs text-gray-400 mb-1">{t('product.size')}: {item.size}</p>
+                                )}
                                 <div className="text-xs text-gray-400 mb-1">
                                     <PriceDisplay
                                         price={item.productPrice}
@@ -357,7 +361,7 @@ const CartPage = () => {
                                     {/* Quantity */}
                                     <div className="flex items-center border border-gray-300">
                                         <button
-                                            onClick={() => handleUpdateQuantity(item.id, item.productId, item.quantity - 1)}
+                                            onClick={() => handleUpdateQuantity(item.id, item.productId, item.quantity - 1, item.size)}
                                             className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors text-black"
                                         >
                                             −
@@ -366,7 +370,7 @@ const CartPage = () => {
                                             {item.quantity}
                                         </span>
                                         <button
-                                            onClick={() => handleUpdateQuantity(item.id, item.productId, item.quantity + 1)}
+                                            onClick={() => handleUpdateQuantity(item.id, item.productId, item.quantity + 1, item.size)}
                                             className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors text-black"
                                         >
                                             +
@@ -375,7 +379,7 @@ const CartPage = () => {
 
                                     {/* Remove */}
                                     <button
-                                        onClick={() => handleRemoveItem(item.id)}
+                                        onClick={() => handleRemoveItem(item.id, item.productId, item.size)}
                                         className="text-xs text-gray-400 hover:text-black transition-colors underline"
                                     >
                                         {t('common.remove')}

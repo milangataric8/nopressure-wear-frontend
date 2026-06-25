@@ -46,17 +46,20 @@ const AdminProducts = () => {
     const [allStores, setAllStores] = useState([]);
     const [productStores, setProductStores] = useState([]);
     const [colorVariants, setColorVariants] = useState([]);
+    const ALL_SIZES = ['S', 'M', 'L', 'XL'];
+    const defaultVariants = () => ALL_SIZES.map(size => ({ size, stockQuantity: 0, sku: '' }));
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         price: '',
-        stockQuantity: '',
         sku: '',
         imageUrl: '',
         videoUrl: '',
         categoryId: '',
         discountPercentage: '',
         material: '',
+        variants: defaultVariants(),
     });
     const COLOR_PALETTE = [
         { name: 'White', hex: '#FFFFFF', key: 'white' },
@@ -145,8 +148,13 @@ const AdminProducts = () => {
             const payload = {
                 ...formData,
                 price: parseFloat(formData.price),
-                stockQuantity: parseInt(formData.stockQuantity),
+                stockQuantity: 0,
                 categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+                variants: formData.variants.map(v => ({
+                    size: v.size,
+                    stockQuantity: parseInt(v.stockQuantity) || 0,
+                    // sku: v.sku || null,
+                })),
             };
 
             if (editingProduct) {
@@ -181,7 +189,6 @@ const AdminProducts = () => {
             name: product.name,
             description: product.description || '',
             price: product.price,
-            stockQuantity: product.stockQuantity,
             sku: product.sku,
             imageUrl: product.imageUrl || '',
             videoUrl: product.videoUrl || '',
@@ -191,6 +198,10 @@ const AdminProducts = () => {
             brand: product.brand || '',
             discountPercentage: product.discountPercentage || '',
             material: product.material || '',
+            variants: ALL_SIZES.map(size => {
+                const found = product.variants?.find(v => v.size === size);
+                return { size, stockQuantity: found?.stockQuantity ?? 0 /*, sku: found?.sku ?? ''*/ };
+            }),
         });
         setShowForm(true);
 
@@ -230,7 +241,6 @@ const AdminProducts = () => {
             name: '',
             description: '',
             price: '',
-            stockQuantity: '',
             sku: '',
             imageUrl: '',
             videoUrl: '',
@@ -240,6 +250,7 @@ const AdminProducts = () => {
             categoryId: '',
             discountPercentage: '',
             material: '',
+            variants: defaultVariants(),
         });
         setEditingProduct(null);
         setPendingImages([]);
@@ -407,16 +418,38 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('admin.stockQuantity')}</label>
-                            <input
-                                type="number"
-                                name="stockQuantity"
-                                value={formData.stockQuantity}
-                                onChange={handleChange}
-                                className={inputClass}
-                                placeholder="0"
-                                required
-                            />
+                            <label className={labelClass}>{t('admin.sizesAndStock')}</label>
+                            <p className="text-xs text-gray-400 mb-3">{t('admin.sizesHint')}</p>
+                            <div className="space-y-2">
+                                {formData.variants.map((v, idx) => (
+                                    <div key={v.size} className="flex items-center gap-3">
+                                        <span className="w-110 text-lg font-bold text-black shrink-0 border-b border-gray-200 self-end">{v.size}</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={v.stockQuantity}
+                                            onChange={(e) => {
+                                                const updated = [...formData.variants];
+                                                updated[idx] = { ...updated[idx], stockQuantity: e.target.value };
+                                                setFormData({ ...formData, variants: updated });
+                                            }}
+                                            className={inputClass + " flex-1 justify-items-center"}
+                                            placeholder="0"
+                                        />
+                                        {/*<input*/}
+                                        {/*    type="text"*/}
+                                        {/*    value={v.sku || ''}*/}
+                                        {/*    onChange={(e) => {*/}
+                                        {/*        const updated = [...formData.variants];*/}
+                                        {/*        updated[idx] = { ...updated[idx], sku: e.target.value };*/}
+                                        {/*        setFormData({ ...formData, variants: updated });*/}
+                                        {/*    }}*/}
+                                        {/*    className={inputClass + " flex-1"}*/}
+                                        {/*    placeholder={t('admin.sizeSku')}*/}
+                                        {/*/>*/}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         <div>

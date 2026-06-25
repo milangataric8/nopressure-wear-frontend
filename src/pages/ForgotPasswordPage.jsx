@@ -1,9 +1,8 @@
-import axiosInstance from '../api/axiosInstance';
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { forgotPassword } from '../api/authApi';
 
 const ForgotPasswordPage = () => {
     const { t } = useTranslation();
@@ -15,7 +14,7 @@ const ForgotPasswordPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axiosInstance.post('/auth/forgot-password', { email });
+            await forgotPassword(email);
             setSent(true);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to send reset email');

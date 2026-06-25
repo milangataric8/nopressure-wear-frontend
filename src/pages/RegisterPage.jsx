@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { register } from '../api/authApi';
@@ -6,9 +6,11 @@ import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
 import { useTranslation } from 'react-i18next';
 import AuthBackground from "../components/auth/AuthBackground.jsx";
+import { getSettingsMap } from '../api/settingsApi';
 
 const RegisterPage = () => {
     const { t } = useTranslation();
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -18,6 +20,12 @@ const RegisterPage = () => {
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            setRegistrationEnabled(r.data.registration_enabled !== 'false');
+        }).catch(() => {});
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,6 +63,25 @@ const RegisterPage = () => {
 
     const inputClass = "w-full border border-gray-300 px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-2";
+
+    if (!registrationEnabled) {
+        return (
+            <div className="min-h-screen flex">
+                <AuthBackground />
+                <div className="flex-1 flex items-center justify-center px-6 py-12">
+                    <div className="w-full max-w-sm text-center">
+                        <h1 className="text-2xl font-black uppercase tracking-tight text-black mb-3">
+                            {t('auth.registrationClosedTitle')}
+                        </h1>
+                        <p className="text-sm text-gray-500 mb-6">{t('auth.registrationClosed')}</p>
+                        <Link to="/login" className="text-black font-semibold hover:underline text-sm">
+                            {t('auth.signIn')}
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex">

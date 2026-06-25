@@ -1,17 +1,34 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { login } from '../api/authApi';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import AuthBackground from "../components/auth/AuthBackground.jsx";
+import { getSettingsMap } from '../api/settingsApi';
 
 const LoginPage = () => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
+    const [loginEnabled, setLoginEnabled] = useState(true);
+    const [registrationEnabled, setRegistrationEnabled] = useState(true);
     const { loginUser } = useAuth();
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+
+    useEffect(() => {
+        getSettingsMap().then(r => {
+            setLoginEnabled(r.data.login_enabled !== 'false');
+            setRegistrationEnabled(r.data.registration_enabled !== 'false');
+        }).catch(() => {});
+    }, []);
+
+    useEffect(() => {
+        if (params.get('error') === 'login_disabled') {
+            toast.error(t('auth.loginDisabled'));
+        }
+    }, [params, t]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,7 +43,12 @@ const LoginPage = () => {
             loginUser({ id, firstName, lastName, email, role }, token);
             navigate('/');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            const msg = error.response?.data?.message;
+            if (error.response?.status === 403 && msg) {
+                toast.error(t('auth.loginDisabled'));
+            } else {
+                toast.error(msg || t('auth.loginFailed'));
+            }
         } finally {
             setLoading(false);
         }
@@ -46,6 +68,12 @@ const LoginPage = () => {
                         <h2 className="text-2xl font-bold text-black mb-1">{t('auth.login')}</h2>
                         <p className="text-sm text-gray-500">{t('auth.loginSubtitle')}</p>
                     </div>
+
+                    {!loginEnabled && (
+                        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 text-xs text-amber-800">
+                            {t('auth.loginRestricted')}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
@@ -87,12 +115,14 @@ const LoginPage = () => {
                         </button>
                     </form>
 
-                    <p className="text-sm text-gray-500 mt-8">
-                        {t('auth.noAccount')}{' '}
-                        <Link to="/register" className="text-black font-semibold hover:underline">
-                            {t('nav.joinUs')}
-                        </Link>
-                    </p>
+                    {registrationEnabled && (
+                        <p className="text-sm text-gray-500 mt-8">
+                            {t('auth.noAccount')}{' '}
+                            <Link to="/register" className="text-black font-semibold hover:underline">
+                                {t('nav.joinUs')}
+                            </Link>
+                        </p>
+                    )}
                     <p className="text-sm text-gray-500 mt-2 text-right">
                         <Link to="/forgot-password" className="text-black hover:underline text-xs">
                             {t('auth.forgotPassword')}

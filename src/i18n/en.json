@@ -384,7 +384,12 @@
     "joinHeroLine1": "Join",
     "joinHeroLine2": "Us",
     "joinTagline": "Become a member today",
-    "registerSubtitle": "Fill in your details to get started"
+    "registerSubtitle": "Fill in your details to get started",
+    "registrationClosedTitle": "Registration Closed",
+    "registrationClosed": "New account registration is currently unavailable.",
+    "loginRestricted": "Customer login is temporarily unavailable. Staff may still sign in.",
+    "loginDisabled": "Login is currently unavailable.",
+    "loginFailed": "Invalid email or password."
   },
   "profile": {
     "title": "My Profile",
@@ -501,7 +506,10 @@
     "authBgTypeImage": "Image",
     "authBgTypeNone": "None (no background)",
     "changeImage": "Change Image",
-    "uploadImage": "Upload Image"
+    "uploadImage": "Upload Image",
+    "access": "Access",
+    "registration_enabled": "Customer Registration",
+    "login_enabled": "Customer Login"
   },
   "messages": {
     "productCreated": "Product created",

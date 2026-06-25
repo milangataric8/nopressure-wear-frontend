@@ -384,7 +384,12 @@
     "joinHeroLine1": "Pridruži",
     "joinHeroLine2": "nam se",
     "joinTagline": "Postanite član danas",
-    "registerSubtitle": "Unesite podatke za početak"
+    "registerSubtitle": "Unesite podatke za početak",
+    "registrationClosedTitle": "Registracija zatvorena",
+    "registrationClosed": "Registracija novih naloga trenutno nije dostupna.",
+    "loginRestricted": "Prijava kupaca je trenutno nedostupna. Osoblje i dalje može da se prijavi.",
+    "loginDisabled": "Prijava trenutno nije dostupna.",
+    "loginFailed": "Pogrešan email ili lozinka."
   },
   "profile": {
     "title": "Moj profil",
@@ -501,7 +506,10 @@
     "authBgTypeImage": "Slika",
     "authBgTypeNone": "Bez pozadine",
     "changeImage": "Promeni sliku",
-    "uploadImage": "Otpremi sliku"
+    "uploadImage": "Otpremi sliku",
+    "access": "Pristup",
+    "registration_enabled": "Registracija kupaca",
+    "login_enabled": "Prijava kupaca"
   },
   "messages": {
     "productCreated": "Proizvod kreiran",

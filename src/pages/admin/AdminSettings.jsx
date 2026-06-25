@@ -64,6 +64,11 @@ const AdminSettings = () => {
             keys: ['payment_card_enabled', 'payment_cod_enabled']
         },
         {
+            key: 'access',
+            title: t('settings.access'),
+            keys: ['registration_enabled', 'login_enabled']
+        },
+        {
             key: 'features',
             title: t('settings.features'),
             keys: ['find_in_store_enabled',
@@ -379,7 +384,9 @@ const AdminSettings = () => {
                                                 'favorites_enabled',
                                                 'contact_enabled',
                                                 'add_to_cart_enabled',
-                                                'multilanguage_enabled'].includes(setting.key) ? (
+                                                'multilanguage_enabled',
+                                                'registration_enabled',
+                                                'login_enabled'].includes(setting.key) ? (
                                                 <div className="flex-1 flex items-center gap-3">
                                                     <button
                                                         onClick={async () => {

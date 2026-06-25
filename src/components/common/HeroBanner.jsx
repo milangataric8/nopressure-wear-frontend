@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveBanners } from '../../api/bannerApi';
 import { getImageUrl } from '../../utils/imageUtils';
@@ -17,13 +17,17 @@ const HeroBanner = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    useEffect(() => {
-        if (banners.length <= 1) return;
-        const interval = setInterval(() => {
-            setCurrentIndex(i => (i + 1) % banners.length);
-        }, 5000);
-        return () => clearInterval(interval);
+    const goNext = useCallback(() => {
+        setCurrentIndex(prev => (prev + 1) % banners.length);
     }, [banners.length]);
+
+    useEffect(() => {
+        if (!banners || banners.length <= 1) return;
+        const seconds = banners[currentIndex]?.displayDuration ?? 5;
+        if (!seconds || seconds <= 0) return;
+        const timer = setTimeout(goNext, seconds * 1000);
+        return () => clearTimeout(timer);
+    }, [currentIndex, banners, goNext]);
 
     if (loading || banners.length === 0) {
         return (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getActivePopup } from '../../api/popupApi';
 import { getImageUrl } from '../../utils/imageUtils';
@@ -21,12 +21,20 @@ const HomePopup = () => {
         }).catch(() => {});
     }, []);
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setVisible(false);
         if (popup?.showOnce) {
             localStorage.setItem(`popup_seen_${popup.id}`, 'true');
         }
-    };
+    }, [popup]);
+
+    useEffect(() => {
+        if (!popup) return;
+        const seconds = popup.displayDuration ?? 0;
+        if (!seconds || seconds <= 0) return;
+        const timer = setTimeout(handleClose, seconds * 1000);
+        return () => clearTimeout(timer);
+    }, [popup, handleClose]);
 
     if (!visible || !popup) return null;
 

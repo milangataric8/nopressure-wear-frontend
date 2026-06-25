@@ -26,6 +26,7 @@ const AdminBanners = () => {
         buttonLink: '',
         displayOrder: 0,
         displayTitle: true,
+        displayDuration: 5,
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
@@ -113,6 +114,7 @@ const AdminBanners = () => {
             buttonLink: banner.buttonLink || '',
             displayOrder: banner.displayOrder,
             displayTitle: banner.displayTitle ?? true,
+            displayDuration: banner.displayDuration ?? 5,
         });
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -148,6 +150,7 @@ const AdminBanners = () => {
             buttonLink: '',
             displayOrder: 0,
             displayTitle: true,
+            displayDuration: 5,
         });
         setEditingBanner(null);
         setShowForm(false);
@@ -273,6 +276,25 @@ const AdminBanners = () => {
                                 className={inputClass}
                                 placeholder="0"
                             />
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>{t('admin.displayDuration')}</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="60"
+                                    value={formData.displayDuration}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        displayDuration: e.target.value === '' ? '' : parseInt(e.target.value, 10)
+                                    }))}
+                                    className="w-24 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                />
+                                <span className="text-xs text-gray-400">{t('admin.seconds')}</span>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">{t('admin.bannerDurationHint')}</p>
                         </div>
 
                         <div className="md:col-span-2">

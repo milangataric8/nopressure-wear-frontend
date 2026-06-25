@@ -32,6 +32,7 @@ const AdminPopups = () => {
         backgroundColor: '#FFFFFF',
         textColor: '#000000',
         showOnce: false,
+        displayDuration: 0,
     });
 
     const fetchPopups = useCallback(async () => {
@@ -109,6 +110,7 @@ const AdminPopups = () => {
             backgroundColor: popup.backgroundColor || '#FFFFFF',
             textColor: popup.textColor || '#000000',
             showOnce: popup.showOnce || false,
+            displayDuration: popup.displayDuration ?? 0,
         });
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -146,6 +148,7 @@ const AdminPopups = () => {
             backgroundColor: '#FFFFFF',
             textColor: '#000000',
             showOnce: false,
+            displayDuration: 0,
         });
         setEditingPopup(null);
         setShowForm(false);
@@ -347,6 +350,25 @@ const AdminPopups = () => {
                                     {t('admin.showOnce')}
                                 </span>
                             </label>
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>{t('admin.displayDuration')}</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="120"
+                                    value={formData.displayDuration}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        displayDuration: e.target.value === '' ? '' : parseInt(e.target.value, 10)
+                                    }))}
+                                    className="w-24 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                />
+                                <span className="text-xs text-gray-400">{t('admin.seconds')}</span>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">{t('admin.popupDurationHint')}</p>
                         </div>
 
                         {/* Preview */}

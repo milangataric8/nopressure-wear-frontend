@@ -194,7 +194,11 @@
     "titleShown": "Naslov prikazan",
     "titleHidden": "Naslov sakriven",
     "searchPopups": "Pretraži iskačuće prozore...",
-    "searchBroadcasts": "Pretraži obaveštenja..."
+    "searchBroadcasts": "Pretraži obaveštenja...",
+    "displayDuration": "Trajanje prikaza",
+    "seconds": "sekundi",
+    "bannerDurationHint": "Koliko dugo se svaki slajd prikazuje pre prelaska na sledeći. 0 = bez automatske rotacije.",
+    "popupDurationHint": "Koliko dugo popap ostaje otvoren. 0 = dok se ručno ne zatvori."
   },
   "product": {
     "allProducts": "Svi proizvodi",

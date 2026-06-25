@@ -194,7 +194,11 @@
     "titleShown": "Title shown",
     "titleHidden": "Title hidden",
     "searchPopups": "Search popups...",
-    "searchBroadcasts": "Search broadcasts..."
+    "searchBroadcasts": "Search broadcasts...",
+    "displayDuration": "Display Duration",
+    "seconds": "seconds",
+    "bannerDurationHint": "How long each slide shows before advancing. 0 = no auto-rotate.",
+    "popupDurationHint": "How long the popup stays open. 0 = until manually closed."
   },
   "product": {
     "allProducts": "All Products",

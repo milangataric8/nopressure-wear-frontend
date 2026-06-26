@@ -14,6 +14,7 @@ import CheckoutForm from '../components/common/CheckoutForm';
 import { createPaymentIntent } from '../api/paymentApi';
 import { getAddressByUser, createAddress } from '../api/addressApi';
 import { getSettingsMap } from '../api/settingsApi';
+import { resendVerification } from '../api/authApi';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
 import { GuestCartContext } from '../context/GuestCartContext';
 import {useCurrency} from "../context/CurrencyContext.jsx";
@@ -46,6 +47,7 @@ const CartPage = () => {
     const [cardEnabled, setCardEnabled] = useState(true);
     const [codEnabled, setCodEnabled] = useState(true);
     const [addToCartEnabled, setAddToCartEnabled] = useState(true);
+    const [emailNotVerified, setEmailNotVerified] = useState(false);
     const [newAddress, setNewAddress] = useState({
         street: '',
         city: '',
@@ -182,7 +184,11 @@ const CartPage = () => {
             toast.success(t('messages.paymentSuccess'));
             navigate('/orders');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to place order');
+            if (error.response?.status === 403) {
+                setEmailNotVerified(true);
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to place order');
+            }
         }
     };
 
@@ -199,9 +205,23 @@ const CartPage = () => {
             toast.success(t('messages.codSuccess'));
             navigate('/orders');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to place order');
+            if (error.response?.status === 403) {
+                setEmailNotVerified(true);
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to place order');
+            }
         } finally {
             setCheckingOut(false);
+        }
+    };
+
+    const handleResendFromCart = async () => {
+        if (!user?.email) return;
+        try {
+            await resendVerification(user.email);
+            toast.success(t('auth.resend'));
+        } catch {
+            toast.error('Failed to resend verification email');
         }
     };
 
@@ -318,6 +338,17 @@ const CartPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Cart items */}
                 <div className="lg:col-span-2 space-y-6">
+                    {emailNotVerified && (
+                        <div className="p-4 bg-yellow-50 border border-yellow-300 text-sm">
+                            <p className="font-semibold text-yellow-800 mb-2">{t('auth.notVerifiedCheckout')}</p>
+                            <button
+                                onClick={handleResendFromCart}
+                                className="text-xs text-black font-semibold underline hover:no-underline"
+                            >
+                                {t('auth.resend')}
+                            </button>
+                        </div>
+                    )}
                     {displayItems.map(item => (
                         <div key={item.id} className="flex gap-6 pb-6 border-b border-gray-200">
                             {/* Image */}

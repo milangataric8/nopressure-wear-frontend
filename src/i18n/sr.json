@@ -396,7 +396,19 @@
     "registrationClosed": "Registracija novih naloga trenutno nije dostupna.",
     "loginRestricted": "Prijava kupaca je trenutno nedostupna. Osoblje i dalje može da se prijavi.",
     "loginDisabled": "Prijava trenutno nije dostupna.",
-    "loginFailed": "Pogrešan email ili lozinka."
+    "loginFailed": "Pogrešan email ili lozinka.",
+    "verifying": "Potvrđujemo vaš email…",
+    "verifiedTitle": "Email potvrđen",
+    "verifiedText": "Vaš email je potvrđen. Sada možete da se prijavite i kupujete.",
+    "verifyFailedTitle": "Potvrda neuspešna",
+    "verifyFailedText": "Link je nevažeći ili je istekao. Zatražite novi sa svog naloga.",
+    "goToLogin": "Prijavi se",
+    "checkInboxTitle": "Proverite sanduče",
+    "checkInbox": "Poslali smo link za potvrdu na {{email}}. Proverite vaše sanduče.",
+    "resend": "Poslat je ponovo email za potvrdu",
+    "notVerifiedCheckout": "Molimo potvrdite vaš email pre nego što naručite.",
+    "emailAlreadyExists": "Nalog sa ovim emailom već postoji.",
+    "emailNotVerified": "Molimo potvrdite vaš email pre prijave."
   },
   "profile": {
     "title": "Moj profil",

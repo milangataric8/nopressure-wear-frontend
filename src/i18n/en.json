@@ -396,7 +396,19 @@
     "registrationClosed": "New account registration is currently unavailable.",
     "loginRestricted": "Customer login is temporarily unavailable. Staff may still sign in.",
     "loginDisabled": "Login is currently unavailable.",
-    "loginFailed": "Invalid email or password."
+    "loginFailed": "Invalid email or password.",
+    "verifying": "Verifying your email…",
+    "verifiedTitle": "Email Verified",
+    "verifiedText": "Your email is confirmed. You can now log in and shop.",
+    "verifyFailedTitle": "Verification Failed",
+    "verifyFailedText": "This link is invalid or has expired. Request a new one from your account.",
+    "goToLogin": "Go to Login",
+    "checkInboxTitle": "Check Your Inbox",
+    "checkInbox": "We sent a verification link to {{email}}. Please check your inbox.",
+    "resend": "A confirmation email has been sent again",
+    "notVerifiedCheckout": "Please verify your email before placing an order.",
+    "emailAlreadyExists": "An account with this email already exists.",
+    "emailNotVerified": "Please verify your email before logging in."
   },
   "profile": {
     "title": "My Profile",

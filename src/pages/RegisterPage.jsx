@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { register } from '../api/authApi';
+import { register, resendVerification } from '../api/authApi';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
 import {isPasswordValid} from "../utils/passwordUtils.js";
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ import { getSettingsMap } from '../api/settingsApi';
 const RegisterPage = () => {
     const { t } = useTranslation();
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registeredEmail, setRegisteredEmail] = useState(null);
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -19,7 +20,9 @@ const RegisterPage = () => {
         confirmPassword: '',
     });
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+    const [emailError, setEmailError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         getSettingsMap().then(r => {
@@ -28,6 +31,7 @@ const RegisterPage = () => {
     }, []);
 
     const handleChange = (e) => {
+        if (e.target.name === 'email') setEmailError('');
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
@@ -52,17 +56,59 @@ const RegisterPage = () => {
                 email: formData.email,
                 password: formData.password,
             });
-            toast.success(t('messages.registerSuccess'));
-            navigate('/login');
+            setRegisteredEmail(formData.email);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Registration failed');
+            const status = error.response?.status;
+            const msg = error.response?.data?.message || '';
+            if (status === 409 || msg.toLowerCase().includes('email already exists')) {
+                setEmailError(t('auth.emailAlreadyExists'));
+            } else {
+                toast.error(msg || 'Registration failed');
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    const handleResend = async () => {
+        if (!registeredEmail) return;
+        try {
+            await resendVerification(registeredEmail);
+            toast.success(t('auth.resend'));
+        } catch {
+            toast.error('Failed to resend verification email');
+        }
+    };
+
     const inputClass = "w-full border border-gray-300 px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-2";
+
+    if (registeredEmail) {
+        return (
+            <div className="min-h-screen flex">
+                <AuthBackground />
+                <div className="flex-1 flex items-center justify-center px-6 py-12">
+                    <div className="w-full max-w-sm text-center">
+                        <h1 className="text-2xl font-black uppercase tracking-tight text-black mb-3">
+                            {t('auth.checkInboxTitle')}
+                        </h1>
+                        <p className="text-sm text-gray-500 mb-6">
+                            {t('auth.checkInbox', { email: registeredEmail })}
+                        </p>
+                        <button
+                            onClick={handleResend}
+                            className="block w-full text-sm text-black font-semibold hover:underline mb-4"
+                        >
+                            {t('auth.resend')}
+                        </button>
+                        <Link to="/login" className="text-sm text-gray-500 hover:underline">
+                            {t('auth.signIn')}
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (!registrationEnabled) {
         return (
@@ -131,26 +177,47 @@ const RegisterPage = () => {
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={`${inputClass} ${emailError ? 'border-red-500' : ''}`}
                                 placeholder="you@example.com"
                                 required
                             />
+                            {emailError && (
+                                <p className="text-xs text-red-500 mt-1">{emailError}</p>
+                            )}
                         </div>
 
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
                                 {t('auth.password')}
                             </label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none
-                                         focus:border-black transition-colors"
-                                placeholder="••••••••"
-                                required
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-black transition-colors"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(v => !v)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
                             <PasswordStrength password={formData.password} />
                         </div>
 
@@ -159,15 +226,34 @@ const RegisterPage = () => {
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-1.5">
                                 {t('auth.confirmPassword')}
                             </label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
-                                placeholder="••••••••"
-                                required
-                            />
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className="w-full border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-black transition-colors"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(v => !v)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showConfirmPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
                             {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                                 <p className="text-xs text-red-500 mt-1">{t('auth.passwordsNoMatch')}</p>
                             )}

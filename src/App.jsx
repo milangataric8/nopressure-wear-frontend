@@ -38,6 +38,7 @@ import FavoritesPage from './pages/FavoritesPage';
 import AdminReports from "./pages/admin/AdminReports.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import AdminNotifications from "./pages/AdminNotifications.jsx";
+import VerifyEmailPage from './pages/VerifyEmailPage';
 import i18n from './i18n/i18n';
 
 function App() {
@@ -113,6 +114,7 @@ function App() {
                     <Route path="/products/:id" element={<ProductDetailPage />} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/verify-email" element={<VerifyEmailPage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/orders" element={
                         <ProtectedRoute><OrdersPage /></ProtectedRoute>

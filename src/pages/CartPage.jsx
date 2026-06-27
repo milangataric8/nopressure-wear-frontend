@@ -47,6 +47,7 @@ const CartPage = () => {
     const [cardEnabled, setCardEnabled] = useState(true);
     const [codEnabled, setCodEnabled] = useState(true);
     const [addToCartEnabled, setAddToCartEnabled] = useState(true);
+    const [delivery, setDelivery] = useState({ enabled: true, fee: 0, threshold: 0 });
     const [emailNotVerified, setEmailNotVerified] = useState(false);
     const [newAddress, setNewAddress] = useState({
         street: '',
@@ -91,6 +92,11 @@ const CartPage = () => {
             setCardEnabled(r.data.payment_card_enabled !== 'false');
             setCodEnabled(r.data.payment_cod_enabled !== 'false');
             setAddToCartEnabled(r.data.add_to_cart_enabled !== 'false');
+            setDelivery({
+                enabled: r.data.delivery_enabled !== 'false',
+                fee: parseFloat(r.data.delivery_fee || '0'),
+                threshold: parseFloat(r.data.free_shipping_threshold || '0'),
+            });
         }).catch(() => {});
     }, []);
 
@@ -331,6 +337,13 @@ const CartPage = () => {
         );
     }
 
+    const subtotalAfterCoupon = couponData ? couponData.finalTotal : displayTotal;
+    const deliveryFee = !delivery.enabled ? 0
+        : (delivery.threshold > 0 && subtotalAfterCoupon >= delivery.threshold) ? 0
+        : delivery.fee;
+    const grandTotal = subtotalAfterCoupon + deliveryFee;
+    const remainingForFree = delivery.threshold > 0 ? Math.max(delivery.threshold - subtotalAfterCoupon, 0) : 0;
+
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
             <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-10">{t('cart.title')}</h1>
@@ -440,13 +453,24 @@ const CartPage = () => {
                                 <span className="text-gray-500">{t('cart.subtotal')}</span>
                                 <span className="font-medium">{format(displayTotal)}</span>
                             </div>
+                            {couponData && (
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-500">{t('cart.discount', { code: couponData.code })}</span>
+                                    <span className="font-medium text-green-600">-{format(couponData.discountAmount)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">{t('cart.delivery')}</span>
-                                <span className="font-medium text-green-600">{t('cart.free')}</span>
+                                <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
+                                    {deliveryFee === 0 ? t('cart.free') : format(deliveryFee)}
+                                </span>
                             </div>
+                            {remainingForFree > 0 && (
+                                <p className="text-xs text-gray-500">{t('cart.freeShippingNudge', { amount: format(remainingForFree) })}</p>
+                            )}
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
                                 <span className="font-semibold text-black">{t('cart.total')}</span>
-                                <span className="font-bold text-black">{format(displayTotal)}</span>
+                                <span className="font-bold text-black">{format(grandTotal)}</span>
                             </div>
                         </div>
 
@@ -550,13 +574,16 @@ const CartPage = () => {
                         )}
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-500">{t('cart.delivery')}</span>
-                            <span className="font-medium text-green-600">{t('cart.free')}</span>
+                            <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
+                                {deliveryFee === 0 ? t('cart.free') : format(deliveryFee)}
+                            </span>
                         </div>
+                        {remainingForFree > 0 && (
+                            <p className="text-xs text-gray-500">{t('cart.freeShippingNudge', { amount: format(remainingForFree) })}</p>
+                        )}
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
-                            <span className="font-bold text-black">
-                                {format(couponData ? couponData.finalTotal : displayTotal)}
-                            </span>
+                            <span className="font-bold text-black">{format(grandTotal)}</span>
                         </div>
                     </div>
                 </div>

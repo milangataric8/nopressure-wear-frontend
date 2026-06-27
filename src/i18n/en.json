@@ -315,7 +315,8 @@
     "clearBag": "Clear Bag",
     "discount": "Discount",
     "sku": "SKU",
-    "orderingDisabled": "Ordering is currently unavailable"
+    "orderingDisabled": "Ordering is currently unavailable",
+    "freeShippingNudge": "Add {{amount}} more for free shipping"
   },
   "order": {
     "title": "My Orders",
@@ -535,7 +536,12 @@
     "uploadImage": "Upload Image",
     "access": "Access",
     "registration_enabled": "Customer Registration",
-    "login_enabled": "Customer Login"
+    "login_enabled": "Customer Login",
+    "delivery": "Delivery",
+    "delivery_enabled": "Delivery Enabled",
+    "delivery_fee": "Delivery Fee",
+    "free_shipping_threshold": "Free Shipping Threshold",
+    "freeShippingHint": "Order total above this ships free (0 = off)"
   },
   "messages": {
     "productCreated": "Product created",

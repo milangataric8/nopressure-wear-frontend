@@ -315,7 +315,8 @@
     "clearBag": "Isprazni korpu",
     "discount": "Popust",
     "sku": "SKU",
-    "orderingDisabled": "Naručivanje trenutno nije dostupno"
+    "orderingDisabled": "Naručivanje trenutno nije dostupno",
+    "freeShippingNudge": "Dodajte još {{amount}} za besplatnu dostavu"
   },
   "order": {
     "title": "Moje porudžbine",
@@ -535,7 +536,12 @@
     "uploadImage": "Otpremi sliku",
     "access": "Pristup",
     "registration_enabled": "Registracija kupaca",
-    "login_enabled": "Prijava kupaca"
+    "login_enabled": "Prijava kupaca",
+    "delivery": "Dostava",
+    "delivery_enabled": "Dostava omogućena",
+    "delivery_fee": "Cena dostave",
+    "free_shipping_threshold": "Prag za besplatnu dostavu",
+    "freeShippingHint": "Iznos porudžbine iznad ovoga ima besplatnu dostavu (0 = isključeno)"
   },
   "messages": {
     "productCreated": "Proizvod kreiran",

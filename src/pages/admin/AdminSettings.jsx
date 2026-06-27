@@ -87,6 +87,11 @@ const AdminSettings = () => {
                 'currency_sr',
                 'exchange_rate_eur',
                 'exchange_rate_usd']
+        },
+        {
+            key: 'delivery',
+            title: t('settings.delivery'),
+            keys: ['delivery_enabled', 'delivery_fee', 'free_shipping_threshold']
         }
     ];
 
@@ -377,6 +382,31 @@ const AdminSettings = () => {
                                                         <option value="sr">Serbian (Srpski)</option>
                                                     </select>
                                                 </div>
+                                            ) : ['delivery_fee', 'free_shipping_threshold'].includes(setting.key) ? (
+                                                <div className="flex-1 flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="1"
+                                                        value={setting.value}
+                                                        onChange={async (e) => {
+                                                            const val = e.target.value;
+                                                            try {
+                                                                await updateSettings(setting.id, val);
+                                                                setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: val } : s));
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        onBlur={() => { toast.success(t('messages.settingUpdated')); fetchSettings(); }}
+                                                        className="w-32 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                                    />
+                                                    <span className="text-xs text-gray-400">RSD</span>
+                                                    {setting.key === 'free_shipping_threshold' && (
+                                                        <span className="text-xs text-gray-400 ml-1">{t('settings.freeShippingHint')}</span>
+                                                    )}
+                                                </div>
                                             ) : ['payment_card_enabled',
                                                 'payment_cod_enabled',
                                                 'find_in_store_enabled',
@@ -386,7 +416,8 @@ const AdminSettings = () => {
                                                 'add_to_cart_enabled',
                                                 'multilanguage_enabled',
                                                 'registration_enabled',
-                                                'login_enabled'].includes(setting.key) ? (
+                                                'login_enabled',
+                                                'delivery_enabled'].includes(setting.key) ? (
                                                 <div className="flex-1 flex items-center gap-3">
                                                     <button
                                                         onClick={async () => {

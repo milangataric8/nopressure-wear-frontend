@@ -10,7 +10,10 @@
     "cartEmpty": "Your cart is empty",
     "viewCart": "View Cart",
     "viewAllOrders": "View All Orders",
-    "viewAllProducts": "View All Products"
+    "viewAllProducts": "View All Products",
+    "men": "Men",
+    "women": "Women",
+    "allCategory": "All"
   },
   "admin": {
     "dashboard": "Admin Dashboard",
@@ -242,6 +245,10 @@
     "selectSizePrompt": "Select a size",
     "selectSizeFirst": "Select a size to add to cart",
     "sizeSoldOut": "Sold out",
+    "gender": "Gender",
+    "genderMen": "Men",
+    "genderWomen": "Women",
+    "genderUnisex": "Unisex",
     "shopByCategory": "Shop By Category",
     "resultsFor": "Results for: \"{{query}}\"",
     "noColor": "No Color",
@@ -306,7 +313,7 @@
     "processing": "Processing...",
     "selectAddress": "Please select a shipping address",
     "clearBag": "Clear Bag",
-    "discount": "Discount ({{code}})",
+    "discount": "Discount",
     "sku": "SKU",
     "orderingDisabled": "Ordering is currently unavailable"
   },

@@ -4,11 +4,13 @@ const LIGHT_COLORS = ['#FFFFFF', '#FFFF00', '#FFD700', '#FFC0CB', '#F5F5DC', '#C
 
 const ProductFilterBar = ({
                               availableColors,
-                              availableBrands,
+                              // availableBrands,
                               colorFilter,
                               setColorFilter,
-                              brandFilter,
-                              setBrandFilter,
+                              // brandFilter,
+                              // setBrandFilter,
+                              genderFilter,
+                              setGenderFilter,
                               setPage,
                               translateColorName,
                           }) => {
@@ -17,7 +19,7 @@ const ProductFilterBar = ({
     return (
         <div className="flex items-center justify-between mb-6 gap-2 md:gap-4">
             {/* Color filter */}
-            <div className="flex w-1/3">
+            <div className="flex w-1/2">
                 {availableColors.length > 0 && (
                     <div className="flex gap-2 mb-4 flex-wrap items-center">
                         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
@@ -64,27 +66,49 @@ const ProductFilterBar = ({
             </div>
 
             {/* Brand filter */}
-            <div className="flex w-10/12">
-                {availableBrands.length > 0 && (
-                    <div className="flex gap-2 mb-4 flex-wrap items-center">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
-                            {t('product.brand')}:
-                        </span>
-                        {availableBrands.map(brand => (
-                            <button
-                                key={brand}
-                                onClick={() => { setBrandFilter(prev => prev === brand ? '' : brand); setPage(0); }}
-                                className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
-                                    brandFilter === brand
-                                        ? 'bg-black text-white border-black'
-                                        : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'
-                                }`}
-                            >
-                                {brand}
-                            </button>
-                        ))}
-                    </div>
-                )}
+            {/*<div className="flex w-10/12">*/}
+            {/*    {availableBrands.length > 0 && (*/}
+            {/*        <div className="flex gap-2 mb-4 flex-wrap items-center">*/}
+            {/*            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">*/}
+            {/*                {t('product.brand')}:*/}
+            {/*            </span>*/}
+            {/*            {availableBrands.map(brand => (*/}
+            {/*                <button*/}
+            {/*                    key={brand}*/}
+            {/*                    onClick={() => { setBrandFilter(prev => prev === brand ? '' : brand); setPage(0); }}*/}
+            {/*                    className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${*/}
+            {/*                        brandFilter === brand*/}
+            {/*                            ? 'bg-black text-white border-black'*/}
+            {/*                            : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'*/}
+            {/*                    }`}*/}
+            {/*                >*/}
+            {/*                    {brand}*/}
+            {/*                </button>*/}
+            {/*            ))}*/}
+            {/*        </div>*/}
+            {/*    )}*/}
+            {/*</div>*/}
+
+            {/* Gender filter */}
+            <div className="flex w-1/2">
+                <div className="flex gap-2 mb-4 flex-wrap items-center">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
+                        {t('product.gender')}:
+                    </span>
+                    {['MEN', 'WOMEN', 'UNISEX'].map(g => (
+                        <button
+                            key={g}
+                            onClick={() => { setGenderFilter(genderFilter === g ? '' : g); setPage(0); }}
+                            className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                genderFilter === g
+                                    ? 'bg-black text-white border-black'
+                                    : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'
+                            }`}
+                        >
+                            {t(`product.gender${g.charAt(0) + g.slice(1).toLowerCase()}`)}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
     );

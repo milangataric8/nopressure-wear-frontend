@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useContext } from 'react';
+import ProductsMegaMenu from './ProductsMegaMenu';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { GuestCartContext } from '../../context/GuestCartContext';
@@ -26,6 +27,7 @@ const Navbar = () => {
     const dropdownRef = useRef(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [openGender, setOpenGender] = useState(null);
     const { t, i18n } = useTranslation();
     const [socialSettings, setSocialSettings] = useState({});
     const [storeSettings, setStoreSettings] = useState({});
@@ -177,7 +179,7 @@ const Navbar = () => {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex items-center justify-between h-16 relative">
                         <div className="hidden md:flex items-center gap-8 ml-1">
-                            {/* Products */}
+                            {/* Products mega-menu */}
                             <div
                                 className="relative"
                                 onMouseEnter={() => setActiveDropdown('products')}
@@ -189,44 +191,11 @@ const Navbar = () => {
                                 >
                                     {t('nav.products')}
                                 </Link>
-
                                 {activeDropdown === 'products' && (
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 z-50">
-                                        <div className="bg-white border border-gray-200 shadow-lg p-6 w-auto">
-                                            <div className="flex gap-8 mb-4">
-                                                {rootCategories.map(cat => (
-                                                    <div key={cat.id} className="flex-shrink-0">
-                                                        <Link
-                                                            to={`/products?category=${cat.id}`}
-                                                            onClick={() => setActiveDropdown(null)}
-                                                            className="text-xs font-black uppercase tracking-wide text-black hover:underline block mb-2 whitespace-nowrap"
-                                                        >
-                                                            {cat.name}
-                                                        </Link>
-                                                        {getSubcategories(cat.id).map(sub => (
-                                                            <Link
-                                                                key={sub.id}
-                                                                to={`/products?category=${sub.id}`}
-                                                                onClick={() => setActiveDropdown(null)}
-                                                                className="block text-xs text-gray-500 hover:text-black transition-colors py-0.5 whitespace-nowrap"
-                                                            >
-                                                                {sub.name}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <div className="border-t border-gray-200 pt-2">
-                                                <Link
-                                                    to="/products"
-                                                    onClick={() => setActiveDropdown(null)}
-                                                    className="text-xs font-semibold uppercase tracking-wide text-black hover:underline whitespace-nowrap"
-                                                >
-                                                    {t('nav.viewAllProducts')} →
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ProductsMegaMenu
+                                        categories={rootCategories}
+                                        onNavigate={() => setActiveDropdown(null)}
+                                    />
                                 )}
                             </div>
 
@@ -649,8 +618,43 @@ const Navbar = () => {
                                         </button>
                                     </form>
 
-                                    {/* Links */}
-                                    <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.products')}</Link>
+                                    {/* Products accordion */}
+                                    <div>
+                                        <p className="text-xs font-black uppercase tracking-wide text-gray-500 mb-2">{t('nav.products')}</p>
+                                        {[{ key: 'MEN', labelKey: 'nav.men' }, { key: 'WOMEN', labelKey: 'nav.women' }].map(g => (
+                                            <div key={g.key} className="mb-1">
+                                                <button
+                                                    onClick={() => setOpenGender(prev => prev === g.key ? null : g.key)}
+                                                    className="w-full flex items-center justify-between py-2 text-sm font-semibold text-black"
+                                                >
+                                                    {t(g.labelKey)}
+                                                    <span className="text-gray-400">{openGender === g.key ? '−' : '+'}</span>
+                                                </button>
+                                                {openGender === g.key && (
+                                                    <div className="ml-3 border-l border-gray-200 pl-3 space-y-1 mb-2">
+                                                        <Link
+                                                            to={`/products?gender=${g.key}`}
+                                                            onClick={() => { setMobileMenuOpen(false); setOpenGender(null); }}
+                                                            className="block text-sm text-gray-500 hover:text-black py-1"
+                                                        >
+                                                            {t('nav.allCategory')}
+                                                        </Link>
+                                                        {rootCategories.map(cat => (
+                                                            <Link
+                                                                key={cat.id}
+                                                                to={`/products?gender=${g.key}&category=${cat.id}`}
+                                                                onClick={() => { setMobileMenuOpen(false); setOpenGender(null); }}
+                                                                className="block text-sm text-gray-500 hover:text-black py-1"
+                                                            >
+                                                                {cat.name}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="block text-xs text-gray-400 hover:text-black py-1 mb-1">{t('nav.viewAllProducts')} →</Link>
+                                    </div>
                                     {isAuthenticated() && (
                                         <>
                                             <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">{t('nav.orders')}</Link>

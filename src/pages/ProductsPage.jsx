@@ -37,7 +37,8 @@ const ProductsPage = () => {
     const [appliedMinPrice, setAppliedMinPrice] = useState('');
     const [appliedMaxPrice, setAppliedMaxPrice] = useState('');
     const [showFilters, setShowFilters] = useState(true);
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [selectedGender, setSelectedGender] = useState(searchParams.get('gender') || '');
     const [expandedCategories, setExpandedCategories] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [selectedBrand, setSelectedBrand] = useState('');
@@ -72,6 +73,7 @@ const ProductsPage = () => {
             if (selectedBrand) params.brand = selectedBrand;
             if (selectedColor) params.colorName = selectedColor;
             if (selectedMaterial) params.material = selectedMaterial;
+            if (selectedGender) params.gender = selectedGender;
 
             const response = await searchActiveProducts(params);
 
@@ -83,7 +85,7 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, categories]);
+    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, selectedMaterial, selectedGender, categories]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -103,13 +105,6 @@ const ProductsPage = () => {
     }, [fetchProducts]);
 
     useEffect(() => {
-        const categoryFromUrl = searchParams.get('category');
-        if (categoryFromUrl) {
-            setSelectedCategory(parseInt(categoryFromUrl));
-        }
-    }, [searchParams]);
-
-    useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -127,29 +122,28 @@ const ProductsPage = () => {
         );
     };
 
+    // Single consolidated URL sync — gender + category + search all handled here
     useEffect(() => {
         const searchFromUrl = searchParams.get('search');
         const categoryFromUrl = searchParams.get('category');
+        const genderFromUrl = searchParams.get('gender');
 
-        function resetFilters() {
-            setShowFilters(false);
+        if (searchFromUrl !== null) {
+            setSearchInput(searchFromUrl);
+            setSearchQuery(searchFromUrl);
             setSelectedCategory('');
+            setSelectedGender('');
             setAppliedMinPrice('');
             setAppliedMaxPrice('');
             setMinPrice('');
             setMaxPrice('');
             setPage(0);
-        }
-
-        if (searchFromUrl !== null) {
-            setSearchInput(searchFromUrl);
-            setSearchQuery(searchFromUrl);
-            resetFilters();
             return;
         }
-        if (categoryFromUrl !== null) {
-            setSelectedCategory(parseInt(categoryFromUrl));
-        }
+
+        setSelectedCategory(categoryFromUrl ? parseInt(categoryFromUrl) : '');
+        setSelectedGender(genderFromUrl || '');
+        setPage(0);
     }, [searchParams]);
 
     useEffect(() => {
@@ -197,9 +191,14 @@ const ProductsPage = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-4xl font-black uppercase tracking-tight text-black">
-                    {selectedCategory
-                        ? categories.find(c => c.id === selectedCategory)?.name || t('product.allProducts')
-                        : t('product.allProducts')}
+                    {(() => {
+                        const genderLabel = selectedGender
+                            ? t(`product.gender${selectedGender.charAt(0) + selectedGender.slice(1).toLowerCase()}`)
+                            : null;
+                        const categoryName = categories.find(c => c.id === selectedCategory)?.name;
+                        if (genderLabel && categoryName) return `${genderLabel} · ${categoryName}`;
+                        return genderLabel || categoryName || t('nav.products');
+                    })()}
                 </h1>
                 <span className="text-sm text-gray-400">
                     {totalElements} {totalElements === 1 ? t('product.product') : t('product.products')}
@@ -239,6 +238,10 @@ const ProductsPage = () => {
                         setSearchQuery={setSearchQuery}
                         setSearchInput={setSearchInput}
                         setPage={setPage}
+                        selectedGender={selectedGender}
+                        setSelectedGender={setSelectedGender}
+                        searchParams={searchParams}
+                        setSearchParams={setSearchParams}
                     />
                 )}
 
@@ -315,10 +318,13 @@ const ProductsPage = () => {
                         onRemoveMaterial={() => { setSelectedMaterial(''); setPage(0); }}
                         onRemovePrice={() => { setMinPrice(''); setMaxPrice(''); setAppliedMinPrice(''); setAppliedMaxPrice(''); setPage(0); }}
                         onRemoveSearch={() => { setSearchQuery(''); setSearchInput(''); setPage(0); navigate('/products'); }}
+                        onRemoveGender={() => { setSelectedGender(''); setPage(0); setSearchParams(prev => { const sp = new URLSearchParams(prev); sp.delete('gender'); return sp; }); }}
+                        selectedGender={selectedGender}
                         onClearAll={() => {
                             setSelectedCategory(''); setSelectedColor(''); setSelectedBrand('');
                             setSelectedMaterial(''); setAppliedMinPrice(''); setAppliedMaxPrice('');
                             setMinPrice(''); setMaxPrice(''); setSearchQuery(''); setSearchInput('');
+                            setSelectedGender(''); setSearchParams({});
                         }}
                     />
 

@@ -52,6 +52,11 @@ const ProductsTable = ({ products, page, totalPages, setPage, onEdit, onToggle, 
                         <td className="px-3 py-3">
                             <p className="text-xs font-semibold text-black">{product.name}</p>
                             <p className="text-xs text-gray-400">{product.categoryName || t('admin.noCategory')}</p>
+                            {product.gender && (
+                                <span className="inline-block mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-400 border border-gray-200 px-1.5 py-0.5">
+                                    {t(`product.gender${product.gender.charAt(0) + product.gender.slice(1).toLowerCase()}`)}
+                                </span>
+                            )}
                         </td>
                         <td className="hidden md:table-cell px-3 py-3 text-xs text-gray-500">{product.sku}</td>
                         <td className="px-3 py-3 text-xs font-semibold text-black">{format(product.price)}</td>

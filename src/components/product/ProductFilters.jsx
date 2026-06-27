@@ -34,6 +34,11 @@ const ProductFilters = ({
                             appliedMaxPrice,
                             setAppliedMinPrice,
                             setAppliedMaxPrice,
+                            // gender
+                            selectedGender,
+                            setSelectedGender,
+                            searchParams,
+                            setSearchParams,
                             // shared
                             searchQuery,
                             setSearchQuery,
@@ -49,7 +54,8 @@ const ProductFilters = ({
         searchQuery !== '' ||
         selectedBrand !== '' ||
         selectedColor !== '' ||
-        selectedMaterial !== '';
+        selectedMaterial !== '' ||
+        selectedGender !== '';
 
     const clearAll = () => {
         setSelectedCategory('');
@@ -62,8 +68,18 @@ const ProductFilters = ({
         setSelectedBrand('');
         setSelectedColor('');
         setSelectedMaterial('');
+        setSelectedGender('');
         setPage(0);
         navigate('/products');
+    };
+
+    const handleGenderToggle = (g) => {
+        const next = selectedGender === g ? '' : g;
+        setSelectedGender(next);
+        setPage(0);
+        const sp = new URLSearchParams(searchParams);
+        if (next) sp.set('gender', next); else sp.delete('gender');
+        setSearchParams(sp);
     };
 
     // setSelectedCategory comes through handleCategoryClick; expose a direct setter for clearAll
@@ -73,6 +89,28 @@ const ProductFilters = ({
 
     return (
         <div className={isMobile ? 'w-full' : 'w-56 flex-shrink-0'}>
+            {/* Gender filter */}
+            <div className="mb-8">
+                <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                    {t('product.gender')}
+                </h3>
+                <div className="flex gap-2 flex-wrap">
+                    {['MEN', 'WOMEN', 'UNISEX'].map(g => (
+                        <button
+                            key={g}
+                            onClick={() => handleGenderToggle(g)}
+                            className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                                selectedGender === g
+                                    ? 'bg-black text-white border-black'
+                                    : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'
+                            }`}
+                        >
+                            {t(`product.gender${g.charAt(0) + g.slice(1).toLowerCase()}`)}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Categories */}
             {isFilterVisible('category') && (
                 <div className="mb-8">

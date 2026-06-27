@@ -10,7 +10,10 @@
     "cartEmpty": "Korpa je prazna",
     "viewCart": "Pogledaj korpu",
     "viewAllOrders": "Sve porudžbine",
-    "viewAllProducts": "Svi proizvodi"
+    "viewAllProducts": "Svi proizvodi",
+    "men": "Muškarci",
+    "women": "Žene",
+    "allCategory": "Sve"
   },
   "admin": {
     "dashboard": "Admin Panel",
@@ -242,6 +245,10 @@
     "selectSizePrompt": "Izaberi veličinu",
     "selectSizeFirst": "Izaberi veličinu za dodavanje u korpu",
     "sizeSoldOut": "Rasprodato",
+    "gender": "Pol",
+    "genderMen": "Muškarci",
+    "genderWomen": "Žene",
+    "genderUnisex": "Uniseks",
     "shopByCategory": "Kupujte po kategoriji",
     "resultsFor": "Rezultati za: \"{{query}}\"",
     "noColor": "Bez boje",
@@ -306,7 +313,7 @@
     "processing": "Obrađujem...",
     "selectAddress": "Izaberite adresu za dostavu",
     "clearBag": "Isprazni korpu",
-    "discount": "Popust ({{code}})",
+    "discount": "Popust",
     "sku": "SKU",
     "orderingDisabled": "Naručivanje trenutno nije dostupno"
   },

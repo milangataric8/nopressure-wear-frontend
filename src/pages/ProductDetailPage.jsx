@@ -447,6 +447,13 @@ const ProductDetailPage = () => {
                             <span>{product.material}</span>
                         </div>
                     )}
+
+                    {product.gender && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('product.gender')}:</span>
+                            <span>{t(`product.gender${product.gender.charAt(0) + product.gender.slice(1).toLowerCase()}`)}</span>
+                        </div>
+                    )}
                 </div>
             </div>
 

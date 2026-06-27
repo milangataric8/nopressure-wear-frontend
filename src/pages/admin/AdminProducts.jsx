@@ -24,6 +24,7 @@ import StoreAvailabilityManager from "../../components/admin/StoreAvailabilityMa
 import ProductMediaManager from "../../components/admin/ProductMediaManager.jsx";
 import ProductsTable from "../../components/admin/ProductsTable.jsx";
 import ProductFilterBar from "../../components/admin/ProductFilterBar.jsx";
+import CategoryFilterBar from "../../components/admin/CategoryFilterBar.jsx";
 
 const AdminProducts = () => {
     const { t } = useTranslation();
@@ -41,6 +42,7 @@ const AdminProducts = () => {
     const [activeFilter, setActiveFilter] = useState(null);
     const [brandFilter, setBrandFilter] = useState('');
     const [colorFilter, setColorFilter] = useState('');
+    const [genderFilter, setGenderFilter] = useState('');
     const [availableBrands, setAvailableBrands] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
     const [allStores, setAllStores] = useState([]);
@@ -59,6 +61,7 @@ const AdminProducts = () => {
         categoryId: '',
         discountPercentage: '',
         material: '',
+        gender: 'UNISEX',
         variants: defaultVariants(),
     });
     const COLOR_PALETTE = [
@@ -99,6 +102,7 @@ const AdminProducts = () => {
             if (activeFilter !== null) params.active = activeFilter;
             if (brandFilter) params.brand = brandFilter;
             if (colorFilter) params.colorName = colorFilter;
+            if (genderFilter) params.gender = genderFilter;
 
             const response = await getProducts(params);
             setProducts(response.data.content);
@@ -108,7 +112,7 @@ const AdminProducts = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, categoryFilter, activeFilter, brandFilter, colorFilter]);
+    }, [page, searchQuery, categoryFilter, activeFilter, brandFilter, colorFilter, genderFilter]);
 
     const fetchCategories = async () => {
         try {
@@ -121,7 +125,7 @@ const AdminProducts = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [page, searchQuery, categoryFilter, activeFilter, brandFilter, colorFilter])
+    }, [fetchProducts])
 
     useEffect(() => {
         fetchCategories();
@@ -198,6 +202,7 @@ const AdminProducts = () => {
             brand: product.brand || '',
             discountPercentage: product.discountPercentage || '',
             material: product.material || '',
+            gender: product.gender ?? 'UNISEX',
             variants: ALL_SIZES.map(size => {
                 const found = product.variants?.find(v => v.size === size);
                 return { size, stockQuantity: found?.stockQuantity ?? 0 /*, sku: found?.sku ?? ''*/ };
@@ -250,6 +255,7 @@ const AdminProducts = () => {
             categoryId: '',
             discountPercentage: '',
             material: '',
+            gender: 'UNISEX',
             variants: defaultVariants(),
         });
         setEditingProduct(null);
@@ -289,70 +295,28 @@ const AdminProducts = () => {
                 />
             )}
 
-            <ProductFilterBar
-                availableColors={availableColors}
-                availableBrands={availableBrands}
-                colorFilter={colorFilter}
-                setColorFilter={setColorFilter}
-                brandFilter={brandFilter}
-                setBrandFilter={setBrandFilter}
-                setPage={setPage}
-                translateColorName={translateColorName}
-            />
+            {!showForm && (
+                <ProductFilterBar
+                    availableColors={availableColors}
+                    availableBrands={availableBrands}
+                    colorFilter={colorFilter}
+                    setColorFilter={setColorFilter}
+                    brandFilter={brandFilter}
+                    setBrandFilter={setBrandFilter}
+                    genderFilter={genderFilter}
+                    setGenderFilter={setGenderFilter}
+                    setPage={setPage}
+                    translateColorName={translateColorName}
+                />
+            )}
 
             {!showForm && (
-                <div className="mb-6 border border-gray-200">
-                    {/* Root categories */}
-                    <div className="flex border-b border-gray-200">
-                        {categories.filter(cat => !cat.parentId).map(cat => {
-                            const subcats = categories.filter(c => c.parentId === cat.id);
-                            const isSelected = categoryFilter === cat.id || subcats.some(s => s.id === categoryFilter);
-
-                            return (
-                                <div key={cat.id} className="flex-1 relative border-r border-gray-200 last:border-r-0">
-                                    <button
-                                        onClick={() => {
-                                            setCategoryFilter(isSelected ? null : cat.id);
-                                            setPage(0);
-                                        }}
-                                        className={`w-full py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                                            isSelected
-                                                ? 'bg-gray-800 text-white'
-                                                : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'
-                                        }`}
-                                    >
-                                        {cat.name}
-                                        {subcats.length > 0 && (
-                                            <span className="ml-1 text-xs opacity-60">▾</span>
-                                        )}
-                                    </button>
-
-                                    {/* Dropdown subcategories */}
-                                    {isSelected && subcats.length > 0 && (
-                                        <div className="absolute top-full left-0 right-0 bg-white border border-t-0 border-gray-200 z-10 shadow-sm">
-                                            {subcats.map(sub => (
-                                                <button
-                                                    key={sub.id}
-                                                    onClick={() => {
-                                                        setCategoryFilter(prev => prev === sub.id ? cat.id : sub.id);
-                                                        setPage(0);
-                                                    }}
-                                                    className={`w-full py-2 text-xs uppercase tracking-wide transition-colors border-b border-gray-100 last:border-b-0 ${
-                                                        categoryFilter === sub.id
-                                                            ? 'bg-gray-100 text-black font-semibold'
-                                                            : 'text-gray-400 hover:bg-gray-50 hover:text-black'
-                                                    }`}
-                                                >
-                                                    {sub.name}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+                <CategoryFilterBar
+                    categories={categories}
+                    categoryFilter={categoryFilter}
+                    setCategoryFilter={setCategoryFilter}
+                    setPage={setPage}
+                />
             )}
 
             {showForm && (
@@ -418,38 +382,16 @@ const AdminProducts = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('admin.sizesAndStock')}</label>
-                            <p className="text-xs text-gray-400 mb-3">{t('admin.sizesHint')}</p>
-                            <div className="space-y-2">
-                                {formData.variants.map((v, idx) => (
-                                    <div key={v.size} className="flex items-center gap-3">
-                                        <span className="w-110 text-lg font-bold text-black shrink-0 border-b border-gray-200 self-end">{v.size}</span>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value={v.stockQuantity}
-                                            onChange={(e) => {
-                                                const updated = [...formData.variants];
-                                                updated[idx] = { ...updated[idx], stockQuantity: e.target.value };
-                                                setFormData({ ...formData, variants: updated });
-                                            }}
-                                            className={inputClass + " flex-1 justify-items-center"}
-                                            placeholder="0"
-                                        />
-                                        {/*<input*/}
-                                        {/*    type="text"*/}
-                                        {/*    value={v.sku || ''}*/}
-                                        {/*    onChange={(e) => {*/}
-                                        {/*        const updated = [...formData.variants];*/}
-                                        {/*        updated[idx] = { ...updated[idx], sku: e.target.value };*/}
-                                        {/*        setFormData({ ...formData, variants: updated });*/}
-                                        {/*    }}*/}
-                                        {/*    className={inputClass + " flex-1"}*/}
-                                        {/*    placeholder={t('admin.sizeSku')}*/}
-                                        {/*/>*/}
-                                    </div>
-                                ))}
-                            </div>
+                            <label className={labelClass}>{t('product.gender')}</label>
+                            <select
+                                value={formData.gender}
+                                onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
+                                className={inputClass}
+                            >
+                                <option value="MEN">{t('product.genderMen')}</option>
+                                <option value="WOMEN">{t('product.genderWomen')}</option>
+                                <option value="UNISEX">{t('product.genderUnisex')}</option>
+                            </select>
                         </div>
 
                         <div>
@@ -491,11 +433,47 @@ const AdminProducts = () => {
                             />
                         </div>
 
+                        <div>
+                            <label className={labelClass}>{t('admin.sizesAndStock')}</label>
+                            <p className="text-xs text-gray-400 mb-3">{t('admin.sizesHint')}</p>
+                            <div className="space-y-2">
+                                {formData.variants.map((v, idx) => (
+                                    <div key={v.size} className="flex items-center gap-3">
+                                        <span className="w-110 text-lg font-bold text-black shrink-0 border-b border-gray-200 self-end">{v.size}</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={v.stockQuantity}
+                                            onChange={(e) => {
+                                                const updated = [...formData.variants];
+                                                updated[idx] = { ...updated[idx], stockQuantity: e.target.value };
+                                                setFormData({ ...formData, variants: updated });
+                                            }}
+                                            className={inputClass + " flex-1 justify-items-center"}
+                                            placeholder="0"
+                                        />
+                                        {/*<input*/}
+                                        {/*    type="text"*/}
+                                        {/*    value={v.sku || ''}*/}
+                                        {/*    onChange={(e) => {*/}
+                                        {/*        const updated = [...formData.variants];*/}
+                                        {/*        updated[idx] = { ...updated[idx], sku: e.target.value };*/}
+                                        {/*        setFormData({ ...formData, variants: updated });*/}
+                                        {/*    }}*/}
+                                        {/*    className={inputClass + " flex-1"}*/}
+                                        {/*    placeholder={t('admin.sizeSku')}*/}
+                                        {/*/>*/}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                         <ColorPicker
                             palette={COLOR_PALETTE}
                             colorName={formData.colorName}
                             colorHex={formData.colorHex}
-                            onSelect={(name, hex) => setFormData(prev => ({ ...prev, colorName: name, colorHex: hex }))}
+                            onSelect={(name, hex) => setFormData(prev =>
+                                ({ ...prev, colorName: name, colorHex: hex }))}
                             translateColorName={translateColorName}
                             t={t}
                         />

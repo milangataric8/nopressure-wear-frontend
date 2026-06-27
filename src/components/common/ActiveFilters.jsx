@@ -3,8 +3,9 @@ import {t} from "i18next";
 const ActiveFilters = ({
                            selectedCategory, categories, selectedColor, availableColors,
                            selectedBrand, selectedMaterial, appliedMinPrice, appliedMaxPrice,
-                           searchQuery, onRemoveCategory, onRemoveColor, onRemoveBrand,
-                           onRemoveMaterial, onRemovePrice, onRemoveSearch, onClearAll
+                           searchQuery, selectedGender,
+                           onRemoveCategory, onRemoveColor, onRemoveBrand,
+                           onRemoveMaterial, onRemovePrice, onRemoveSearch, onRemoveGender, onClearAll
                        }) => {
     const activeFilters = [];
 
@@ -27,6 +28,12 @@ const ActiveFilters = ({
             label: `${appliedMinPrice || '0'} - ${appliedMaxPrice || '∞'} RSD`,
             onRemove: onRemovePrice
         });
+    }
+    if (selectedGender) {
+        const label = selectedGender === 'MEN' ? t('product.genderMen')
+            : selectedGender === 'WOMEN' ? t('product.genderWomen')
+            : t('product.genderUnisex');
+        activeFilters.push({ label, onRemove: onRemoveGender });
     }
     if (searchQuery) {
         activeFilters.push({ label: `"${searchQuery}"`, onRemove: onRemoveSearch });

@@ -563,7 +563,11 @@
     "delivery_enabled": "Delivery Enabled",
     "delivery_fee": "Delivery Fee",
     "free_shipping_threshold": "Free Shipping Threshold",
-    "freeShippingHint": "Order total above this ships free (0 = off)"
+    "freeShippingHint": "Order total above this ships free (0 = off)",
+    "low_stock": "Low-Stock Alerts",
+    "low_stock_alerts_enabled": "Alert Emails",
+    "low_stock_threshold": "Threshold",
+    "lowStockThresholdHint": "Alert when stock reaches this level"
   },
   "messages": {
     "productCreated": "Product created",

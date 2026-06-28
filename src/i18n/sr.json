@@ -563,7 +563,11 @@
     "delivery_enabled": "Dostava omogućena",
     "delivery_fee": "Cena dostave",
     "free_shipping_threshold": "Prag za besplatnu dostavu",
-    "freeShippingHint": "Iznos porudžbine iznad ovoga ima besplatnu dostavu (0 = isključeno)"
+    "freeShippingHint": "Iznos porudžbine iznad ovoga ima besplatnu dostavu (0 = isključeno)",
+    "low_stock": "Upozorenja o niskim zalihama",
+    "low_stock_alerts_enabled": "Imejl upozorenja",
+    "low_stock_threshold": "Prag",
+    "lowStockThresholdHint": "Upozori kada zaliha dostigne ovaj nivo"
   },
   "messages": {
     "productCreated": "Proizvod kreiran",

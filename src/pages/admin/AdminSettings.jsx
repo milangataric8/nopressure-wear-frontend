@@ -92,6 +92,11 @@ const AdminSettings = () => {
             key: 'delivery',
             title: t('settings.delivery'),
             keys: ['delivery_enabled', 'delivery_fee', 'free_shipping_threshold']
+        },
+        {
+            key: 'low_stock',
+            title: t('settings.low_stock'),
+            keys: ['low_stock_alerts_enabled', 'low_stock_threshold']
         }
     ];
 
@@ -407,6 +412,28 @@ const AdminSettings = () => {
                                                         <span className="text-xs text-gray-400 ml-1">{t('settings.freeShippingHint')}</span>
                                                     )}
                                                 </div>
+                                            ) : setting.key === 'low_stock_threshold' ? (
+                                                <div className="flex-1 flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="1"
+                                                        value={setting.value}
+                                                        onChange={async (e) => {
+                                                            const val = e.target.value;
+                                                            try {
+                                                                await updateSettings(setting.id, val);
+                                                                setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: val } : s));
+                                                                window.dispatchEvent(new Event('settings-updated'));
+                                                            } catch (err) {
+                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                            }
+                                                        }}
+                                                        onBlur={() => { toast.success(t('messages.settingUpdated')); fetchSettings(); }}
+                                                        className="w-24 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                                    />
+                                                    <span className="text-xs text-gray-400">{t('settings.lowStockThresholdHint')}</span>
+                                                </div>
                                             ) : ['payment_card_enabled',
                                                 'payment_cod_enabled',
                                                 'find_in_store_enabled',
@@ -417,7 +444,8 @@ const AdminSettings = () => {
                                                 'multilanguage_enabled',
                                                 'registration_enabled',
                                                 'login_enabled',
-                                                'delivery_enabled'].includes(setting.key) ? (
+                                                'delivery_enabled',
+                                                'low_stock_alerts_enabled'].includes(setting.key) ? (
                                                 <div className="flex-1 flex items-center gap-3">
                                                     <button
                                                         onClick={async () => {

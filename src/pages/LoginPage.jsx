@@ -48,7 +48,11 @@ const LoginPage = () => {
         } catch (error) {
             const status = error.response?.status;
             const msg = error.response?.data?.message || '';
-            if (status === 403 && msg.toLowerCase().includes('verify')) {
+            if (status === 423) {
+                const match = msg.match(/(\d+) minute/);
+                const minutes = match ? parseInt(match[1]) : null;
+                setLoginError(minutes !== null ? t('auth.accountLockedMinutes', { count: minutes }) : t('auth.accountLocked'));
+            } else if (status === 403 && msg.toLowerCase().includes('verify')) {
                 setLoginError(t('auth.emailNotVerified'));
             } else if (status === 403) {
                 toast.error(t('auth.loginDisabled'));
@@ -82,13 +86,13 @@ const LoginPage = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        {loginError && (
-                            <p className="text-xs text-red-500">{loginError}</p>
-                        )}
                         <div>
                             <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2">
                                 {t('auth.email')}
                             </label>
+                            {loginError && (
+                                <p className="text-xs text-red-500 mb-2">{loginError}</p>
+                            )}
                             <input
                                 type="email"
                                 name="email"

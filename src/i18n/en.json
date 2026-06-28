@@ -416,7 +416,9 @@
     "resend": "A confirmation email has been sent again",
     "notVerifiedCheckout": "Please verify your email before placing an order.",
     "emailAlreadyExists": "An account with this email already exists.",
-    "emailNotVerified": "Please verify your email before logging in."
+    "emailNotVerified": "Please verify your email before logging in.",
+    "accountLocked": "Account is temporarily locked. Please try again later.",
+    "accountLockedMinutes": "Account locked. Try again in {{count}} minute(s)."
   },
   "profile": {
     "title": "My Profile",

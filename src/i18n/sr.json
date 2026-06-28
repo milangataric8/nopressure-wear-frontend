@@ -416,7 +416,9 @@
     "resend": "Poslat je ponovo email za potvrdu",
     "notVerifiedCheckout": "Molimo potvrdite vaš email pre nego što naručite.",
     "emailAlreadyExists": "Nalog sa ovim emailom već postoji.",
-    "emailNotVerified": "Molimo potvrdite vaš email pre prijave."
+    "emailNotVerified": "Molimo potvrdite vaš email pre prijave.",
+    "accountLocked": "Nalog je privremeno zaključan. Pokušajte ponovo kasnije.",
+    "accountLockedMinutes": "Nalog je zaključan. Pokušajte ponovo za {{count}} minut(a)."
   },
   "profile": {
     "title": "Moj profil",

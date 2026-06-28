@@ -113,9 +113,15 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 mt-8 pt-6 text-center">
+                <div className="border-t border-gray-200 mt-8 pt-6 flex flex-col items-center gap-3">
+                    <div className="flex flex-wrap justify-center gap-x-6 gap-y-1">
+                        <Link to="/privacy-policy" className="text-xs text-gray-400 hover:text-black transition-colors">{t('legal.privacyTitle')}</Link>
+                        <Link to="/terms" className="text-xs text-gray-400 hover:text-black transition-colors">{t('legal.termsTitle')}</Link>
+                        <Link to="/returns" className="text-xs text-gray-400 hover:text-black transition-colors">{t('legal.returnsTitle')}</Link>
+                        <Link to="/imprint" className="text-xs text-gray-400 hover:text-black transition-colors">{t('legal.imprintTitle')}</Link>
+                    </div>
                     <p className="text-xs text-gray-400">
-                        © {new Date().getFullYear()}{settings.store_name}. {t('footer.allRightsReserved')}.
+                        © {new Date().getFullYear()} {settings.store_name}. {t('footer.allRightsReserved')}.
                     </p>
                 </div>
             </div>

@@ -7,7 +7,8 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
-import {useCurrency} from "../../context/CurrencyContext.jsx";
+import { useCurrency } from "../../context/CurrencyContext.jsx";
+import { useAuth } from '../../hooks/useAuth';
 
 const AdminCustomerDetail = () => {
     const { t, i18n } = useTranslation();
@@ -19,6 +20,7 @@ const AdminCustomerDetail = () => {
         DELIVERED: t('order.delivered'),
         CANCELLED: t('order.cancelled'),
     }[status] || status);
+    const { isAdmin } = useAuth();
     const { customerId } = useParams();
     const navigate = useNavigate();
     const [customer, setCustomer] = useState(null);
@@ -77,8 +79,16 @@ const AdminCustomerDetail = () => {
         }
     };
 
-    {loading && <LoadingSpinner />}
-    {loading && <LoadingSpinner height="h-32" />}
+    const handleAnonymize = async () => {
+        if (!window.confirm(t('admin.confirmAnonymize'))) return;
+        try {
+            await axiosInstance.delete(`/users/${customerId}/personal-data`);
+            toast.success(t('admin.customerAnonymized'));
+            navigate('/admin/customers');
+        } catch (e) {
+            toast.error(e.response?.data?.message || t('admin.anonymizeFailed'));
+        }
+    };
 
     if (!customer) return null;
 
@@ -144,6 +154,16 @@ const AdminCustomerDetail = () => {
                             </p>
                         </div>
                     </div>
+                    {isAdmin() && (
+                        <div className="mt-6 border-t border-gray-100 pt-4">
+                            <button
+                                onClick={handleAnonymize}
+                                className="w-full text-xs font-semibold uppercase tracking-wide text-red-600 border border-red-200 px-4 py-2 hover:bg-red-50 transition-colors"
+                            >
+                                {t('admin.deletePersonalData')}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 

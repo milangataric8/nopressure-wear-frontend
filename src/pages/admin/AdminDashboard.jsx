@@ -18,6 +18,7 @@ const AdminDashboard = () => {
             title: t('admin.sectionManagement'),
             items: [
                 { to: '/admin/settings', title: t('admin.settings'), desc: t('admin.manageSettings') },
+                { to: '/admin/legal', title: t('admin.legal'), desc: t('admin.manageLegal') },
                 { to: '/admin/reports', title: t('admin.reports'), desc: t('admin.reportDescription') },
                 { to: '/admin/employees', title: t('admin.employees'), desc: t('admin.manageEmployees') },
             ]

@@ -204,7 +204,27 @@
     "popupDurationHint": "How long the popup stays open. 0 = until manually closed.",
     "sizesAndStock": "Sizes & Stock",
     "sizesHint": "Set stock per size. Total stock is calculated automatically.",
-    "sizeSku": "Size SKU (optional)"
+    "sizeSku": "Size SKU (optional)",
+    "legal": "Legal Pages",
+    "manageLegal": "Manage legal page content (Privacy, Terms, Returns, Imprint)",
+    "legalSaved": "Legal content saved.",
+    "legalSaveFailed": "Failed to save legal content.",
+    "deletePersonalData": "Delete Personal Data",
+    "confirmAnonymize": "Permanently anonymize this customer's personal data? This cannot be undone.",
+    "customerAnonymized": "Customer data anonymized.",
+    "anonymizeFailed": "Failed to anonymize customer."
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service",
+    "returnsTitle": "Return Policy",
+    "imprintTitle": "Imprint"
+  },
+  "cookie": {
+    "message": "We use cookies to run the shop and, with your consent, to improve it.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "learnMore": "Learn more"
   },
   "product": {
     "allProducts": "All Products",

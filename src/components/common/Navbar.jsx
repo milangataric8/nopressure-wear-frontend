@@ -283,6 +283,14 @@ const Navbar = () => {
                                                               className="block px-4 py-2 text-sm font-bold text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                             {t('admin.settings')}
                                                         </Link>
+                                                        <Link to="/admin/legal" onClick={() => setActiveDropdown(null)}
+                                                              className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                            {t('admin.legal')}
+                                                        </Link>
+                                                        <Link to="/admin/reports" onClick={() => setActiveDropdown(null)}
+                                                              className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
+                                                            {t('admin.reports')}
+                                                        </Link>
                                                         <Link to="/admin/employees" onClick={() => setActiveDropdown(null)}
                                                               className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                             {t('admin.employees')}
@@ -319,10 +327,6 @@ const Navbar = () => {
                                                 <Link to="/admin/coupons" onClick={() => setActiveDropdown(null)}
                                                       className="block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
                                                     {t('admin.coupons')}
-                                                </Link>
-                                                <Link to="/admin/reports" onClick={() => setActiveDropdown(null)}
-                                                      className="block px-4 py-2 text-sm font-semibold text-gray-600 hover:text-black hover:bg-gray-50 transition-colors">
-                                                    Reports
                                                 </Link>
 
                                                 {/* Marketing */}

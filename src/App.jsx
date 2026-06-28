@@ -39,6 +39,13 @@ import AdminReports from "./pages/admin/AdminReports.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 import AdminNotifications from "./pages/AdminNotifications.jsx";
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage';
+import TermsPage from './pages/legal/TermsPage';
+import ReturnsPage from './pages/legal/ReturnsPage';
+import ImprintPage from './pages/legal/ImprintPage';
+import CookieBanner from './components/common/CookieBanner';
+import ScrollToTop from './components/common/ScrollToTop';
+import AdminLegal from './pages/admin/AdminLegal';
 import i18n from './i18n/i18n';
 
 function App() {
@@ -103,6 +110,7 @@ function App() {
 
     return (
         <>
+            <ScrollToTop />
             <Navbar />
             <div className="pt-16 md:pt-24">
                 <Routes>
@@ -184,9 +192,17 @@ function App() {
                     <Route path="/admin/notifications" element={
                         <ProtectedRoute adminOnly><AdminNotifications /></ProtectedRoute>
                     } />
+                    <Route path="/admin/legal" element={
+                        <ProtectedRoute adminOnly><AdminLegal /></ProtectedRoute>
+                    } />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/returns" element={<ReturnsPage />} />
+                    <Route path="/imprint" element={<ImprintPage />} />
                 </Routes>
             </div>
             {!hideFooter && <Footer />}
+            <CookieBanner />
         </>
     );
 }

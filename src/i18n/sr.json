@@ -204,7 +204,27 @@
     "popupDurationHint": "Koliko dugo popap ostaje otvoren. 0 = dok se ručno ne zatvori.",
     "sizesAndStock": "Veličine i zalihe",
     "sizesHint": "Unesite zalihe po veličini. Ukupna zaliha se izračunava automatski.",
-    "sizeSku": "SKU veličine (opciono)"
+    "sizeSku": "SKU veličine (opciono)",
+    "legal": "Pravne stranice",
+    "manageLegal": "Upravljajte sadržajem pravnih stranica (Privatnost, Uslovi, Povraćaj, Impresum)",
+    "legalSaved": "Sadržaj je sačuvan.",
+    "legalSaveFailed": "Čuvanje nije uspelo.",
+    "deletePersonalData": "Obriši lične podatke",
+    "confirmAnonymize": "Trajno anonimizovati lične podatke ovog kupca? Ovo se ne može poništiti.",
+    "customerAnonymized": "Podaci kupca su anonimizovani.",
+    "anonymizeFailed": "Anonimizacija nije uspela."
+  },
+  "legal": {
+    "privacyTitle": "Politika privatnosti",
+    "termsTitle": "Uslovi korišćenja",
+    "returnsTitle": "Politika povraćaja",
+    "imprintTitle": "Impresum"
+  },
+  "cookie": {
+    "message": "Koristimo kolačiće za rad prodavnice i, uz vašu saglasnost, za njeno poboljšanje.",
+    "accept": "Prihvati",
+    "decline": "Odbij",
+    "learnMore": "Saznaj više"
   },
   "product": {
     "allProducts": "Svi proizvodi",

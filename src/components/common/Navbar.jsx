@@ -100,11 +100,6 @@ const Navbar = () => {
         return () => window.removeEventListener('settings-updated', handler);
     }, []);
 
-    const toggleLanguage = () => {
-        const newLang = i18n.language === 'en' ? 'sr' : 'en';
-        i18n.changeLanguage(newLang);
-    };
-
     const handleLogout = () => {
         logoutUser();
         navigate('/login');
@@ -143,12 +138,21 @@ const Navbar = () => {
                     {/* Auth links + language — right */}
                     <div className="flex items-center gap-6 ml-auto">
                         {storeSettings.multilanguage_enabled !== 'false' && (
-                            <button
-                                onClick={toggleLanguage}
-                                className="text-xs text-gray-500 hover:text-black transition-colors uppercase font-medium"
-                            >
-                                {i18n.language === 'en' ? 'SR' : 'EN'}
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                                <button
+                                    onClick={() => i18n.changeLanguage('en')}
+                                    className={`text-xs uppercase transition-colors ${i18n.language === 'en' ? 'font-bold text-black' : 'font-medium text-gray-400 hover:text-black'}`}
+                                >
+                                    EN
+                                </button>
+                                <span className="text-gray-300 text-xs select-none">|</span>
+                                <button
+                                    onClick={() => i18n.changeLanguage('sr')}
+                                    className={`text-xs uppercase transition-colors ${i18n.language === 'sr' ? 'font-bold text-black' : 'font-medium text-gray-400 hover:text-black'}`}
+                                >
+                                    SR
+                                </button>
+                            </div>
                         )}
 
                         {isAuthenticated() ? (

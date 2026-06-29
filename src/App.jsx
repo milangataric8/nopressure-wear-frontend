@@ -47,6 +47,7 @@ import CookieBanner from './components/common/CookieBanner';
 import ScrollToTop from './components/common/ScrollToTop';
 import AdminLegal from './pages/admin/AdminLegal';
 import i18n from './i18n/i18n';
+import { enableAnalytics, trackPageview } from './analytics';
 
 function App() {
     const { user, isAuthenticated, setCartCount, setFavoriteCount } = useAuth();
@@ -104,6 +105,10 @@ function App() {
     }, []);
 
     const location = useLocation();
+
+    useEffect(() => {
+        trackPageview(location.pathname + location.search);
+    }, [location]);
 
     const hideFooter = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname)
         || location.pathname.startsWith('/admin');

@@ -1,17 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { enableAnalytics } from '../../analytics';
 
 const CookieBanner = () => {
     const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
-        if (!localStorage.getItem('np_cookie_consent')) setVisible(true);
+        const consent = localStorage.getItem('np_cookie_consent');
+        if (!consent) {
+            setVisible(true);
+        } else if (consent === 'accepted') {
+            enableAnalytics();
+        }
     }, []);
 
     const decide = (accepted) => {
         localStorage.setItem('np_cookie_consent', accepted ? 'accepted' : 'declined');
+        if (accepted) enableAnalytics();
         setVisible(false);
     };
 

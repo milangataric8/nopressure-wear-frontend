@@ -274,6 +274,10 @@
     "noColor": "No Color",
     "multiColor": "Multi-Color",
     "mayAlsoLike": "You May Also Like",
+    "share": "Share",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied!",
+    "copyFailed": "Failed to copy",
     "colors": {
       "white": "White",
       "black": "Black",

@@ -274,6 +274,10 @@
     "noColor": "Bez boje",
     "multiColor": "Više boja",
     "mayAlsoLike": "Možda će vam se svideti",
+    "share": "Podeli",
+    "copyLink": "Kopiraj link",
+    "linkCopied": "Link kopiran!",
+    "copyFailed": "Kopiranje nije uspelo",
     "colors": {
       "white": "Bela",
       "black": "Crna",

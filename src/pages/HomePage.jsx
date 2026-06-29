@@ -10,6 +10,7 @@ import {toast} from "react-toastify";
 import HeroBanner from "../components/common/HeroBanner.jsx";
 import HomePopup from "../components/common/HomePopup.jsx";
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import Seo from '../components/seo/Seo';
 
 const HomePage = () => {
     const { t } = useTranslation();
@@ -43,6 +44,7 @@ const HomePage = () => {
 
     return (
         <div>
+            <Seo url={`${window.location.origin}`} />
             <HomePopup />
             <HeroBanner />
 

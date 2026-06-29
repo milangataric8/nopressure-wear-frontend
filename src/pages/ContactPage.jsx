@@ -5,6 +5,7 @@ import { sendContactMessage } from '../api/contactApi';
 import { getSettingsMap } from '../api/settingsApi';
 import { useNavigate } from 'react-router-dom';
 import SocialIcons from '../components/common/SocialIcons';
+import Seo from '../components/seo/Seo';
 
 const ContactPage = () => {
     const { i18n } = useTranslation();
@@ -51,6 +52,7 @@ const ContactPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-16">
+            <Seo title="Contact" url={`${window.location.origin}/contact`} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 {/* Left — Connect with us */}
                 <div>

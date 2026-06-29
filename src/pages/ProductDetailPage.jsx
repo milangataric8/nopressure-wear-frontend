@@ -21,6 +21,7 @@ import ProductDescription from "../components/product/ProductDescription.jsx";
 import SimilarProducts from "../components/product/SimilarProducts.jsx";
 import FindInStore from "../components/product/FindInStore.jsx";
 import ProductColorVariants from "../components/product/ProductColorVariants.jsx";
+import Seo from '../components/seo/Seo';
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
@@ -227,6 +228,13 @@ const ProductDetailPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
+            <Seo
+                title={product.name}
+                description={product.description?.replace(/<[^>]*>/g, '').slice(0, 155) || `${product.name} — ${product.categoryName}`}
+                image={product.imageUrl ? getImageUrl(product.imageUrl) : undefined}
+                url={`${window.location.origin}/products/${product.id}`}
+                type="product"
+            />
             <button
                 onClick={() => navigate('/products')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"

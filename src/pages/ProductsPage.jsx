@@ -14,6 +14,7 @@ import PriceDisplay from "../components/common/PriceDisplay.jsx";
 import ActiveFilters from "../components/common/ActiveFilters.jsx";
 import {getSettingsMap} from "../api/settingsApi.js";
 import ProductFilters from "../components/product/ProductFilters.jsx";
+import Seo from '../components/seo/Seo';
 
 const ProductsPage = () => {
     const { t } = useTranslation();
@@ -188,6 +189,7 @@ const ProductsPage = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-6 py-10">
+            <Seo title={t('nav.products')} url={`${window.location.origin}/products`} />
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-4xl font-black uppercase tracking-tight text-black">

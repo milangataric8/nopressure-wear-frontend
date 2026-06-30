@@ -5,7 +5,7 @@ import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
 import { useAuth } from '../hooks/useAuth';
 import { GuestCartContext } from '../context/GuestCartContext';
-import { getImageUrl } from '../utils/imageUtils';
+import { getImageUrl, optimizedImage } from '../utils/imageUtils';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
 import { getStoresForProduct } from '../api/storeApi';
@@ -250,9 +250,11 @@ const ProductDetailPage = () => {
                     <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden mb-3">
                         {selectedImage ? (
                             <img
-                                src={getImageUrl(selectedImage)}
+                                src={optimizedImage(selectedImage, { width: 1000 })}
                                 alt={product.name}
                                 className="w-full h-full object-contain p-4"
+                                loading="eager"
+                                fetchPriority="high"
                             />
                         ) : (
                             <span className="text-gray-400 text-sm">{t('common.noImage')}</span>
@@ -287,9 +289,10 @@ const ProductDetailPage = () => {
                                     }`}
                                 >
                                     <img
-                                        src={getImageUrl(img.imageUrl)}
+                                        src={optimizedImage(img.imageUrl, { width: 120, height: 120, crop: 'fill' })}
                                         alt={`${product.name} ${index + 1}`}
                                         className="w-full h-full object-contain p-1"
+                                        loading="lazy"
                                     />
                                 </button>
                             ))}

@@ -5,7 +5,7 @@ import useFormatPrice from '../hooks/useFormatPrice';
 import { Link } from 'react-router-dom';
 import { getActiveProducts } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
-import {getImageUrl} from "../utils/imageUtils.js";
+import { optimizedImage } from "../utils/imageUtils.js";
 import {toast} from "react-toastify";
 import HeroBanner from "../components/common/HeroBanner.jsx";
 import HomePopup from "../components/common/HomePopup.jsx";
@@ -98,9 +98,10 @@ const HomePage = () => {
                                 <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                     {product.imageUrl ? (
                                         <img
-                                            src={getImageUrl(product.imageUrl)}
+                                            src={optimizedImage(product.imageUrl, { width: 500 })}
                                             alt={product.name}
                                             className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                            loading="lazy"
                                         />
                                     ) : (
                                         <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
@@ -126,9 +127,10 @@ const HomePage = () => {
                                                 >
                                                     {product.imageUrl ? (
                                                         <img
-                                                            src={getImageUrl(product.imageUrl)}
+                                                            src={optimizedImage(product.imageUrl, { width: 120, crop: 'fill' })}
                                                             alt={product.colorName || ''}
                                                             className="w-full h-full object-cover"
+                                                            loading="lazy"
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
@@ -146,9 +148,10 @@ const HomePage = () => {
                                                 >
                                                     {variant.imageUrl ? (
                                                         <img
-                                                            src={getImageUrl(variant.imageUrl)}
+                                                            src={optimizedImage(variant.imageUrl, { width: 120, crop: 'fill' })}
                                                             alt={variant.colorName || ''}
                                                             className="w-full h-full object-cover"
+                                                            loading="lazy"
                                                         />
                                                     ) : (
                                                         <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getImageUrl } from '../../utils/imageUtils';
+import { optimizedImage } from '../../utils/imageUtils';
 import StarRating from '../common/StarRating';
 import PriceDisplay from '../common/PriceDisplay';
 
@@ -20,9 +20,10 @@ const SimilarProducts = ({ similarProducts, reviewsEnabled }) => {
                         <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
                             {sp.imageUrl ? (
                                 <img
-                                    src={getImageUrl(sp.imageUrl)}
+                                    src={optimizedImage(sp.imageUrl, { width: 500 })}
                                     alt={sp.name}
                                     className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                                    loading="lazy"
                                 />
                             ) : (
                                 <span className="text-gray-400 text-xs">{t('common.noImage')}</span>

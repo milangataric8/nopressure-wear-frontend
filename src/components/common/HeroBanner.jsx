@@ -73,6 +73,8 @@ const HeroBanner = () => {
                     src={getImageUrl(banner.mediaUrl)}
                     alt={banner.title}
                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+                    loading="eager"
+                    fetchPriority="high"
                 />
             ) : (
                 <div className="absolute inset-0 bg-gray-100" />

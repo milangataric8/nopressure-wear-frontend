@@ -33,7 +33,6 @@ const Navbar = () => {
     const [storeSettings, setStoreSettings] = useState({});
     const { format } = useCurrency();
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
-    const getSubcategories = (parentId) => (categories || []).filter(cat => cat.parentId === parentId);
 
     useEffect(() => {
         const loadCategories = () => {

@@ -156,8 +156,7 @@ const AdminProducts = () => {
                 categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
                 variants: formData.variants.map(v => ({
                     size: v.size,
-                    stockQuantity: parseInt(v.stockQuantity) || 0,
-                    // sku: v.sku || null,
+                    stockQuantity: parseInt(v.stockQuantity) || 0
                 })),
             };
 

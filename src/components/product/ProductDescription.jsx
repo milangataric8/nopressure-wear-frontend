@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import signature from '../../../../uploads/products/nopressure_signature_footer.png';
+import signature from '../../assets/nopressure_signature_footer.png';
 
 const ProductDescription = ({ description, isOpen, onToggle }) => {
     const { t } = useTranslation();

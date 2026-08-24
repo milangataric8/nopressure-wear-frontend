@@ -47,7 +47,7 @@ import CookieBanner from './components/common/CookieBanner';
 import ScrollToTop from './components/common/ScrollToTop';
 import AdminLegal from './pages/admin/AdminLegal';
 import i18n from './i18n/i18n';
-import { enableAnalytics, trackPageview } from './analytics';
+import { trackPageview } from './analytics';
 
 function App() {
     const { user, isAuthenticated, setCartCount, setFavoriteCount } = useAuth();

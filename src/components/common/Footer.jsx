@@ -3,7 +3,7 @@ import { getSettingsMap } from '../../api/settingsApi';
 import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
 import {Link} from "react-router-dom";
-import signature from '../../../../uploads/products/nopressure_signature_footer.png';
+import signature from '../../assets/nopressure_signature_footer.png';
 
 const Footer = () => {
     const { t } = useTranslation();

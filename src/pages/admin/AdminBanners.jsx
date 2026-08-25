@@ -22,6 +22,8 @@ const AdminBanners = () => {
         subtitle: '',
         mediaUrl: '',
         mediaType: 'IMAGE',
+        mobileMediaUrl: '',
+        mobileMediaType: 'IMAGE',
         buttonText: '',
         buttonLink: '',
         displayOrder: 0,
@@ -36,6 +38,8 @@ const AdminBanners = () => {
     const [displayTitleFilter, setDisplayTitleFilter] = useState(null);
     const [mediaTypeFilter, setMediaTypeFilter] = useState(null);
     const [removeBgBanner, setRemoveBgBanner] = useState(false);
+    const [removeBgBannerMobile, setRemoveBgBannerMobile] = useState(false);
+    const [uploadingMobile, setUploadingMobile] = useState(false);
 
     const fetchBanners = useCallback(async () => {
         setLoading(true);
@@ -86,6 +90,28 @@ const AdminBanners = () => {
         }
     };
 
+    const handleMobileFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        e.target.value = '';
+
+        setUploadingMobile(true);
+        try {
+            let response;
+            if (formData.mobileMediaType === 'VIDEO') {
+                response = await uploadVideo(file);
+            } else {
+                response = await uploadImage(file, removeBgBannerMobile);
+            }
+            setFormData(prev => ({ ...prev, mobileMediaUrl: response.data.url }));
+            toast.success(t('messages.fileUploaded'));
+        } catch (e) {
+            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
+        } finally {
+            setUploadingMobile(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -110,6 +136,8 @@ const AdminBanners = () => {
             subtitle: banner.subtitle || '',
             mediaUrl: banner.mediaUrl || '',
             mediaType: banner.mediaType,
+            mobileMediaUrl: banner.mobileMediaUrl || '',
+            mobileMediaType: banner.mobileMediaType || banner.mediaType || 'IMAGE',
             buttonText: banner.buttonText || '',
             buttonLink: banner.buttonLink || '',
             displayOrder: banner.displayOrder,
@@ -146,12 +174,16 @@ const AdminBanners = () => {
             subtitle: '',
             mediaUrl: '',
             mediaType: 'IMAGE',
+            mobileMediaUrl: '',
+            mobileMediaType: 'IMAGE',
             buttonText: '',
             buttonLink: '',
             displayOrder: 0,
             displayTitle: true,
             displayDuration: 5,
         });
+        setRemoveBgBanner(false);
+        setRemoveBgBannerMobile(false);
         setEditingBanner(null);
         setShowForm(false);
     };
@@ -311,55 +343,124 @@ const AdminBanners = () => {
                             </label>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <label className={labelClass}>
-                                {t('common.upload')} {formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}
-                            </label>
-                            {formData.mediaType === 'IMAGE' && (
-                                <label className="flex items-center gap-2 cursor-pointer mb-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={removeBgBanner}
-                                        onChange={(e) => setRemoveBgBanner(e.target.checked)}
-                                        className="w-3.5 h-3.5"
-                                    />
-                                    <span className="text-xs text-gray-500 uppercase tracking-wide">
-                                        {t('admin.removeBackground')}
+                        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Desktop media */}
+                            <div>
+                                <label className={labelClass}>
+                                    {t('admin.desktopMedia')}
+                                    <span className="block text-xs font-normal text-gray-400 normal-case mt-0.5">
+                                        {t('admin.desktopMediaHint')}
                                     </span>
                                 </label>
-                            )}
-                            <label className="cursor-pointer block">
-                                <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
-                                    {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
-                                </div>
-                                <input
-                                    type="file"
-                                    accept={formData.mediaType === 'VIDEO' ? 'video/*' : 'image/*'}
-                                    onChange={handleFileUpload}
-                                    className="hidden"
-                                    disabled={uploading}
-                                />
-                            </label>
+                                {formData.mediaType === 'IMAGE' && (
+                                    <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={removeBgBanner}
+                                            onChange={(e) => setRemoveBgBanner(e.target.checked)}
+                                            className="w-3.5 h-3.5"
+                                        />
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                            {t('admin.removeBackground')}
+                                        </span>
+                                    </label>
+                                )}
+                                <label className="cursor-pointer block">
+                                    <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
+                                        {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept={formData.mediaType === 'VIDEO' ? 'video/*' : 'image/*'}
+                                        onChange={handleFileUpload}
+                                        className="hidden"
+                                        disabled={uploading}
+                                    />
+                                </label>
 
-                            {/* Preview */}
-                            {formData.mediaUrl && (
-                                <div className="mt-3 border border-gray-200 overflow-hidden h-40">
-                                    {formData.mediaType === 'VIDEO' ? (
-                                        <video
-                                            src={getImageUrl(formData.mediaUrl)}
-                                            className="w-full h-full object-cover"
-                                            muted
-                                            controls
+                                {/* Preview */}
+                                {formData.mediaUrl && (
+                                    <div className="mt-3 border border-gray-200 overflow-hidden h-40">
+                                        {formData.mediaType === 'VIDEO' ? (
+                                            <video
+                                                src={getImageUrl(formData.mediaUrl)}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                                controls
+                                            />
+                                        ) : (
+                                            <img
+                                                src={getImageUrl(formData.mediaUrl)}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Mobile media */}
+                            <div>
+                                <label className={labelClass}>
+                                    {t('admin.mobileMedia')}
+                                    <span className="block text-xs font-normal text-gray-400 normal-case mt-0.5">
+                                        {t('admin.mobileMediaHint')}
+                                    </span>
+                                </label>
+                                <select
+                                    value={formData.mobileMediaType}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, mobileMediaType: e.target.value }))}
+                                    className={`${inputClass} mb-2`}
+                                >
+                                    <option value="IMAGE">{t('admin.mediaImage')}</option>
+                                    <option value="VIDEO">{t('admin.mediaVideo')}</option>
+                                </select>
+                                {formData.mobileMediaType === 'IMAGE' && (
+                                    <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={removeBgBannerMobile}
+                                            onChange={(e) => setRemoveBgBannerMobile(e.target.checked)}
+                                            className="w-3.5 h-3.5"
                                         />
-                                    ) : (
-                                        <img
-                                            src={getImageUrl(formData.mediaUrl)}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    )}
-                                </div>
-                            )}
+                                        <span className="text-xs text-gray-500 uppercase tracking-wide">
+                                            {t('admin.removeBackground')}
+                                        </span>
+                                    </label>
+                                )}
+                                <label className="cursor-pointer block">
+                                    <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
+                                        {uploadingMobile ? t('common.uploading') : `${t('common.upload')} ${formData.mobileMediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept={formData.mobileMediaType === 'VIDEO' ? 'video/*' : 'image/*'}
+                                        onChange={handleMobileFileUpload}
+                                        className="hidden"
+                                        disabled={uploadingMobile}
+                                    />
+                                </label>
+
+                                {/* Preview */}
+                                {formData.mobileMediaUrl && (
+                                    <div className="mt-3 border border-gray-200 overflow-hidden h-40">
+                                        {formData.mobileMediaType === 'VIDEO' ? (
+                                            <video
+                                                src={getImageUrl(formData.mobileMediaUrl)}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                                controls
+                                            />
+                                        ) : (
+                                            <img
+                                                src={getImageUrl(formData.mobileMediaUrl)}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div>

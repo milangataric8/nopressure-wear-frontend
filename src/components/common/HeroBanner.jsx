@@ -2,7 +2,84 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveBanners } from '../../api/bannerApi';
 import { getImageUrl, optimizedImage } from '../../utils/imageUtils';
+import { useIsMobile, MOBILE_BREAKPOINT } from '../../hooks/useIsMobile';
 import { useTranslation } from 'react-i18next';
+
+// <video> has no reliable cross-browser way to switch source by media query,
+// so mobile/desktop video is picked in JS. Handles the "mobile asset is an
+// image even though desktop is a video" case too.
+const BannerVideo = ({ banner }) => {
+    const isMobile = useIsMobile();
+    const useMobile = isMobile && !!banner.mobileMediaUrl;
+
+    const src = useMobile ? banner.mobileMediaUrl : banner.mediaUrl;
+    const type = useMobile ? (banner.mobileMediaType || banner.mediaType) : banner.mediaType;
+
+    if (!src) {
+        return <div className="absolute inset-0 bg-gray-100" />;
+    }
+
+    if (type === 'IMAGE') {
+        return (
+            <img
+                key={src}
+                src={optimizedImage(src, { width: useMobile ? 1080 : 1920 })}
+                alt={banner.title || ''}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="eager"
+                fetchPriority="high"
+            />
+        );
+    }
+
+    return (
+        // key={src} forces the element to remount when the source switches —
+        // React otherwise reuses the <video> node and ignores the new src.
+        <video
+            key={src}
+            src={getImageUrl(src)}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+        />
+    );
+};
+
+// Images use <picture>: the browser resolves the media query before fetching,
+// so a phone downloads only the portrait asset — narrower crop and less data,
+// with no flash of the wrong image.
+const BannerMedia = ({ banner }) => {
+    if (!banner.mediaUrl && !banner.mobileMediaUrl) {
+        return <div className="absolute inset-0 bg-gray-100" />;
+    }
+
+    if (banner.mediaType === 'VIDEO' || banner.mobileMediaType === 'VIDEO') {
+        return <BannerVideo banner={banner} />;
+    }
+
+    const desktopUrl = optimizedImage(banner.mediaUrl, { width: 1920 });
+    const mobileUrl = banner.mobileMediaUrl
+        ? optimizedImage(banner.mobileMediaUrl, { width: 1080 })
+        : desktopUrl;
+
+    return (
+        <picture>
+            {banner.mobileMediaUrl && (
+                <source media={`(max-width: ${MOBILE_BREAKPOINT}px)`} srcSet={mobileUrl} />
+            )}
+            <img
+                key={banner.id}
+                src={desktopUrl}
+                alt={banner.title || ''}
+                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+                loading="eager"
+                fetchPriority="high"
+            />
+        </picture>
+    );
+};
 
 const HeroBanner = () => {
     const { t } = useTranslation();
@@ -56,29 +133,9 @@ const HeroBanner = () => {
     const banner = banners[currentIndex];
 
     return (
-        <div className="relative w-full h-[42vh] sm:h-[55vh] lg:h-[70vh] overflow-hidden">
+        <div className="relative w-full h-[60vh] sm:h-[55vh] lg:h-[70vh] overflow-hidden">
             {/* Media */}
-            {banner.mediaType === 'VIDEO' ? (
-                <video
-                    key={banner.id}
-                    src={getImageUrl(banner.mediaUrl)}
-                    autoPlay
-                    muted
-                    loop
-                    className="absolute inset-0 w-full h-full object-cover"
-                />
-            ) : banner.mediaUrl ? (
-                <img
-                    key={banner.id}
-                    src={optimizedImage(banner.mediaUrl, { width: 1600 })}
-                    alt={banner.title || ''}
-                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-                    loading="eager"
-                    fetchPriority="high"
-                />
-            ) : (
-                <div className="absolute inset-0 bg-gray-100" />
-            )}
+            <BannerMedia banner={banner} />
 
             {/* Content */}
             <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center">

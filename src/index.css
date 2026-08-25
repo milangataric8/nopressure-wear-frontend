@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Custom Toast Styles */
 .Toastify__toast-container--top-center {

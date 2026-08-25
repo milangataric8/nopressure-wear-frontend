@@ -218,7 +218,8 @@
     "privacyTitle": "Privacy Policy",
     "termsTitle": "Terms of Service",
     "returnsTitle": "Return Policy",
-    "imprintTitle": "Imprint"
+    "imprintTitle": "Imprint",
+    "lastUpdated": "Last updated: {{date}}"
   },
   "cookie": {
     "message": "We use cookies to run the shop and, with your consent, to improve it.",

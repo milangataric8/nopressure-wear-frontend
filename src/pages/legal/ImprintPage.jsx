@@ -14,8 +14,12 @@ const ImprintPage = () => {
             .catch(() => {});
     }, [i18n.language]);
 
+    const lastUpdated = data?.lastUpdated
+        ? new Date(data.lastUpdated).toLocaleDateString()
+        : null;
+
     return (
-        <LegalPage title={t('legal.imprintTitle')}>
+        <LegalPage title={t('legal.imprintTitle')} lastUpdated={lastUpdated}>
             <Seo title={t('legal.imprintTitle')} url={`${window.location.origin}/imprint`} />
             {data?.content
                 ? <div dangerouslySetInnerHTML={{ __html: data.content }} />

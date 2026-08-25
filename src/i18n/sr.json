@@ -218,7 +218,8 @@
     "privacyTitle": "Politika privatnosti",
     "termsTitle": "Uslovi korišćenja",
     "returnsTitle": "Politika povraćaja",
-    "imprintTitle": "Impresum"
+    "imprintTitle": "Impresum",
+    "lastUpdated": "Poslednja izmena: {{date}}"
   },
   "cookie": {
     "message": "Koristimo kolačiće za rad prodavnice i, uz vašu saglasnost, za njeno poboljšanje.",

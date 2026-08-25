@@ -209,6 +209,7 @@
     "manageLegal": "Upravljajte sadržajem pravnih stranica (Privatnost, Uslovi, Povraćaj, Impresum)",
     "legalSaved": "Sadržaj je sačuvan.",
     "legalSaveFailed": "Čuvanje nije uspelo.",
+    "legalLineBreakHint": "Enter = novi pasus · Shift+Enter = novi red (koristite unutar pasusa ili stavke liste da izbegnete veliki razmak)",
     "deletePersonalData": "Obriši lične podatke",
     "confirmAnonymize": "Trajno anonimizovati lične podatke ovog kupca? Ovo se ne može poništiti.",
     "customerAnonymized": "Podaci kupca su anonimizovani.",

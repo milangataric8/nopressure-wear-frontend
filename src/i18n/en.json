@@ -209,6 +209,7 @@
     "manageLegal": "Manage legal page content (Privacy, Terms, Returns, Imprint)",
     "legalSaved": "Legal content saved.",
     "legalSaveFailed": "Failed to save legal content.",
+    "legalLineBreakHint": "Enter = new paragraph · Shift+Enter = line break (use inside a paragraph or list item to avoid a big gap)",
     "deletePersonalData": "Delete Personal Data",
     "confirmAnonymize": "Permanently anonymize this customer's personal data? This cannot be undone.",
     "customerAnonymized": "Customer data anonymized.",

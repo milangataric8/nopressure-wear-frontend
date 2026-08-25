@@ -16,12 +16,13 @@ const LegalPage = ({ title, lastUpdated, children }) => {
             <div
                 className="prose prose-neutral max-w-none break-words
                            prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight
-                           prose-h2:text-lg prose-h2:mt-8 prose-h2:mb-2
+                           prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-2
                            prose-h3:text-base prose-h3:mt-6 prose-h3:mb-2
-                           prose-p:text-sm prose-p:leading-relaxed prose-p:text-gray-600
+                           prose-p:my-3 prose-p:text-sm prose-p:leading-relaxed prose-p:text-gray-600
                            prose-strong:text-black prose-strong:font-semibold
                            prose-a:text-black prose-a:underline
-                           prose-li:text-sm prose-li:text-gray-600"
+                           prose-ul:my-3 prose-ol:my-3 prose-li:my-1 prose-li:text-sm prose-li:text-gray-600
+                           [&_p:empty]:hidden [&_br]:leading-normal"
             >
                 {children}
             </div>

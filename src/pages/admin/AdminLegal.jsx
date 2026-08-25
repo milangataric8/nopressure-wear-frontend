@@ -105,6 +105,9 @@ const AdminLegal = () => {
                     />
                 )}
             </div>
+            <p className="text-xs text-gray-400 mt-1">
+                {t('admin.legalLineBreakHint')}
+            </p>
 
             <div className="mt-4 flex justify-end">
                 <button

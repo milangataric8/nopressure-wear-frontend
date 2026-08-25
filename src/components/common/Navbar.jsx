@@ -179,9 +179,30 @@ const Navbar = () => {
 
             {/* Main navbar */}
             <nav className="bg-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex items-center justify-between h-16 relative">
-                        <div className="hidden md:flex items-center gap-8 ml-1">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                    <div className="flex items-center h-16 gap-3">
+
+                        {/* ── LEFT ── mobile: logo | desktop: nav links ── */}
+                        <div className="flex items-center gap-8 flex-1 min-w-0">
+
+                            {/* Logo — mobile/tablet only, left aligned */}
+                            <Link to="/" className="lg:hidden flex items-center flex-shrink-0">
+                                {logoUrl ? (
+                                    <img
+                                        src={logoUrl.startsWith('http')
+                                            ? logoUrl
+                                            : `${import.meta.env.VITE_API_URL}${logoUrl}`}
+                                        alt={storeName}
+                                        className="h-9 w-auto object-contain"
+                                    />
+                                ) : (
+                                    <span className="text-base font-black tracking-tight text-black uppercase">
+                                        {storeName}
+                                    </span>
+                                )}
+                            </Link>
+
+                        <div className="hidden lg:flex items-center gap-8">
                             {/* Products mega-menu */}
                             <div
                                 className="relative"
@@ -372,31 +393,29 @@ const Navbar = () => {
                                 </Link>
                             )}
                         </div>
-
-                        {/* Center links */}
-                        <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
-                            {/* Logo */}
-                            <Link to="/" className="flex items-center">
-                                {logoUrl ? (
-                                    <img
-                                        src={logoUrl.startsWith('http')
-                                            ? logoUrl
-                                            : `${import.meta.env.VITE_API_URL}${logoUrl}`}
-                                        alt={storeName}
-                                        className="h-15 object-contain"
-                                    />
-                                ) : (
-                                    <span className="text-xl font-black tracking-tight text-black uppercase">
-                                    {storeName}
-                                </span>
-                                )}
-                            </Link>
                         </div>
 
-                        {/* Mobile menu button + search + cart */}
-                        <div className="flex items-center gap-2">
+                        {/* ── CENTER ── logo, desktop only ── */}
+                        <Link to="/" className="hidden lg:flex items-center flex-shrink-0">
+                            {logoUrl ? (
+                                <img
+                                    src={logoUrl.startsWith('http')
+                                        ? logoUrl
+                                        : `${import.meta.env.VITE_API_URL}${logoUrl}`}
+                                    alt={storeName}
+                                    className="h-12 w-auto object-contain"
+                                />
+                            ) : (
+                                <span className="text-xl font-black tracking-tight text-black uppercase">
+                                    {storeName}
+                                </span>
+                            )}
+                        </Link>
+
+                        {/* ── RIGHT ── search, favorites, cart, hamburger ── */}
+                        <div className="flex items-center justify-end gap-2 flex-1 min-w-0">
                             {/* Search — desktop */}
-                            <form onSubmit={handleSearch} className="hidden md:flex items-stretch">
+                            <form onSubmit={handleSearch} className="hidden lg:flex items-stretch">
                                 <div className="relative flex items-center">
                                     <input
                                         type="text"
@@ -427,7 +446,7 @@ const Navbar = () => {
                             </form>
 
                             {/* Mobile search */}
-                            <div className="relative md:hidden flex items-center">
+                            <div className="relative lg:hidden flex items-center">
                                 {mobileSearchOpen && (
                                     <form
                                         onSubmit={(e) => { handleSearch(e); setMobileSearchOpen(false); }}
@@ -586,7 +605,7 @@ const Navbar = () => {
 
                             {/* Mobile hamburger */}
                             <button
-                                className="md:hidden p-2 text-gray-600 hover:text-black"
+                                className="lg:hidden p-2 text-gray-600 hover:text-black"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             >
                                 {mobileMenuOpen ? (
@@ -606,7 +625,7 @@ const Navbar = () => {
 
                         {/* Mobile menu — fixed full-screen overlay below the navbar */}
                         {mobileMenuOpen && (
-                            <div className="md:hidden fixed left-0 right-0 top-24 bottom-0 bg-white z-40 overflow-y-auto border-t border-gray-200">
+                            <div className="lg:hidden fixed left-0 right-0 top-24 bottom-0 bg-white z-40 overflow-y-auto border-t border-gray-200">
                                 <div className="px-6 py-4 space-y-4">
                                     {/* Search */}
                                     <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">

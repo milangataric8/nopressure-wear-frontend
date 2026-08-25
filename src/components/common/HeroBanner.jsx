@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getActiveBanners } from '../../api/bannerApi';
-import { getImageUrl } from '../../utils/imageUtils';
+import { getImageUrl, optimizedImage } from '../../utils/imageUtils';
 import { useTranslation } from 'react-i18next';
 
 const HeroBanner = () => {
@@ -56,7 +56,7 @@ const HeroBanner = () => {
     const banner = banners[currentIndex];
 
     return (
-        <div className="relative h-[700px] overflow-hidden">
+        <div className="relative w-full h-[42vh] sm:h-[55vh] lg:h-[70vh] overflow-hidden">
             {/* Media */}
             {banner.mediaType === 'VIDEO' ? (
                 <video
@@ -70,8 +70,8 @@ const HeroBanner = () => {
             ) : banner.mediaUrl ? (
                 <img
                     key={banner.id}
-                    src={getImageUrl(banner.mediaUrl)}
-                    alt={banner.title}
+                    src={optimizedImage(banner.mediaUrl, { width: 1600 })}
+                    alt={banner.title || ''}
                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
                     loading="eager"
                     fetchPriority="high"
@@ -81,21 +81,21 @@ const HeroBanner = () => {
             )}
 
             {/* Content */}
-            <div className="relative h-full max-w-7xl mx-auto px-6 flex flex-col justify-center">
+            <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-center">
                 {(banner.displayTitle ?? true) && banner.title && (
-                    <h1 className="text-6xl font-black uppercase tracking-tight text-white mb-4 leading-none">
+                    <h2 className="text-2xl sm:text-4xl lg:text-6xl font-black uppercase tracking-tight text-white mb-2 sm:mb-4 leading-none">
                         {banner.title}
-                    </h1>
+                    </h2>
                 )}
                 {banner.subtitle && (
-                    <p className="text-white/80 text-lg mb-8 max-w-md">
+                    <p className="text-white/80 text-sm sm:text-base lg:text-lg mt-2 mb-4 sm:mb-8 max-w-md">
                         {banner.subtitle}
                     </p>
                 )}
                 {banner.buttonText && banner.buttonLink && (
                     <Link
                         to={banner.buttonLink}
-                        className="bg-white text-black text-sm font-semibold uppercase tracking-wide px-8 py-4 hover:bg-gray-200 transition-colors inline-block w-fit"
+                        className="bg-white text-black text-xs sm:text-sm font-semibold uppercase tracking-wide px-5 py-2.5 sm:px-8 sm:py-4 hover:bg-gray-200 transition-colors inline-block w-fit"
                     >
                         {banner.buttonText}
                     </Link>
@@ -104,7 +104,7 @@ const HeroBanner = () => {
 
             {/* Dots */}
             {banners.length > 1 && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
                     {banners.map((_, i) => (
                         <button
                             key={i}
@@ -122,13 +122,13 @@ const HeroBanner = () => {
                 <>
                     <button
                         onClick={() => setCurrentIndex(i => (i - 1 + banners.length) % banners.length)}
-                        className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-10 h-10 flex items-center justify-center transition-colors"
+                        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center transition-colors"
                     >
                         ←
                     </button>
                     <button
                         onClick={() => setCurrentIndex(i => (i + 1) % banners.length)}
-                        className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-10 h-10 flex items-center justify-center transition-colors"
+                        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center transition-colors"
                     >
                         →
                     </button>

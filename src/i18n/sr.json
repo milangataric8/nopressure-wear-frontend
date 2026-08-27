@@ -471,7 +471,9 @@
     "contact": "Kontakt",
     "followUs": "Pratite nas",
     "findUs": "Pronađite nas",
-    "allRightsReserved": "Sva prava zadržana"
+    "allRightsReserved": "Sva prava zadržana",
+    "emailSubject": "Upit sa sajta",
+    "callUs": "Pozovite nas"
   },
   "common": {
     "loading": "Učitavanje...",

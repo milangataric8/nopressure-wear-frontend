@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
 import {Link} from "react-router-dom";
 import signature from '../../assets/nopressure_signature_footer.png';
+import { telHref, mailHref } from '../../utils/contactUtils';
 
 const Footer = () => {
     const { t } = useTranslation();
@@ -76,8 +77,23 @@ const Footer = () => {
                                 {t('footer.contact')}
                             </Link>
                             <div className="space-y-1 text-sm justify-items-center text-gray-500">
-                                <p>{settings.footer_email || ''}</p>
-                                <p>{settings.footer_phone || ''}</p>
+                                {settings.footer_email && (
+                                    <a
+                                        href={mailHref(settings.footer_email, t('footer.emailSubject'))}
+                                        className="block hover:text-black transition-colors"
+                                    >
+                                        {settings.footer_email}
+                                    </a>
+                                )}
+                                {settings.footer_phone && (
+                                    <a
+                                        href={telHref(settings.footer_phone)}
+                                        aria-label={`${t('footer.callUs')}: ${settings.footer_phone}`}
+                                        className="block whitespace-nowrap hover:text-black transition-colors"
+                                    >
+                                        {settings.footer_phone}
+                                    </a>
+                                )}
                             </div>
                         </div>
                     )}

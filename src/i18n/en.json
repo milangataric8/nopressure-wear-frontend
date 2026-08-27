@@ -471,7 +471,9 @@
     "contact": "Contact",
     "followUs": "Follow Us",
     "findUs": "Find Us",
-    "allRightsReserved": "All rights reserved"
+    "allRightsReserved": "All rights reserved",
+    "emailSubject": "Inquiry from the website",
+    "callUs": "Call us"
   },
   "common": {
     "loading": "Loading...",

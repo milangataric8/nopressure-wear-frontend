@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import SocialIcons from '../components/common/SocialIcons';
 import Seo from '../components/seo/Seo';
 import { telHref, mailHref } from '../utils/contactUtils';
+import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGEX } from '../utils/validationUtils';
 
 const ContactPage = () => {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [settings, setSettings] = useState({});
     const [sending, setSending] = useState(false);
     const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const ContactPage = () => {
         subject: '',
         message: '',
     });
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,18 +36,41 @@ const ContactPage = () => {
     }, []);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.name?.trim()) e.name = t('validation.nameRequired');
+        if (!formData.email?.trim()) e.email = t('validation.emailRequired');
+        else if (!EMAIL_REGEX.test(formData.email)) e.email = t('validation.emailInvalid');
+        if (!formData.message?.trim()) e.message = t('validation.messageRequired');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         setSending(true);
         try {
             await sendContactMessage(formData, i18n.language);
             toast.success(i18n.language === 'sr' ? 'Poruka je poslata!' : 'Message sent!');
             setFormData({ name: '', email: '', subject: '', message: '' });
+            setErrors({});
         } catch (error) {
-            toast.error(error.response?.data?.message || (i18n.language === 'sr' ? 'Slanje nije uspelo' : 'Failed to send'));
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || (i18n.language === 'sr' ? 'Slanje nije uspelo' : 'Failed to send'));
+            }
         } finally {
             setSending(false);
         }
@@ -126,38 +151,45 @@ const ContactPage = () => {
 
                     <div className="space-y-5">
                         <div>
-                            <label className="block text-sm text-gray-600 mb-1.5">
+                            <label className="block text-sm text-gray-600 mb-1.5" htmlFor="contact-name">
                                 {i18n.language === 'sr' ? 'Ime' : 'Name'}*
                             </label>
                             <input
+                                id="contact-name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className="w-full border-b border-gray-300 pb-2 text-sm focus:outline-none focus:border-black transition-colors"
-                                required
+                                aria-invalid={!!errors.name}
+                                aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                                className={`w-full border-b pb-2 text-sm focus:outline-none transition-colors ${errors.name ? inputError : inputNormal}`}
                             />
+                            {errors.name && <p id="contact-name-error" className="text-xs text-red-500 mt-1">{errors.name}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm text-gray-600 mb-1.5">
+                            <label className="block text-sm text-gray-600 mb-1.5" htmlFor="contact-email">
                                 Email*
                             </label>
                             <input
+                                id="contact-email"
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className="w-full border-b border-gray-300 pb-2 text-sm focus:outline-none focus:border-black transition-colors"
-                                required
+                                aria-invalid={!!errors.email}
+                                aria-describedby={errors.email ? 'contact-email-error' : undefined}
+                                className={`w-full border-b pb-2 text-sm focus:outline-none transition-colors ${errors.email ? inputError : inputNormal}`}
                             />
+                            {errors.email && <p id="contact-email-error" className="text-xs text-red-500 mt-1">{errors.email}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm text-gray-600 mb-1.5">
+                            <label className="block text-sm text-gray-600 mb-1.5" htmlFor="contact-subject">
                                 {i18n.language === 'sr' ? 'Naslov' : 'Subject'}
                             </label>
                             <input
+                                id="contact-subject"
                                 type="text"
                                 name="subject"
                                 value={formData.subject}
@@ -167,22 +199,25 @@ const ContactPage = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm text-gray-600 mb-1.5">
+                            <label className="block text-sm text-gray-600 mb-1.5" htmlFor="contact-message">
                                 {i18n.language === 'sr' ? 'Poruka' : 'Message'}*
                             </label>
                             <textarea
+                                id="contact-message"
                                 name="message"
                                 value={formData.message}
                                 onChange={handleChange}
                                 rows={6}
-                                className="w-full border-b border-gray-300 pb-2 text-sm focus:outline-none focus:border-black transition-colors resize-none"
-                                required
+                                aria-invalid={!!errors.message}
+                                aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                                className={`w-full border-b pb-2 text-sm focus:outline-none transition-colors resize-none ${errors.message ? inputError : inputNormal}`}
                             />
+                            {errors.message && <p id="contact-message-error" className="text-xs text-red-500 mt-1">{errors.message}</p>}
                         </div>
 
                         <button
                             onClick={handleSubmit}
-                            disabled={sending || !formData.name || !formData.email || !formData.message}
+                            disabled={sending}
                             className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors disabled:opacity-30"
                         >
                             {sending

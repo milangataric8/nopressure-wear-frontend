@@ -10,6 +10,7 @@ import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
 import {useCurrency} from "../../context/CurrencyContext.jsx";
+import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
 
 const AdminCoupons = () => {
     const { t } = useTranslation();
@@ -24,6 +25,7 @@ const AdminCoupons = () => {
         usageLimit: '',
         expiresAt: '',
     });
+    const [errors, setErrors] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
@@ -54,11 +56,34 @@ const AdminCoupons = () => {
     }, [page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.code?.trim()) e.code = t('validation.codeRequired');
+        if (formData.discountValue === '' || isNaN(parseFloat(formData.discountValue)) || parseFloat(formData.discountValue) <= 0) {
+            e.discountValue = t('validation.discountValueInvalid');
+        }
+        if (formData.usageLimit === '' || isNaN(parseInt(formData.usageLimit)) || parseInt(formData.usageLimit) <= 0) {
+            e.usageLimit = t('validation.required');
+        }
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         try {
             await axiosInstance.post('/coupons', {
                 ...formData,
@@ -75,9 +100,12 @@ const AdminCoupons = () => {
                 usageLimit: '',
                 expiresAt: '',
             });
+            setErrors({});
             fetchCoupons();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            }
         }
     };
 
@@ -110,7 +138,7 @@ const AdminCoupons = () => {
                 title={t('admin.coupons')}
                 subtitle={t('admin.manageCoupons')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newCoupon')}
-                onButtonClick={() => showForm ? setShowForm(false) : setShowForm(true)}
+                onButtonClick={() => { setShowForm(v => !v); setErrors({}); }}
             />
 
             {!showForm && (
@@ -134,16 +162,19 @@ const AdminCoupons = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>{t('admin.code')}</label>
+                            <label className={labelClass} htmlFor="coupon-code">{t('admin.code')}</label>
                             <input
+                                id="coupon-code"
                                 type="text"
                                 name="code"
                                 value={formData.code}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.code}
+                                aria-describedby={errors.code ? 'coupon-code-error' : undefined}
+                                className={`${inputClass} ${errors.code ? inputError : inputNormal}`}
                                 placeholder="SUMMER20"
-                                required
                             />
+                            {errors.code && <p id="coupon-code-error" className="text-xs text-red-500 mt-1">{errors.code}</p>}
                         </div>
 
                         <div>
@@ -152,7 +183,7 @@ const AdminCoupons = () => {
                                 name="discountType"
                                 value={formData.discountType}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={`${inputClass} ${inputNormal}`}
                             >
                                 <option value="PERCENTAGE">{t('admin.percentageDiscount')}</option>
                                 <option value="FIXED">{t('admin.fixedAmount')}</option>
@@ -160,32 +191,38 @@ const AdminCoupons = () => {
                         </div>
 
                         <div>
-                            <label className={labelClass}>
+                            <label className={labelClass} htmlFor="coupon-discountValue">
                                 {t('admin.discountValue')} {formData.discountType === 'PERCENTAGE' ? '(%)' : '($)'}
                             </label>
                             <input
+                                id="coupon-discountValue"
                                 type="number"
                                 name="discountValue"
                                 value={formData.discountValue}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.discountValue}
+                                aria-describedby={errors.discountValue ? 'coupon-discountValue-error' : undefined}
+                                className={`${inputClass} ${errors.discountValue ? inputError : inputNormal}`}
                                 placeholder={formData.discountType === 'PERCENTAGE' ? '10' : '20'}
                                 step="0.01"
-                                required
                             />
+                            {errors.discountValue && <p id="coupon-discountValue-error" className="text-xs text-red-500 mt-1">{errors.discountValue}</p>}
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('admin.usageLimit')}</label>
+                            <label className={labelClass} htmlFor="coupon-usageLimit">{t('admin.usageLimit')}</label>
                             <input
+                                id="coupon-usageLimit"
                                 type="number"
                                 name="usageLimit"
                                 value={formData.usageLimit}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.usageLimit}
+                                aria-describedby={errors.usageLimit ? 'coupon-usageLimit-error' : undefined}
+                                className={`${inputClass} ${errors.usageLimit ? inputError : inputNormal}`}
                                 placeholder="100"
-                                required
                             />
+                            {errors.usageLimit && <p id="coupon-usageLimit-error" className="text-xs text-red-500 mt-1">{errors.usageLimit}</p>}
                         </div>
 
                         <div>

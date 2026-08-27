@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
+import { isPasswordValid } from '../utils/passwordUtils';
+import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../utils/validationUtils';
 
 const ChangePasswordPage = () => {
     const { t } = useTranslation();
@@ -15,18 +17,36 @@ const ChangePasswordPage = () => {
         newPassword: '',
         confirmPassword: '',
     });
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.currentPassword) e.currentPassword = t('validation.currentPasswordRequired');
+        if (!formData.newPassword) e.newPassword = t('validation.newPasswordRequired');
+        else if (!isPasswordValid(formData.newPassword)) e.newPassword = t('messages.passwordNotMeet');
+        if (!formData.confirmPassword) e.confirmPassword = t('validation.passwordRequired');
+        else if (formData.newPassword !== formData.confirmPassword) e.confirmPassword = t('auth.passwordsNoMatch');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.newPassword !== formData.confirmPassword) {
-            toast.error(t('auth.passwordsNoMatch'));
+
+        if (!validate()) {
+            focusFirstError();
             return;
         }
+
         setLoading(true);
         try {
             await axiosInstance.post(`/auth/change-password/${user.id}`, {
@@ -36,13 +56,23 @@ const ChangePasswordPage = () => {
             toast.success(t('messages.passwordChanged'));
             navigate('/profile');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to change password');
+            if (applyServerErrors(error, t, setErrors)) {
+                // inline
+            } else {
+                const msg = error.response?.data?.message || '';
+                if (msg.toLowerCase().includes('current password')) {
+                    setErrors({ currentPassword: t('validation.currentPasswordWrong') });
+                    focusFirstError();
+                } else {
+                    toast.error(msg || 'Failed to change password');
+                }
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    const inputClass = "w-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors";
+    const inputClass = "w-full border px-4 py-2.5 text-sm focus:outline-none transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -59,44 +89,59 @@ const ChangePasswordPage = () => {
                 <p className="text-sm text-gray-500">Enter your current and new password</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div>
-                    <label className={labelClass}>{t('profile.currentPassword')}</label>
+                    <label className={labelClass} htmlFor="currentPassword">{t('profile.currentPassword')}</label>
                     <input
+                        id="currentPassword"
                         type="password"
                         name="currentPassword"
                         value={formData.currentPassword}
                         onChange={handleChange}
-                        className={inputClass}
+                        aria-invalid={!!errors.currentPassword}
+                        aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
+                        className={`${inputClass} ${errors.currentPassword ? inputError : inputNormal}`}
                         placeholder="••••••••"
-                        required
                     />
+                    {errors.currentPassword && (
+                        <p id="currentPassword-error" className="text-xs text-red-500 mt-1">{errors.currentPassword}</p>
+                    )}
                 </div>
 
                 <div>
-                    <label className={labelClass}>{t('profile.newPassword')}</label>
+                    <label className={labelClass} htmlFor="newPassword">{t('profile.newPassword')}</label>
                     <input
+                        id="newPassword"
                         type="password"
                         name="newPassword"
                         value={formData.newPassword}
                         onChange={handleChange}
-                        className={inputClass}
+                        aria-invalid={!!errors.newPassword}
+                        aria-describedby={errors.newPassword ? 'newPassword-error' : undefined}
+                        className={`${inputClass} ${errors.newPassword ? inputError : inputNormal}`}
                         placeholder="••••••••"
-                        required
                     />
+                    {errors.newPassword && (
+                        <p id="newPassword-error" className="text-xs text-red-500 mt-1">{errors.newPassword}</p>
+                    )}
                 </div>
 
                 <div>
-                    <label className={labelClass}>{t('profile.confirmNewPassword')}</label>
+                    <label className={labelClass} htmlFor="confirmPassword">{t('profile.confirmNewPassword')}</label>
                     <input
+                        id="confirmPassword"
                         type="password"
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
-                        className={inputClass}
+                        aria-invalid={!!errors.confirmPassword}
+                        aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                        className={`${inputClass} ${errors.confirmPassword ? inputError : inputNormal}`}
                         placeholder="••••••••"
-                        required
                     />
+                    {errors.confirmPassword && (
+                        <p id="confirmPassword-error" className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>
+                    )}
                 </div>
 
                 <button

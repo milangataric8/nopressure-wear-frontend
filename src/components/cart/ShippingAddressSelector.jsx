@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { inputClass, inputNormal, inputError } from '../../utils/validationUtils';
 
 const ShippingAddressSelector = ({
                                      isAuthenticated,
@@ -13,10 +14,28 @@ const ShippingAddressSelector = ({
                                      setSaveAddress,
                                      isMainAddress,
                                      setIsMainAddress,
+                                     errors = {},
+                                     setErrors,
+                                     validateCheckout,
                                  }) => {
     const { t } = useTranslation();
 
-    const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors";
+    const handleUseAddress = () => {
+        if (!validateCheckout()) {
+            return;
+        }
+
+        setSelectedAddress(newAddress);
+        setShowNewAddress(false);
+    };
+
+    const handleChange = (field) => (e) => {
+        const { value } = e.target;
+        setNewAddress(prev => ({ ...prev, [field]: value }));
+        if (errors[field] && setErrors) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        }
+    };
 
     return (
         <div className="border border-gray-200 p-6 mb-6">
@@ -30,7 +49,11 @@ const ShippingAddressSelector = ({
                     {addresses.map(address => (
                         <button
                             key={address.id}
-                            onClick={() => { setSelectedAddress(address); setShowNewAddress(false); }}
+                            onClick={() => {
+                                setSelectedAddress(address);
+                                setShowNewAddress(false);
+                                if (errors.address && setErrors) setErrors(prev => ({ ...prev, address: undefined }));
+                            }}
                             className={`w-full text-left p-3 border transition-colors ${
                                 selectedAddress?.id === address.id
                                     ? 'border-black bg-gray-50'
@@ -47,44 +70,64 @@ const ShippingAddressSelector = ({
 
             {/* Add new address */}
             {!showNewAddress ? (
-                <button
-                    onClick={() => { setShowNewAddress(true); setSelectedAddress(null); }}
-                    className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
-                >
-                    {t('cart.addNewAddress')}
-                </button>
+                <>
+                    <button
+                        onClick={() => { setShowNewAddress(true); setSelectedAddress(null); }}
+                        aria-invalid={!!errors.address}
+                        className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
+                    >
+                        {t('cart.addNewAddress')}
+                    </button>
+                    {errors.address && <p className="text-xs text-red-500 mt-2">{errors.address}</p>}
+                </>
             ) : (
                 <div className="space-y-3">
-                    <input
-                        type="text"
-                        value={newAddress.street}
-                        onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
-                        placeholder={t('cart.street')}
-                        className={inputClass}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
+                    <div>
                         <input
                             type="text"
-                            value={newAddress.city}
-                            onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
-                            placeholder={t('cart.city')}
-                            className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                            value={newAddress.street}
+                            onChange={handleChange('street')}
+                            placeholder={t('cart.street')}
+                            aria-invalid={!!errors.street}
+                            className={`${inputClass} ${errors.street ? inputError : inputNormal}`}
                         />
-                        <input
-                            type="text"
-                            value={newAddress.postalCode}
-                            onChange={(e) => setNewAddress(prev => ({ ...prev, postalCode: e.target.value }))}
-                            placeholder={t('cart.postalCode')}
-                            className="border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
-                        />
+                        {errors.street && <p className="text-xs text-red-500 mt-1">{errors.street}</p>}
                     </div>
-                    <input
-                        type="text"
-                        value={newAddress.country}
-                        onChange={(e) => setNewAddress(prev => ({ ...prev, country: e.target.value }))}
-                        placeholder={t('cart.country')}
-                        className={inputClass}
-                    />
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <input
+                                type="text"
+                                value={newAddress.city}
+                                onChange={handleChange('city')}
+                                placeholder={t('cart.city')}
+                                aria-invalid={!!errors.city}
+                                className={`${inputClass} ${errors.city ? inputError : inputNormal}`}
+                            />
+                            {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
+                        </div>
+                        <div>
+                            <input
+                                type="text"
+                                value={newAddress.postalCode}
+                                onChange={handleChange('postalCode')}
+                                placeholder={t('cart.postalCode')}
+                                aria-invalid={!!errors.postalCode}
+                                className={`${inputClass} ${errors.postalCode ? inputError : inputNormal}`}
+                            />
+                            {errors.postalCode && <p className="text-xs text-red-500 mt-1">{errors.postalCode}</p>}
+                        </div>
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            value={newAddress.country}
+                            onChange={handleChange('country')}
+                            placeholder={t('cart.country')}
+                            aria-invalid={!!errors.country}
+                            className={`${inputClass} ${errors.country ? inputError : inputNormal}`}
+                        />
+                        {errors.country && <p className="text-xs text-red-500 mt-1">{errors.country}</p>}
+                    </div>
 
                     {/* Save options (authenticated only) */}
                     {isAuthenticated() && (
@@ -114,10 +157,7 @@ const ShippingAddressSelector = ({
 
                     <div className="flex gap-3">
                         <button
-                            onClick={() => {
-                                setSelectedAddress(newAddress);
-                                setShowNewAddress(false);
-                            }}
+                            onClick={handleUseAddress}
                             className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors"
                         >
                             {t('cart.useThisAddress')}

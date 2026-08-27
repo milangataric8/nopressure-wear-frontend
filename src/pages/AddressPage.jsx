@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
+import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../utils/validationUtils';
 
 const AddressPage = () => {
     const { t } = useTranslation();
@@ -21,6 +22,7 @@ const AddressPage = () => {
         postalCode: '',
         country: '',
     });
+    const [errors, setErrors] = useState({});
 
     const fetchAddresses = useCallback(async () => {
         setLoading(true);
@@ -39,11 +41,31 @@ const AddressPage = () => {
     }, [fetchAddresses]);
 
     const handleChange = (e) => {
-        setAddressData({ ...addressData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setAddressData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!addressData.street?.trim()) e.street = t('validation.streetRequired');
+        if (!addressData.city?.trim()) e.city = t('validation.cityRequired');
+        if (!addressData.postalCode?.trim()) e.postalCode = t('validation.postalCodeRequired');
+        if (!addressData.country?.trim()) e.country = t('validation.countryRequired');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         try {
             if (editingAddress) {
                 await axiosInstance.put(`/addresses/${editingAddress.id}`, {
@@ -61,7 +83,9 @@ const AddressPage = () => {
             resetForm();
             fetchAddresses();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to save address');
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || 'Failed to save address');
+            }
         }
     };
 
@@ -73,6 +97,7 @@ const AddressPage = () => {
             postalCode: address.postalCode,
             country: address.country,
         });
+        setErrors({});
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -92,9 +117,10 @@ const AddressPage = () => {
         setAddressData({ street: '', city: '', postalCode: '', country: '' });
         setEditingAddress(null);
         setShowForm(false);
+        setErrors({});
     };
 
-    const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
+    const inputClass = "w-full border px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -129,58 +155,70 @@ const AddressPage = () => {
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
                         {editingAddress ? t('common.edit') : t('cart.addNewAddress')}
                     </h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
                         <div>
-                            <label className={labelClass}>{t('cart.street')}</label>
+                            <label className={labelClass} htmlFor="street">{t('cart.street')}</label>
                             <input
+                                id="street"
                                 type="text"
                                 name="street"
                                 value={addressData.street}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.street}
+                                aria-describedby={errors.street ? 'street-error' : undefined}
+                                className={`${inputClass} ${errors.street ? inputError : inputNormal}`}
                                 placeholder="Street and number"
-                                required
                             />
+                            {errors.street && <p id="street-error" className="text-xs text-red-500 mt-1">{errors.street}</p>}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className={labelClass}>{t('cart.city')}</label>
+                                <label className={labelClass} htmlFor="city">{t('cart.city')}</label>
                                 <input
+                                    id="city"
                                     type="text"
                                     name="city"
                                     value={addressData.city}
                                     onChange={handleChange}
-                                    className={inputClass}
+                                    aria-invalid={!!errors.city}
+                                    aria-describedby={errors.city ? 'city-error' : undefined}
+                                    className={`${inputClass} ${errors.city ? inputError : inputNormal}`}
                                     placeholder="City"
-                                    required
                                 />
+                                {errors.city && <p id="city-error" className="text-xs text-red-500 mt-1">{errors.city}</p>}
                             </div>
                             <div>
-                                <label className={labelClass}>{t('cart.postalCode')}</label>
+                                <label className={labelClass} htmlFor="postalCode">{t('cart.postalCode')}</label>
                                 <input
+                                    id="postalCode"
                                     type="text"
                                     name="postalCode"
                                     value={addressData.postalCode}
                                     onChange={handleChange}
-                                    className={inputClass}
+                                    aria-invalid={!!errors.postalCode}
+                                    aria-describedby={errors.postalCode ? 'postalCode-error' : undefined}
+                                    className={`${inputClass} ${errors.postalCode ? inputError : inputNormal}`}
                                     placeholder="12345"
-                                    required
                                 />
+                                {errors.postalCode && <p id="postalCode-error" className="text-xs text-red-500 mt-1">{errors.postalCode}</p>}
                             </div>
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('cart.country')}</label>
+                            <label className={labelClass} htmlFor="country">{t('cart.country')}</label>
                             <input
+                                id="country"
                                 type="text"
                                 name="country"
                                 value={addressData.country}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.country}
+                                aria-describedby={errors.country ? 'country-error' : undefined}
+                                className={`${inputClass} ${errors.country ? inputError : inputNormal}`}
                                 placeholder="Country"
-                                required
                             />
+                            {errors.country && <p id="country-error" className="text-xs text-red-500 mt-1">{errors.country}</p>}
                         </div>
 
                         <div className="flex gap-3 pt-2">

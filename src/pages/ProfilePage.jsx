@@ -11,6 +11,7 @@ import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { getSavedCards, createSetupIntent, deleteCard } from '../api/paymentApi';
 import AddCardForm from "../components/common/AddCardForm.jsx";
 import { useTranslation } from 'react-i18next';
+import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGEX } from '../utils/validationUtils';
 
 const ProfilePage = () => {
     const { t } = useTranslation();
@@ -23,6 +24,7 @@ const ProfilePage = () => {
         lastName: '',
         email: '',
     });
+    const [errors, setErrors] = useState({});
     const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
     const [savedCards, setSavedCards] = useState([]);
     const [showAddCard, setShowAddCard] = useState(false);
@@ -97,11 +99,31 @@ const ProfilePage = () => {
     };
 
     const handleProfileChange = (e) => {
-        setProfileData({ ...profileData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setProfileData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validateProfile = () => {
+        const e = {};
+        if (!profileData.firstName?.trim()) e.firstName = t('validation.firstNameRequired');
+        if (!profileData.lastName?.trim()) e.lastName = t('validation.lastNameRequired');
+        if (!profileData.email?.trim()) e.email = t('validation.emailRequired');
+        else if (!EMAIL_REGEX.test(profileData.email)) e.email = t('validation.emailInvalid');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleProfileSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateProfile()) {
+            focusFirstError();
+            return;
+        }
+
         setSaving(true);
         try {
             const payload = {
@@ -120,12 +142,14 @@ const ProfilePage = () => {
             toast.success(t('messages.profileUpdated'));
             setProfileData(prev => ({ ...prev, password: '' }));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update profile');
+            if (!applyServerErrors(e, t, setErrors)) {
+                toast.error(e.response?.data?.message || 'Failed to update profile');
+            }
         } finally {
             setSaving(false);
         }
     };
-    const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
+    const inputClass = "w-full border px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     {loading && <LoadingSpinner />}
@@ -159,41 +183,50 @@ const ProfilePage = () => {
                         {t('profile.personalInfo')}
                     </h2>
 
-                    <form onSubmit={handleProfileSubmit} className="space-y-4">
+                    <form onSubmit={handleProfileSubmit} noValidate className="space-y-4">
                         <div>
-                            <label className={labelClass}>{t('auth.firstName')}</label>
+                            <label className={labelClass} htmlFor="firstName">{t('auth.firstName')}</label>
                             <input
+                                id="firstName"
                                 type="text"
                                 name="firstName"
                                 value={profileData.firstName}
                                 onChange={handleProfileChange}
-                                className={inputClass}
-                                required
+                                aria-invalid={!!errors.firstName}
+                                aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+                                className={`${inputClass} ${errors.firstName ? inputError : inputNormal}`}
                             />
+                            {errors.firstName && <p id="firstName-error" className="text-xs text-red-500 mt-1">{errors.firstName}</p>}
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('auth.lastName')}</label>
+                            <label className={labelClass} htmlFor="lastName">{t('auth.lastName')}</label>
                             <input
+                                id="lastName"
                                 type="text"
                                 name="lastName"
                                 value={profileData.lastName}
                                 onChange={handleProfileChange}
-                                className={inputClass}
-                                required
+                                aria-invalid={!!errors.lastName}
+                                aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+                                className={`${inputClass} ${errors.lastName ? inputError : inputNormal}`}
                             />
+                            {errors.lastName && <p id="lastName-error" className="text-xs text-red-500 mt-1">{errors.lastName}</p>}
                         </div>
 
                         <div>
-                            <label className={labelClass}>{t('auth.email')}</label>
+                            <label className={labelClass} htmlFor="profile-email">{t('auth.email')}</label>
                             <input
+                                id="profile-email"
                                 type="email"
                                 name="email"
                                 value={profileData.email}
                                 onChange={handleProfileChange}
-                                className={inputClass}
-                                required
+                                aria-invalid={!!errors.email}
+                                aria-describedby={errors.email ? 'profile-email-error' : undefined}
+                                className={`${inputClass} ${errors.email ? inputError : inputNormal}`}
                             />
+                            {errors.email && <p id="profile-email-error" className="text-xs text-red-500 mt-1">{errors.email}</p>}
                         </div>
 
                         <button

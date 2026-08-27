@@ -12,6 +12,7 @@ const PaymentMethodSelector = ({
                                    onProceedToPayment,
                                    onCashOnDelivery,
                                    onGuestCheckout,
+                                   error,
                                }) =>
 {
     const { t } = useTranslation();
@@ -28,7 +29,10 @@ const PaymentMethodSelector = ({
                     {t('cart.paymentMethod')}
                 </h3>
             )}
-            <div className="space-y-3 mb-6">
+            <div
+                className={`space-y-3 mb-6 ${error ? 'border border-red-500 p-2' : ''}`}
+                aria-invalid={!!error}
+            >
                 {cardEnabled && (
                     <button
                         onClick={() => setPaymentMethod('card')}
@@ -64,6 +68,9 @@ const PaymentMethodSelector = ({
                     <p className="text-sm text-red-500">{t('cart.noPaymentMethods')}</p>
                 )}
             </div>
+            {error && (
+                <p className="text-xs text-red-500 -mt-4 mb-6">{error}</p>
+            )}
 
             {!orderingEnabled && (
                 <p className="text-lg text-red-800 font-bold text-center py-2">

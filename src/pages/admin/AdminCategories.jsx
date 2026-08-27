@@ -15,6 +15,7 @@ import StatusBadge from "../../components/common/StatusBadge.jsx";
 import RichTextEditor from '../../components/common/RichTextEditor';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
 
 const AdminCategories = () => {
     const { t } = useTranslation();
@@ -27,6 +28,7 @@ const AdminCategories = () => {
         description: '',
         parentId: '',
     });
+    const [errors, setErrors] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
@@ -59,11 +61,28 @@ const AdminCategories = () => {
     }, [page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.name?.trim()) e.name = t('validation.nameRequired');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         try {
             const payload = {
                 name: formData.name,
@@ -82,7 +101,9 @@ const AdminCategories = () => {
             resetForm();
             fetchCategories();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            }
         }
     };
 
@@ -93,6 +114,7 @@ const AdminCategories = () => {
             description: category.description || '',
             parentId: category.parentId || '',
         });
+        setErrors({});
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -111,9 +133,10 @@ const AdminCategories = () => {
         setFormData({ name: '', description: '', parentId: '' });
         setEditingCategory(null);
         setShowForm(false);
+        setErrors({});
     };
 
-    const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
+    const inputClass = "w-full border px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -122,7 +145,7 @@ const AdminCategories = () => {
                 title={t('admin.categories')}
                 subtitle={t('admin.manageCategories')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newCategory')}
-                onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
+                onButtonClick={() => { if (showForm) { resetForm(); } else { setShowForm(true); setErrors({}); } }}
             />
 
             {!showForm && (
@@ -147,16 +170,19 @@ const AdminCategories = () => {
 
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>{t('product.name')}</label>
+                            <label className={labelClass} htmlFor="category-name">{t('product.name')}</label>
                             <input
+                                id="category-name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.name}
+                                aria-describedby={errors.name ? 'category-name-error' : undefined}
+                                className={`${inputClass} ${errors.name ? inputError : inputNormal}`}
                                 placeholder="Category name"
-                                required
                             />
+                            {errors.name && <p id="category-name-error" className="text-xs text-red-500 mt-1">{errors.name}</p>}
                         </div>
 
                         <div>
@@ -165,7 +191,7 @@ const AdminCategories = () => {
                                 name="parentId"
                                 value={formData.parentId}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={`${inputClass} ${inputNormal}`}
                             >
                                 <option value="">{t('admin.noParent')}</option>
                                 {categories

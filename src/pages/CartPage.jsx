@@ -22,6 +22,7 @@ import ShippingAddressSelector from "../components/cart/ShippingAddressSelector.
 import GuestInfoForm from "../components/cart/GuestInfoForm.jsx";
 import PaymentMethodSelector from "../components/cart/PaymentMethodSelector.jsx";
 import CouponInput from "../components/cart/CouponInput.jsx";
+import { applyServerErrors, focusFirstError, EMAIL_REGEX } from "../utils/validationUtils";
 
 const CartPage = () => {
     const { t } = useTranslation();
@@ -60,6 +61,35 @@ const CartPage = () => {
         email: '',
         phone: ''
     });
+    const [errors, setErrors] = useState({});
+
+    const validateCheckout = () => {
+        const e = {};
+
+        if (!isAuthenticated()) {
+            if (!guestInfo.fullName?.trim()) e.fullName = t('validation.nameRequired');
+            if (!guestInfo.email?.trim()) e.email = t('validation.emailRequired');
+            else if (!EMAIL_REGEX.test(guestInfo.email)) e.email = t('validation.emailInvalid');
+            if (!guestInfo.phone?.trim()) e.phone = t('validation.phoneRequired');
+
+            if (!newAddress.street?.trim()) e.street = t('validation.streetRequired');
+            if (!newAddress.city?.trim()) e.city = t('validation.cityRequired');
+            if (!newAddress.postalCode?.trim()) e.postalCode = t('validation.postalCodeRequired');
+            if (!newAddress.country?.trim()) e.country = t('validation.countryRequired');
+        } else if (showNewAddress) {
+            if (!newAddress.street?.trim()) e.street = t('validation.streetRequired');
+            if (!newAddress.city?.trim()) e.city = t('validation.cityRequired');
+            if (!newAddress.postalCode?.trim()) e.postalCode = t('validation.postalCodeRequired');
+            if (!newAddress.country?.trim()) e.country = t('validation.countryRequired');
+        } else if (!selectedAddress) {
+            e.address = t('cart.selectAddress');
+        }
+
+        if (!paymentMethod) e.paymentMethod = t('validation.paymentMethodRequired');
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
 
     const fetchCart = async () => {
         try {
@@ -192,6 +222,9 @@ const CartPage = () => {
         } catch (error) {
             if (error.response?.status === 403) {
                 setEmailNotVerified(true);
+            } else if (applyServerErrors(error, t, setErrors)) {
+                setShowPayment(false);
+                setClientSecret(null);
             } else {
                 toast.error(error.response?.data?.message || 'Failed to place order');
             }
@@ -199,8 +232,8 @@ const CartPage = () => {
     };
 
     const handleCashOnDelivery = async () => {
-        if (!selectedAddress) {
-            toast.error(t('cart.selectAddress'));
+        if (!validateCheckout()) {
+            focusFirstError();
             return;
         }
         setCheckingOut(true);
@@ -213,6 +246,8 @@ const CartPage = () => {
         } catch (error) {
             if (error.response?.status === 403) {
                 setEmailNotVerified(true);
+            } else if (applyServerErrors(error, t, setErrors)) {
+                // inline
             } else {
                 toast.error(error.response?.data?.message || 'Failed to place order');
             }
@@ -232,8 +267,8 @@ const CartPage = () => {
     };
 
     const handleProceedToPayment = async () => {
-        if (!selectedAddress) {
-            toast.error(t('cart.selectAddress'));
+        if (!validateCheckout()) {
+            focusFirstError();
             return;
         }
         try {
@@ -241,7 +276,9 @@ const CartPage = () => {
             setClientSecret(response.data.clientSecret);
             setShowPayment(true);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to initialize payment');
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || 'Failed to initialize payment');
+            }
         }
     };
 
@@ -261,8 +298,8 @@ const CartPage = () => {
     };
 
     const handleGuestCheckout = async () => {
-        if (!newAddress.street) {
-            toast.error('Please enter shipping address');
+        if (!validateCheckout()) {
+            focusFirstError();
             return;
         }
 
@@ -288,7 +325,9 @@ const CartPage = () => {
             toast.success('Order placed successfully!');
             navigate('/order-confirmation');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to place order');
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || 'Failed to place order');
+            }
         }
     };
 
@@ -489,11 +528,14 @@ const CartPage = () => {
                                 isMainAddress={isMainAddress}
                                 setIsMainAddress={setIsMainAddress}
                                 orderingEnabled={addToCartEnabled}
+                                errors={errors}
+                                setErrors={setErrors}
+                                validateCheckout={validateCheckout}
                             />
                         )}
 
                         {!isAuthenticated() && (
-                            <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} />
+                            <GuestInfoForm guestInfo={guestInfo} setGuestInfo={setGuestInfo} errors={errors} setErrors={setErrors} />
                         )}
 
                         {!showPayment ? (
@@ -509,6 +551,7 @@ const CartPage = () => {
                                 onProceedToPayment={handleProceedToPayment}
                                 onCashOnDelivery={handleCashOnDelivery}
                                 onGuestCheckout={handleGuestCheckout}
+                                error={errors.paymentMethod}
                             />
                         ) : (
                             <>

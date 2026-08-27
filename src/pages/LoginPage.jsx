@@ -6,12 +6,13 @@ import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import AuthBackground from "../components/auth/AuthBackground.jsx";
 import { getSettingsMap } from '../api/settingsApi';
+import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGEX } from '../utils/validationUtils';
 
 const LoginPage = () => {
     const { t } = useTranslation();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
-    const [loginError, setLoginError] = useState('');
+    const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [loginEnabled, setLoginEnabled] = useState(true);
     const [registrationEnabled, setRegistrationEnabled] = useState(true);
@@ -33,12 +34,30 @@ const LoginPage = () => {
     }, [params, t]);
 
     const handleChange = (e) => {
-        setLoginError('');
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name] || errors.general) {
+            setErrors(prev => ({ ...prev, [name]: undefined, general: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.email?.trim()) e.email = t('validation.emailRequired');
+        else if (!EMAIL_REGEX.test(formData.email)) e.email = t('validation.emailInvalid');
+        if (!formData.password) e.password = t('validation.passwordRequired');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         setLoading(true);
         try {
             const response = await login(formData);
@@ -46,25 +65,29 @@ const LoginPage = () => {
             loginUser({ id, firstName, lastName, email, role }, token);
             navigate('/');
         } catch (error) {
+            if (applyServerErrors(error, t, setErrors)) {
+                setLoading(false);
+                return;
+            }
             const status = error.response?.status;
             const msg = error.response?.data?.message || '';
             if (status === 423) {
                 const match = msg.match(/(\d+) minute/);
                 const minutes = match ? parseInt(match[1]) : null;
-                setLoginError(minutes !== null ? t('auth.accountLockedMinutes', { count: minutes }) : t('auth.accountLocked'));
+                setErrors({ general: minutes !== null ? t('auth.accountLockedMinutes', { count: minutes }) : t('auth.accountLocked') });
             } else if (status === 403 && msg.toLowerCase().includes('verify')) {
-                setLoginError(t('auth.emailNotVerified'));
+                setErrors({ general: t('auth.emailNotVerified') });
             } else if (status === 403) {
                 toast.error(t('auth.loginDisabled'));
             } else {
-                setLoginError(t('auth.loginFailed'));
+                setErrors({ general: t('auth.loginFailed') });
             }
         } finally {
             setLoading(false);
         }
     };
 
-    const inputClass = "w-full border border-gray-300 px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
+    const inputClass = "w-full border px-4 py-3 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
 
     return (
         <div className="min-h-screen flex">
@@ -85,38 +108,45 @@ const LoginPage = () => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                        {errors.general && (
+                            <p className="text-xs text-red-500">{errors.general}</p>
+                        )}
                         <div>
-                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2">
+                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2" htmlFor="email">
                                 {t('auth.email')}
                             </label>
-                            {loginError && (
-                                <p className="text-xs text-red-500 mb-2">{loginError}</p>
-                            )}
                             <input
+                                id="email"
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                className={`${inputClass} ${loginError ? 'border-red-500' : ''}`}
+                                aria-invalid={!!(errors.email || errors.general)}
+                                aria-describedby={errors.email ? 'email-error' : undefined}
+                                className={`${inputClass} ${errors.email || errors.general ? inputError : inputNormal}`}
                                 placeholder="mirko.kopanja@email.com"
-                                required
                             />
+                            {errors.email && (
+                                <p id="email-error" className="text-xs text-red-500 mt-1">{errors.email}</p>
+                            )}
                         </div>
 
                         <div>
-                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2">
+                            <label className="block text-xs font-semibold text-black uppercase tracking-wide mb-2" htmlFor="password">
                                 {t('auth.password')}
                             </label>
                             <div className="relative">
                                 <input
+                                    id="password"
                                     type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
-                                    className={`${inputClass} ${loginError ? 'border-red-500' : ''} pr-10`}
+                                    aria-invalid={!!(errors.password || errors.general)}
+                                    aria-describedby={errors.password ? 'password-error' : undefined}
+                                    className={`${inputClass} ${errors.password || errors.general ? inputError : inputNormal} pr-10`}
                                     placeholder="••••••••"
-                                    required
                                 />
                                 <button
                                     type="button"
@@ -136,6 +166,9 @@ const LoginPage = () => {
                                     )}
                                 </button>
                             </div>
+                            {errors.password && (
+                                <p id="password-error" className="text-xs text-red-500 mt-1">{errors.password}</p>
+                            )}
                         </div>
 
                         <button

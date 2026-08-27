@@ -346,7 +346,11 @@
     "discount": "Popust",
     "sku": "SKU",
     "orderingDisabled": "Naručivanje trenutno nije dostupno",
-    "freeShippingNudge": "Dodajte još {{amount}} za besplatnu dostavu"
+    "yourInformation": "Tvoje informacije",
+    "freeShippingNudge": "Dodajte još {{amount}} za besplatnu dostavu",
+    "fullName": "Mirko Kopanja",
+    "email": "mirko.kopanja@email.com",
+    "phone": "+381 6* *** ***"
   },
   "order": {
     "title": "Moje porudžbine",
@@ -691,5 +695,45 @@
   },
   "store": {
     "addStore": "Dodaj prodavnicu"
+  },
+  "validation": {
+    "required": "Ovo polje je obavezno",
+    "firstNameRequired": "Ime je obavezno",
+    "lastNameRequired": "Prezime je obavezno",
+    "nameRequired": "Naziv je obavezan",
+    "streetRequired": "Adresa je obavezna",
+    "cityRequired": "Grad je obavezan",
+    "postalCodeRequired": "Poštanski broj je obavezan",
+    "countryRequired": "Država je obavezna",
+    "phoneRequired": "Broj telefona je obavezan",
+    "emailRequired": "Email je obavezan",
+    "emailInvalid": "Unesite ispravnu email adresu",
+    "emailTaken": "Nalog sa ovom email adresom već postoji",
+    "passwordRequired": "Lozinka je obavezna",
+    "passwordTooShort": "Lozinka mora imati najmanje 8 karaktera",
+    "passwordsDoNotMatch": "Lozinke se ne podudaraju",
+    "currentPasswordRequired": "Trenutna lozinka je obavezna",
+    "currentPasswordWrong": "Trenutna lozinka nije ispravna",
+    "newPasswordRequired": "Nova lozinka je obavezna",
+    "messageRequired": "Poruka je obavezna",
+    "subjectRequired": "Naslov je obavezan",
+    "paymentMethodRequired": "Izaberite način plaćanja",
+    "nameFieldRequired": "Naziv je obavezan",
+    "priceInvalid": "Unesite ispravnu cenu",
+    "priceRequired": "Cena je obavezna",
+    "skuRequired": "SKU je obavezan",
+    "skuTaken": "Ovaj SKU je već u upotrebi",
+    "categoryRequired": "Izaberite kategoriju",
+    "stockQuantityInvalid": "Unesite ispravnu količinu na stanju",
+    "titleRequired": "Naslov je obavezan",
+    "codeRequired": "Kod je obavezan",
+    "discountValueInvalid": "Unesite ispravnu vrednost popusta",
+    "mediaRequired": "Otpremite sliku ili video",
+    "startDateRequired": "Datum početka je obavezan",
+    "endDateRequired": "Datum završetka je obavezan",
+    "endDateBeforeStart": "Datum završetka mora biti posle datuma početka",
+    "couponInvalid": "Kupon je nevažeći ili je istekao",
+    "outOfStock": "Ova veličina je rasprodata",
+    "sizeRequired": "Izaberite veličinu"
   }
 }

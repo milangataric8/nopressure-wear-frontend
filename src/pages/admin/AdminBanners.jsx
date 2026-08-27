@@ -9,6 +9,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
+import { inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
 
 const AdminBanners = () => {
     const { t } = useTranslation();
@@ -30,6 +31,7 @@ const AdminBanners = () => {
         displayTitle: true,
         displayDuration: 5,
     });
+    const [errors, setErrors] = useState({});
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
@@ -65,7 +67,19 @@ const AdminBanners = () => {
     },[page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const validate = () => {
+        const e = {};
+        if (!formData.title?.trim()) e.title = t('validation.titleRequired');
+        if (!formData.mediaUrl) e.mediaUrl = t('validation.mediaRequired');
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleFileUpload = async (e) => {
@@ -82,6 +96,7 @@ const AdminBanners = () => {
                 response = await uploadImage(file, removeBgBanner);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
+            if (errors.mediaUrl) setErrors(prev => ({ ...prev, mediaUrl: undefined }));
             toast.success(t('messages.fileUploaded'));
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
@@ -114,6 +129,12 @@ const AdminBanners = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            focusFirstError();
+            return;
+        }
+
         try {
             if (editingBanner) {
                 await updateBanner(editingBanner.id, formData);
@@ -125,12 +146,15 @@ const AdminBanners = () => {
             resetForm();
             fetchBanners();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            if (!applyServerErrors(error, t, setErrors)) {
+                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            }
         }
     };
 
     const handleEdit = (banner) => {
         setEditingBanner(banner);
+        setErrors({});
         setFormData({
             title: banner.title || '',
             subtitle: banner.subtitle || '',
@@ -186,9 +210,13 @@ const AdminBanners = () => {
         setRemoveBgBannerMobile(false);
         setEditingBanner(null);
         setShowForm(false);
+        setErrors({});
     };
 
     const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
+    const errorInputClass = (field) => errors[field]
+        ? `w-full border ${inputError} px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors`
+        : inputClass;
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -198,7 +226,7 @@ const AdminBanners = () => {
                 title={t('admin.banners')}
                 subtitle={t('admin.manageBanners')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newBanner')}
-                onButtonClick={() => showForm ? resetForm() : setShowForm(true)}
+                onButtonClick={() => { if (showForm) { resetForm(); } else { setShowForm(true); setErrors({}); } }}
             />
 
             {!showForm && (
@@ -262,15 +290,19 @@ const AdminBanners = () => {
                     </h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className={labelClass}>{t('admin.title')}</label>
+                            <label className={labelClass} htmlFor="banner-title">{t('admin.title')}</label>
                             <input
+                                id="banner-title"
                                 type="text"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className={inputClass}
+                                aria-invalid={!!errors.title}
+                                aria-describedby={errors.title ? 'banner-title-error' : undefined}
+                                className={errorInputClass('title')}
                                 placeholder="Summer Collection"
                             />
+                            {errors.title && <p id="banner-title-error" className="text-xs text-red-500 mt-1">{errors.title}</p>}
                         </div>
 
                         <div>
@@ -366,7 +398,7 @@ const AdminBanners = () => {
                                     </label>
                                 )}
                                 <label className="cursor-pointer block">
-                                    <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
+                                    <div className={`border text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors ${errors.mediaUrl ? 'border-red-500' : 'border-gray-300'}`}>
                                         {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
                                     </div>
                                     <input
@@ -377,6 +409,7 @@ const AdminBanners = () => {
                                         disabled={uploading}
                                     />
                                 </label>
+                                {errors.mediaUrl && <p className="text-xs text-red-500 mt-1">{errors.mediaUrl}</p>}
 
                                 {/* Preview */}
                                 {formData.mediaUrl && (

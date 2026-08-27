@@ -346,7 +346,11 @@
     "discount": "Discount",
     "sku": "SKU",
     "orderingDisabled": "Ordering is currently unavailable",
-    "freeShippingNudge": "Add {{amount}} more for free shipping"
+    "yourInformation": "Your information",
+    "freeShippingNudge": "Add {{amount}} more for free shipping",
+    "fullName": "Mirko Kopanja",
+    "email": "mirko.kopanja@email.com",
+    "phone": "+381 6* *** ***"
   },
   "order": {
     "title": "My Orders",
@@ -691,5 +695,45 @@
   },
   "store": {
     "addStore": "Add Store"
+  },
+  "validation": {
+    "required": "This field is required",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "nameRequired": "Name is required",
+    "streetRequired": "Street address is required",
+    "cityRequired": "City is required",
+    "postalCodeRequired": "Postal code is required",
+    "countryRequired": "Country is required",
+    "phoneRequired": "Phone number is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Enter a valid email address",
+    "emailTaken": "An account with this email already exists",
+    "passwordRequired": "Password is required",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "currentPasswordRequired": "Current password is required",
+    "currentPasswordWrong": "Current password is incorrect",
+    "newPasswordRequired": "New password is required",
+    "messageRequired": "Message is required",
+    "subjectRequired": "Subject is required",
+    "paymentMethodRequired": "Select a payment method",
+    "nameFieldRequired": "Name is required",
+    "priceInvalid": "Enter a valid price",
+    "priceRequired": "Price is required",
+    "skuRequired": "SKU is required",
+    "skuTaken": "This SKU is already in use",
+    "categoryRequired": "Select a category",
+    "stockQuantityInvalid": "Enter a valid stock quantity",
+    "titleRequired": "Title is required",
+    "codeRequired": "Code is required",
+    "discountValueInvalid": "Enter a valid discount value",
+    "mediaRequired": "Upload an image or video",
+    "startDateRequired": "Start date is required",
+    "endDateRequired": "End date is required",
+    "endDateBeforeStart": "End date must be after start date",
+    "couponInvalid": "This coupon is invalid or expired",
+    "outOfStock": "This size is out of stock",
+    "sizeRequired": "Select a size"
   }
 }

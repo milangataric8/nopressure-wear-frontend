@@ -26,7 +26,6 @@ const Navbar = () => {
     const [logoUrl, setLogoUrl] = useState('');
     const dropdownRef = useRef(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [openGender, setOpenGender] = useState(null);
     const { t, i18n } = useTranslation();
     const [socialSettings, setSocialSettings] = useState({});
@@ -445,50 +444,6 @@ const Navbar = () => {
                                 </button>
                             </form>
 
-                            {/* Mobile search */}
-                            <div className="relative lg:hidden flex items-center">
-                                {mobileSearchOpen && (
-                                    <form
-                                        onSubmit={(e) => { handleSearch(e); setMobileSearchOpen(false); }}
-                                        className="absolute right-8 flex items-center"
-                                        style={{ width: '200px' }}
-                                    >
-                                        <input
-                                            type="text"
-                                            value={searchInput}
-                                            onChange={(e) => setSearchInput(e.target.value)}
-                                            placeholder={t('nav.search')}
-                                            className="w-full border border-gray-300 px-3 h-8 text-sm focus:outline-none focus:border-black transition-colors"
-                                            autoFocus
-                                        />
-                                        {searchInput && (
-                                            <button
-                                                type="button"
-                                                onClick={() => { setSearchInput(''); setMobileSearchOpen(false); navigate('/products'); }}
-                                                className="absolute right-1 text-gray-400 hover:text-black text-lg leading-none"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </form>
-                                )}
-                                <button
-                                    onClick={() => {
-                                        if (mobileSearchOpen && searchInput) {
-                                            navigate(`/products?search=${searchInput.trim()}`);
-                                            setSearchInput('');
-                                        }
-                                        setMobileSearchOpen(!mobileSearchOpen);
-                                    }}
-                                    className="text-gray-600 hover:text-black transition-colors p-1"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="11" cy="11" r="8"/>
-                                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                                    </svg>
-                                </button>
-                            </div>
-
                             {/* Favorites heart icon */}
                             {isAuthenticated() && socialSettings.favorites_enabled !== 'false' && (
                                 <Link to="/favorites" className="relative flex items-center text-gray-600 hover:text-black transition-colors">
@@ -629,13 +584,24 @@ const Navbar = () => {
                                 <div className="px-6 py-4 space-y-4">
                                     {/* Search */}
                                     <form onSubmit={(e) => { handleSearch(e); setMobileMenuOpen(false); }} className="flex">
-                                        <input
-                                            type="text"
-                                            value={searchInput}
-                                            onChange={(e) => setSearchInput(e.target.value)}
-                                            placeholder={t('nav.search')}
-                                            className="flex-1 border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
-                                        />
+                                        <div className="relative flex-1">
+                                            <input
+                                                type="search"
+                                                value={searchInput}
+                                                onChange={(e) => setSearchInput(e.target.value)}
+                                                placeholder={t('nav.search')}
+                                                className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
+                                            />
+                                            {searchInput && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSearchInput('')}
+                                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-1 text-gray-400 hover:text-black text-lg leading-none"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
                                         <button type="submit" className="bg-black text-white px-3 flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                                                 <circle cx="11" cy="11" r="8"/>

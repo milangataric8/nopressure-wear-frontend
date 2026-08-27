@@ -28,7 +28,7 @@ const ProductDetailPage = () => {
     const { t } = useTranslation();
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, isAuthenticated, setCartCount, cartCount, setFavoriteCount } = useAuth();
+    const { user, isAuthenticated, setCartCount, cartCount, favoriteCount, setFavoriteCount } = useAuth();
     const { addToGuestCart } = useContext(GuestCartContext);
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -164,12 +164,22 @@ const ProductDetailPage = () => {
             navigate('/login');
             return;
         }
+
+        const previousFavorited = isFavorited;
+        const previousCount = favoriteCount;
+        const nextFavorited = !isFavorited;
+
+        // Optimistic update — the heart responds instantly, no toast needed
+        setIsFavorited(nextFavorited);
+        setFavoriteCount(prev => prev + (nextFavorited ? 1 : -1));
+
         try {
             const response = await toggleFavorite(user.id, product.id);
             setIsFavorited(response.data.favorited);
             setFavoriteCount(response.data.count);
-            toast.success(response.data.favorited ? t('messages.addedToFavorites') : t('messages.removedFromFavorites'));
         } catch (e) {
+            setIsFavorited(previousFavorited);
+            setFavoriteCount(previousCount);
             toast.error(e.response?.data?.message || t('messages.failedToUpdateFavorites'));
         }
     };

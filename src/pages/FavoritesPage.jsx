@@ -31,12 +31,18 @@ const FavoritesPage = () => {
     }, [fetchFavorites]);
 
     const handleRemove = async (productId) => {
+        const previousFavorites = favorites;
+
+        // Optimistic update — the card disappears immediately, no toast needed
+        setFavorites(prev => prev.filter(f => f.productId !== productId));
+        setFavoriteCount(prev => prev - 1);
+
         try {
             const response = await toggleFavorite(user.id, productId);
             setFavoriteCount(response.data.count);
-            setFavorites(prev => prev.filter(f => f.productId !== productId));
-            toast.success(t('messages.removedFromFavorites'));
         } catch (e) {
+            setFavorites(previousFavorites);
+            setFavoriteCount(previousFavorites.length);
             toast.error(e.response?.data?.message || t('messages.failedToRemoveFromFavorites'));
         }
     };

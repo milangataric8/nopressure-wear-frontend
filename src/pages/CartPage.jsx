@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -155,18 +155,47 @@ const CartPage = () => {
         ? (cart?.totalAmount ?? 0)
         : guestCart.reduce((sum, item) => sum + (item.discountPrice ?? item.price) * item.quantity, 0);
 
-    const handleUpdateQuantity = async (cartItemId, productId, quantity, size = null) => {
+    // One debounce timer per cart item — rapid +/- clicks on different rows don't clobber each other
+    const quantityTimers = useRef({});
+
+    useEffect(() => {
+        const timers = quantityTimers.current;
+        return () => {
+            Object.values(timers).forEach(clearTimeout);
+        };
+    }, []);
+
+    const handleUpdateQuantity = (cartItemId, productId, quantity, size = null) => {
         if (quantity < 1) return;
         if (!isAuthenticated()) {
             updateGuestCartItem(productId, quantity, size);
             return;
         }
-        try {
-            const response = await updateCartItem(user.id, cartItemId, { productId, quantity });
-            setCart(response.data);
-        } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to update quantity');
+
+        // Optimistic update — the new quantity is visible immediately
+        setCart(prev => {
+            if (!prev) return prev;
+            const items = prev.items.map(i =>
+                i.id === cartItemId
+                    ? { ...i, quantity, subtotal: (i.discountPrice ?? i.productPrice) * quantity }
+                    : i
+            );
+            return { ...prev, items, totalAmount: items.reduce((sum, i) => sum + i.subtotal, 0) };
+        });
+
+        if (quantityTimers.current[cartItemId]) {
+            clearTimeout(quantityTimers.current[cartItemId]);
         }
+        quantityTimers.current[cartItemId] = setTimeout(async () => {
+            delete quantityTimers.current[cartItemId];
+            try {
+                const response = await updateCartItem(user.id, cartItemId, { productId, quantity });
+                setCart(response.data);
+            } catch (e) {
+                fetchCart(); // several clicks may have queued up — re-sync from server rather than roll back
+                toast.error(e.response?.data?.message || 'Failed to update quantity');
+            }
+        }, 500);
     };
 
     const handleRemoveItem = async (cartItemId, productId = null, size = null) => {
@@ -174,12 +203,24 @@ const CartPage = () => {
             removeFromGuestCart(productId, size);
             return;
         }
+
+        const previousCart = cart;
+
+        // Optimistic update — the item disappears immediately, no toast needed
+        setCart(prev => {
+            if (!prev) return prev;
+            const items = prev.items.filter(i => i.id !== cartItemId);
+            return { ...prev, items, totalAmount: items.reduce((sum, i) => sum + i.subtotal, 0) };
+        });
+        setCartCount(prev => Math.max(prev - 1, 0));
+
         try {
             const response = await removeCartItem(user.id, cartItemId);
             setCart(response.data);
             setCartCount(response.data.items.length);
-            toast.success(t('messages.itemRemoved'));
         } catch (e) {
+            setCart(previousCart);
+            setCartCount(previousCart.items.length);
             toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
         }
     };
@@ -189,12 +230,18 @@ const CartPage = () => {
             clearGuestCart();
             return;
         }
+
+        const previousCart = cart;
+
+        // Optimistic update — the list empties immediately, no toast needed
+        setCart(prev => ({ ...prev, items: [], totalAmount: 0 }));
+        setCartCount(0);
+
         try {
             await clearCart(user.id);
-            setCart({ ...cart, items: [], totalAmount: 0 });
-            setCartCount(0);
-            toast.success(t('messages.cartCleared'));
         } catch (e) {
+            setCart(previousCart);
+            setCartCount(previousCart.items.length);
             toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
         }
     };

@@ -7,7 +7,8 @@ const UndoBar = ({ message, onUndo }) => {
         <div
             role="status"
             aria-live="polite"
-            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50
+            className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))]
+                       left-1/2 -translate-x-1/2 z-50
                        w-[calc(100%-2rem)] max-w-md
                        bg-black text-white
                        flex items-center justify-between gap-4

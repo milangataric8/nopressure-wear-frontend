@@ -446,7 +446,8 @@ const CartPage = () => {
                         {t('cart.continueShopping')}
                     </button>
                 </div>
-                {pending && <UndoBar message={pending.message} onUndo={undo} />}
+                {/*{pending && <UndoBar message={pending.message} onUndo={undo} />}*/}
+                <UndoBar message="TEST" onUndo={() => {}} />
             </>
         );
     }

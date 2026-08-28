@@ -4,13 +4,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
+import { useUndoableAction } from '../hooks/useUndoableAction';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
+import UndoBar from '../components/common/UndoBar';
 import { useTranslation } from 'react-i18next';
 import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../utils/validationUtils';
 
 const AddressPage = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
+    const { pending, run, undo } = useUndoableAction();
     const navigate = useNavigate();
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -102,15 +105,25 @@ const AddressPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Delete this address?')) return;
-        try {
-            await axiosInstance.delete(`/addresses/${id}`);
-            toast.success('Address deleted');
-            fetchAddresses();
-        } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to delete address');
-        }
+    const handleDelete = (id) => {
+        const previousAddresses = addresses;
+
+        // Optimistic update — the card disappears immediately; undo replaces the confirm dialog
+        setAddresses(prev => prev.filter(a => a.id !== id));
+
+        run({
+            message: t('address.removed'),
+            onUndo: () => setAddresses(previousAddresses),
+            // the DELETE request only fires once the undo window closes
+            commit: async () => {
+                try {
+                    await axiosInstance.delete(`/addresses/${id}`);
+                } catch (e) {
+                    setAddresses(previousAddresses);
+                    toast.error(e.response?.data?.message || t('messages.failedToSave'));
+                }
+            },
+        });
     };
 
     const resetForm = () => {
@@ -124,6 +137,7 @@ const AddressPage = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
+        <>
         <div className="max-w-3xl mx-auto px-6 py-10">
             <div className="flex items-center gap-4 mb-10">
                 <button
@@ -289,6 +303,8 @@ const AddressPage = () => {
                 </div>
             )}
         </div>
+        {pending && <UndoBar message={pending.message} onUndo={undo} />}
+        </>
     );
 };
 

@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { useUndoableAction } from '../hooks/useUndoableAction';
 import { getUserFavorites, toggleFavorite } from '../api/favoriteApi';
 import { getImageUrl } from '../utils/imageUtils';
 import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import UndoBar from '../components/common/UndoBar';
 
 const FavoritesPage = () => {
     const { t } = useTranslation();
     const { user, setFavoriteCount } = useAuth();
+    const { pending, run, undo } = useUndoableAction();
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -30,24 +33,34 @@ const FavoritesPage = () => {
         fetchFavorites();
     }, [fetchFavorites]);
 
-    const handleRemove = async (productId) => {
+    const handleRemove = (productId) => {
         const previousFavorites = favorites;
 
-        // Optimistic update — the card disappears immediately, no toast needed
+        // Optimistic update — the card disappears immediately; undo bar is the confirmation
         setFavorites(prev => prev.filter(f => f.productId !== productId));
         setFavoriteCount(prev => prev - 1);
 
-        try {
-            const response = await toggleFavorite(user.id, productId);
-            setFavoriteCount(response.data.count);
-        } catch (e) {
-            setFavorites(previousFavorites);
-            setFavoriteCount(previousFavorites.length);
-            toast.error(e.response?.data?.message || t('messages.failedToRemoveFromFavorites'));
-        }
+        run({
+            message: t('favorite.removed'),
+            onUndo: () => {
+                setFavorites(previousFavorites);
+                setFavoriteCount(previousFavorites.length);
+            },
+            // the toggle request only fires once the undo window closes
+            commit: async () => {
+                try {
+                    await toggleFavorite(user.id, productId);
+                } catch (e) {
+                    setFavorites(previousFavorites);
+                    setFavoriteCount(previousFavorites.length);
+                    toast.error(e.response?.data?.message || t('messages.failedToRemoveFromFavorites'));
+                }
+            },
+        });
     };
 
     return (
+        <>
         <div className="max-w-7xl mx-auto px-6 py-10">
             <div className="flex items-center justify-between mb-10">
                 <div>
@@ -133,6 +146,8 @@ const FavoritesPage = () => {
                 </div>
             )}
         </div>
+        {pending && <UndoBar message={pending.message} onUndo={undo} />}
+        </>
     );
 };
 

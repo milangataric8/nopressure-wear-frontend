@@ -350,7 +350,9 @@
     "freeShippingNudge": "Add {{amount}} more for free shipping",
     "fullName": "Mirko Kopanja",
     "email": "mirko.kopanja@email.com",
-    "phone": "+381 6* *** ***"
+    "phone": "+381 6* *** ***",
+    "itemRemoved": "{{name}} removed",
+    "cartCleared": "Cart cleared"
   },
   "order": {
     "title": "My Orders",
@@ -389,7 +391,11 @@
     "favorites": "Favorites",
     "myFavorites": "My Favorites",
     "noFavorites": "No favorites yet",
-    "browseProducts": "Browse Products"
+    "browseProducts": "Browse Products",
+    "removed": "Removed from favourites"
+  },
+  "address": {
+    "removed": "Address removed"
   },
   "review": {
     "description": "Description",
@@ -503,6 +509,7 @@
     "min": "Min",
     "max": "Max",
     "sku": "SKU",
+    "undo": "Undo",
     "priceFormat": "€{{amount}}"
   },
   "settings": {

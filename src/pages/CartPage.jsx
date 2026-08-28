@@ -5,8 +5,10 @@ import { toast } from 'react-toastify';
 import { getCart, updateCartItem, removeCartItem, clearCart } from '../api/cartApi';
 import { checkout, guestCheckout } from '../api/orderApi';
 import { useAuth } from '../hooks/useAuth';
+import { useUndoableAction } from '../hooks/useUndoableAction';
 import { validateCoupon } from '../api/couponApi';
 import Skeleton from '../components/common/Skeleton';
+import UndoBar from '../components/common/UndoBar';
 import { getImageUrl } from "../utils/imageUtils.js";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
@@ -28,6 +30,7 @@ const CartPage = () => {
     const { t } = useTranslation();
     const { format } = useCurrency();
     const { user, setCartCount, isAuthenticated } = useAuth();
+    const { pending, run, undo } = useUndoableAction();
     const { guestCart, clearGuestCart, updateGuestCartItem, removeFromGuestCart } = useContext(GuestCartContext);
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(isAuthenticated());
@@ -198,15 +201,16 @@ const CartPage = () => {
         }, 500);
     };
 
-    const handleRemoveItem = async (cartItemId, productId = null, size = null) => {
+    const handleRemoveItem = (cartItemId, productId = null, size = null) => {
         if (!isAuthenticated()) {
             removeFromGuestCart(productId, size);
             return;
         }
 
         const previousCart = cart;
+        const removedItem = cart?.items.find(i => i.id === cartItemId);
 
-        // Optimistic update — the item disappears immediately, no toast needed
+        // Optimistic update — the item disappears immediately; undo bar is the confirmation
         setCart(prev => {
             if (!prev) return prev;
             const items = prev.items.filter(i => i.id !== cartItemId);
@@ -214,18 +218,26 @@ const CartPage = () => {
         });
         setCartCount(prev => Math.max(prev - 1, 0));
 
-        try {
-            const response = await removeCartItem(user.id, cartItemId);
-            setCart(response.data);
-            setCartCount(response.data.items.length);
-        } catch (e) {
-            setCart(previousCart);
-            setCartCount(previousCart.items.length);
-            toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
-        }
+        run({
+            message: t('cart.itemRemoved', { name: removedItem?.productName ?? '' }),
+            onUndo: () => {
+                setCart(previousCart);
+                setCartCount(previousCart?.items.length ?? 0);
+            },
+            // the DELETE request only fires once the undo window closes
+            commit: async () => {
+                try {
+                    await removeCartItem(user.id, cartItemId);
+                } catch (e) {
+                    setCart(previousCart);
+                    setCartCount(previousCart?.items.length ?? 0);
+                    toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
+                }
+            },
+        });
     };
 
-    const handleClearCart = async () => {
+    const handleClearCart = () => {
         if (!isAuthenticated()) {
             clearGuestCart();
             return;
@@ -233,17 +245,26 @@ const CartPage = () => {
 
         const previousCart = cart;
 
-        // Optimistic update — the list empties immediately, no toast needed
+        // Optimistic update — the list empties immediately; undo bar is the confirmation
         setCart(prev => ({ ...prev, items: [], totalAmount: 0 }));
         setCartCount(0);
 
-        try {
-            await clearCart(user.id);
-        } catch (e) {
-            setCart(previousCart);
-            setCartCount(previousCart.items.length);
-            toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
-        }
+        run({
+            message: t('cart.cartCleared'),
+            onUndo: () => {
+                setCart(previousCart);
+                setCartCount(previousCart?.items.length ?? 0);
+            },
+            commit: async () => {
+                try {
+                    await clearCart(user.id);
+                } catch (e) {
+                    setCart(previousCart);
+                    setCartCount(previousCart?.items.length ?? 0);
+                    toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
+                }
+            },
+        });
     };
 
     const saveAddressIfNeeded = async () => {
@@ -283,6 +304,8 @@ const CartPage = () => {
             focusFirstError();
             return;
         }
+        // a pending remove must hit the server before the order is built, or the item comes back
+        if (pending) pending.commit();
         setCheckingOut(true);
         try {
             await saveAddressIfNeeded();
@@ -318,6 +341,8 @@ const CartPage = () => {
             focusFirstError();
             return;
         }
+        // a pending remove must hit the server before payment, or the item is charged for
+        if (pending) pending.commit();
         try {
             const response = await createPaymentIntent(user.id, couponData?.code || null);
             setClientSecret(response.data.clientSecret);
@@ -410,16 +435,19 @@ const CartPage = () => {
 
     if (isEmpty) {
         return (
-            <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-                <h2 className="text-3xl font-black uppercase tracking-tight mb-4">{t('cart.title')}</h2>
-                <p className="text-gray-500 mb-8">{t('cart.empty')}</p>
-                <button
-                    onClick={() => navigate('/products')}
-                    className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors"
-                >
-                    {t('cart.continueShopping')}
-                </button>
-            </div>
+            <>
+                <div className="max-w-7xl mx-auto px-6 py-20 text-center">
+                    <h2 className="text-3xl font-black uppercase tracking-tight mb-4">{t('cart.title')}</h2>
+                    <p className="text-gray-500 mb-8">{t('cart.empty')}</p>
+                    <button
+                        onClick={() => navigate('/products')}
+                        className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors"
+                    >
+                        {t('cart.continueShopping')}
+                    </button>
+                </div>
+                {pending && <UndoBar message={pending.message} onUndo={undo} />}
+            </>
         );
     }
 
@@ -431,6 +459,7 @@ const CartPage = () => {
     const remainingForFree = delivery.threshold > 0 ? Math.max(delivery.threshold - subtotalAfterCoupon, 0) : 0;
 
     return (
+        <>
         <div className="max-w-7xl mx-auto px-6 py-10">
             <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-10">{t('cart.title')}</h1>
 
@@ -679,6 +708,8 @@ const CartPage = () => {
                 </div>
             </div>
         </div>
+        {pending && <UndoBar message={pending.message} onUndo={undo} />}
+        </>
     );
 };
 

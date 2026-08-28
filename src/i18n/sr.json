@@ -350,7 +350,9 @@
     "freeShippingNudge": "Dodajte još {{amount}} za besplatnu dostavu",
     "fullName": "Mirko Kopanja",
     "email": "mirko.kopanja@email.com",
-    "phone": "+381 6* *** ***"
+    "phone": "+381 6* *** ***",
+    "itemRemoved": "{{name}} uklonjeno",
+    "cartCleared": "Korpa ispražnjena"
   },
   "order": {
     "title": "Moje porudžbine",
@@ -389,7 +391,11 @@
     "favorites": "Omiljeno",
     "myFavorites": "Moji omiljeni",
     "noFavorites": "Nema omiljenih proizvoda",
-    "browseProducts": "Pregledaj proizvode"
+    "browseProducts": "Pregledaj proizvode",
+    "removed": "Uklonjeno iz omiljenih"
+  },
+  "address": {
+    "removed": "Adresa uklonjena"
   },
   "review": {
     "description": "Opis",
@@ -503,6 +509,7 @@
     "min": "Min",
     "max": "Maks",
     "sku": "SKU",
+    "undo": "Poništi",
     "priceFormat": "{{amount}} RSD"
   },
   "settings": {

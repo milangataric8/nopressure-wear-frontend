@@ -25,6 +25,7 @@ import GuestInfoForm from "../components/cart/GuestInfoForm.jsx";
 import PaymentMethodSelector from "../components/cart/PaymentMethodSelector.jsx";
 import CouponInput from "../components/cart/CouponInput.jsx";
 import { applyServerErrors, focusFirstError, EMAIL_REGEX } from "../utils/validationUtils";
+import { Truck } from 'lucide-react';
 
 const CartPage = () => {
     const { t } = useTranslation();
@@ -394,7 +395,7 @@ const CartPage = () => {
         try {
             await guestCheckout(orderData);
             clearGuestCart();
-            toast.success('Order placed successfully!');
+            toast.success(t('messages.orderPlaced'));
             navigate('/order-confirmation');
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
@@ -452,6 +453,10 @@ const CartPage = () => {
     }
 
     const subtotalAfterCoupon = couponData ? couponData.finalTotal : displayTotal;
+    const progress = Math.min(
+        100,
+        ((delivery.threshold - subtotalAfterCoupon) / delivery.threshold) * 100
+    );
     const deliveryFee = !delivery.enabled ? 0
         : (delivery.threshold > 0 && subtotalAfterCoupon >= delivery.threshold) ? 0
         : delivery.fee;
@@ -466,6 +471,23 @@ const CartPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 {/* Cart items */}
                 <div className="lg:col-span-2 space-y-6">
+                    {remainingForFree > 0 && (
+                        <div className="bg-gray-100 px-6 py-4">
+                            <p className="mb-3 text-xs text-gray-700">
+                                {t('cart.freeShippingNudge', { amount: format(remainingForFree) })}
+                            </p>
+
+                            <div className="flex items-center gap-2">
+                                <div className="h-1 flex-1 overflow-hidden bg-gray-200">
+                                    <div
+                                        className="h-full bg-black"
+                                        style={{ width: `${progress}%` }}
+                                    />
+                                </div>
+                                <Truck className="h-4 w-4 shrink-0 text-[#002855]" />
+                            </div>
+                        </div>
+                    )}
                     {emailNotVerified && (
                         <div className="p-4 bg-yellow-50 border border-yellow-300 text-sm">
                             <p className="font-semibold text-yellow-800 mb-2">{t('auth.notVerifiedCheckout')}</p>
@@ -580,9 +602,6 @@ const CartPage = () => {
                                     {deliveryFee === 0 ? t('cart.free') : format(deliveryFee)}
                                 </span>
                             </div>
-                            {remainingForFree > 0 && (
-                                <p className="text-xs text-gray-500">{t('cart.freeShippingNudge', { amount: format(remainingForFree) })}</p>
-                            )}
                             <div className="border-t border-gray-200 pt-3 flex justify-between">
                                 <span className="font-semibold text-black">{t('cart.total')}</span>
                                 <span className="font-bold text-black">{format(grandTotal)}</span>
@@ -697,9 +716,6 @@ const CartPage = () => {
                                 {deliveryFee === 0 ? t('cart.free') : format(deliveryFee)}
                             </span>
                         </div>
-                        {remainingForFree > 0 && (
-                            <p className="text-xs text-gray-500">{t('cart.freeShippingNudge', { amount: format(remainingForFree) })}</p>
-                        )}
                         <div className="border-t border-gray-200 pt-3 flex justify-between">
                             <span className="font-semibold text-black">{t('cart.total')}</span>
                             <span className="font-bold text-black">{format(grandTotal)}</span>

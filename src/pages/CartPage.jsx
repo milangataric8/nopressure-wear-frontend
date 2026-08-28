@@ -447,7 +447,7 @@ const CartPage = () => {
                     </button>
                 </div>
                 {pending && <UndoBar message={pending.message} onUndo={undo} />}
-                <UndoBar message="TEST" onUndo={() => {}} />
+                {/*<UndoBar message="TEST" onUndo={() => {}} />*/}
             </>
         );
     }

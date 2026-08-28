@@ -12,9 +12,6 @@ const CouponInput = ({
 
     return (
         <div className="mb-4">
-            <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
-                {t('cart.promoCode')}
-            </h3>
             <div className="flex gap-2">
                 <input
                     type="text"

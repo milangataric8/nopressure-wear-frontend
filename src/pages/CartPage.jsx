@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { getCart, updateCartItem, removeCartItem, clearCart } from '../api/cartApi';
@@ -54,6 +54,7 @@ const CartPage = () => {
     const [addToCartEnabled, setAddToCartEnabled] = useState(true);
     const [delivery, setDelivery] = useState({ enabled: true, fee: 0, threshold: 0 });
     const [emailNotVerified, setEmailNotVerified] = useState(false);
+    const [openSection, setOpenSection] = useState(null);
     const [newAddress, setNewAddress] = useState({
         street: '',
         city: '',
@@ -463,6 +464,10 @@ const CartPage = () => {
     const grandTotal = subtotalAfterCoupon + deliveryFee;
     const remainingForFree = delivery.threshold > 0 ? Math.max(delivery.threshold - subtotalAfterCoupon, 0) : 0;
 
+    const toggleSection = (section) => {
+        setOpenSection((prevSection) => (prevSection === section ? null : section));
+    };
+
     return (
         <>
         <div className="max-w-7xl mx-auto px-6 py-10">
@@ -608,6 +613,43 @@ const CartPage = () => {
                             </div>
                         </div>
 
+                        <div key={'promoCode'}>
+                            <button
+                                onClick={() => toggleSection('promoCode')}
+                                className="w-full flex items-center justify-between py-5 text-left"
+                            >
+                            <span className="text-sm font-semibold text-black uppercase tracking-wide">
+                                {t('cart.promoCode')}
+                            </span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18" height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                    className={`text-gray-400 transition-transform duration-200 ${
+                                        openSection === 'promoCode' ? 'rotate-90' : ''
+                                    }`}
+                                >
+                                    <polyline points="9 18 15 12 9 6"/>
+                                </svg>
+                            </button>
+
+                            {openSection === 'promoCode' && (
+                                <div className="pb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <CouponInput
+                                        couponCode={couponCode}
+                                        setCouponCode={setCouponCode}
+                                        couponData={couponData}
+                                        setCouponData={setCouponData}
+                                        applyingCoupon={applyingCoupon}
+                                        onApplyCoupon={handleApplyCoupon}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
                         {addToCartEnabled && (
                             <ShippingAddressSelector
                                 isAuthenticated={isAuthenticated}
@@ -685,41 +727,6 @@ const CartPage = () => {
                                 {t('cart.continueShopping')}
                             </button>
                         )}
-                    </div>
-
-                    <CouponInput
-                        couponCode={couponCode}
-                        setCouponCode={setCouponCode}
-                        couponData={couponData}
-                        setCouponData={setCouponData}
-                        applyingCoupon={applyingCoupon}
-                        onApplyCoupon={handleApplyCoupon}
-                    />
-
-                    {/* Order summary amounts */}
-                    <div className="space-y-3 mb-6">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">{t('cart.subtotal')}</span>
-                            <span className="font-medium">{format(displayTotal)}</span>
-                        </div>
-                        {couponData && (
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">{t('cart.discount', { code: couponData.code })}</span>
-                                <span className="font-medium text-green-600">
-                                    -{format(couponData.discountAmount)}
-                                </span>
-                            </div>
-                        )}
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">{t('cart.delivery')}</span>
-                            <span className={`font-medium ${deliveryFee === 0 ? 'text-green-600' : ''}`}>
-                                {deliveryFee === 0 ? t('cart.free') : format(deliveryFee)}
-                            </span>
-                        </div>
-                        <div className="border-t border-gray-200 pt-3 flex justify-between">
-                            <span className="font-semibold text-black">{t('cart.total')}</span>
-                            <span className="font-bold text-black">{format(grandTotal)}</span>
-                        </div>
                     </div>
                 </div>
             </div>

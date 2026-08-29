@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import StarRating from '../common/StarRating';
 
 const ProductReviews = ({
@@ -13,6 +14,7 @@ const ProductReviews = ({
                             onSubmitReview,
                             onDeleteReview,
                         }) => {
+    const { t } = useTranslation();
     const [showReviewForm, setShowReviewForm] = useState(false);
 
     const alreadyReviewed = isAuthenticated() &&
@@ -27,7 +29,7 @@ const ProductReviews = ({
                         onClick={() => setShowReviewForm(!showReviewForm)}
                         className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
                     >
-                        {showReviewForm ? '− Cancel Review' : '+ Write a Review'}
+                        {showReviewForm ? t('review.cancelReview') : t('review.writeReview')}
                     </button>
 
                     {showReviewForm && (
@@ -43,7 +45,7 @@ const ProductReviews = ({
                             <textarea
                                 value={myComment}
                                 onChange={(e) => setMyComment(e.target.value)}
-                                placeholder="Share your experience... (optional)"
+                                placeholder={t('review.shareExperience')}
                                 className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors mb-3"
                                 rows={3}
                             />
@@ -52,7 +54,7 @@ const ProductReviews = ({
                                 disabled={submittingReview || myRating === 0}
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-6 py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-30"
                             >
-                                {submittingReview ? 'Submitting...' : 'Submit Review'}
+                                {submittingReview ? t('review.submitting') : t('review.submitReview')}
                             </button>
                         </div>
                     )}
@@ -61,7 +63,7 @@ const ProductReviews = ({
 
             {/* Reviews list */}
             {reviews.length === 0 ? (
-                <p className="text-sm text-gray-400">No reviews yet. Be the first to review!</p>
+                <p className="text-sm text-gray-400">{t('review.noReviews')}</p>
             ) : (
                 <div className="space-y-4">
                     {reviews.map(review => (
@@ -80,7 +82,7 @@ const ProductReviews = ({
                                             onClick={() => onDeleteReview(review.id)}
                                             className="text-xs text-red-400 hover:text-red-600 underline"
                                         >
-                                            Delete
+                                            {t('review.delete')}
                                         </button>
                                     )}
                                 </div>

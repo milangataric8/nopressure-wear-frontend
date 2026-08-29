@@ -110,7 +110,9 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-black">{p.name}</p>
-                                    <p className="text-xs text-gray-400">{p.colorName || p.sku}</p>
+                                    <p className="text-xs text-gray-400">
+                                        {[p.colorName, p.sku, p.gender].filter(Boolean).join(" | ")}
+                                    </p>
                                 </div>
                             </button>
                         ))}

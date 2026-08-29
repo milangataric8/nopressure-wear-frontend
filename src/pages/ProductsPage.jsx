@@ -374,11 +374,14 @@ const ProductsPage = () => {
                                         <h3 className="text-sm font-semibold text-black mb-1 truncate">
                                             {product.name}
                                         </h3>
+                                        <p className="text-xs text-gray-400 mb-0.5">
+                                            {product.gender}
+                                        </p>
                                         {/* Color variants */}
                                         {(product.colorVariants?.length > 0 || product.colorHex) && (
                                             <div className="flex gap-1 mt-2 flex-wrap">
                                                 {/* Current product */}
-                                                {product.colorHex && (
+                                                {(
                                                     <div
                                                         className="w-8 h-8 border-2 border-transparent hover:border-black overflow-hidden flex-shrink-0"
                                                         title={product.colorName}

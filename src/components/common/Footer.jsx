@@ -42,7 +42,7 @@ const Footer = () => {
                                 className="product-description text-sm text-gray-900 text-center w-full min-w-0"
                                 style={{
                                     whiteSpace: 'normal',
-                                    wordBreak: 'keep-all',
+                                    wordBreak: 'normal',
                                     overflowWrap: 'break-word',
                                 }}
                                 dangerouslySetInnerHTML={{ __html: settings.store_tagline }}

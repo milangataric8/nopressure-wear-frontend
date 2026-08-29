@@ -26,6 +26,7 @@ import ProductsTable from "../../components/admin/ProductsTable.jsx";
 import ProductFilterBar from "../../components/admin/ProductFilterBar.jsx";
 import CategoryFilterBar from "../../components/admin/CategoryFilterBar.jsx";
 import { inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
+import { normalizeWhitespace } from '../../utils/text.js';
 
 const AdminProducts = () => {
     const { t } = useTranslation();
@@ -174,6 +175,9 @@ const AdminProducts = () => {
         try {
             const payload = {
                 ...formData,
+                // strip &nbsp; / zero-width noise the rich-text editor emits; the
+                // backend re-applies typography rules and returns the source of truth
+                description: normalizeWhitespace(formData.description),
                 price: parseFloat(formData.price),
                 stockQuantity: 0,
                 categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,

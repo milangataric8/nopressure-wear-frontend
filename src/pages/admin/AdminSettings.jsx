@@ -6,6 +6,7 @@ import { getAllFilters, updateFilter } from '../../api/filterApi';
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import { useTranslation } from 'react-i18next';
 import RichTextEditor from "../../components/common/RichTextEditor.jsx";
+import { normalizeWhitespace } from "../../utils/text.js";
 
 const AdminSettings = () => {
     const { t } = useTranslation();
@@ -353,8 +354,11 @@ const AdminSettings = () => {
                                                     />
                                                     <button
                                                         onClick={async () => {
+                                                            // strip &nbsp; / zero-width noise before it reaches the API;
+                                                            // the backend re-applies typography rules and returns the truth
+                                                            const clean = normalizeWhitespace(setting.value);
                                                             try {
-                                                                await updateSettings(setting.id, setting.value);
+                                                                await updateSettings(setting.id, clean);
                                                                 toast.success(t('messages.settingUpdated'));
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));

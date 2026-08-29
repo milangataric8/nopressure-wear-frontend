@@ -222,6 +222,18 @@
     text-decoration: line-through;
 }
 
+/*
+ * Guarantee word-boundary wrapping for rendered rich text, whatever the WYSIWYG
+ * editor emitted. Unlayered rules beat Tailwind's `break-normal` utility, so no
+ * !important is needed; the `*` covers stray inline styles on injected children.
+ */
+.product-description,
+.product-description * {
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+}
+
 /* text editor */
 .ql-editor p {
     margin: 0 !important;

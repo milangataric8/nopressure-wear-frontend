@@ -458,6 +458,7 @@ const CartPage = () => {
         100,
         ((delivery.threshold - subtotalAfterCoupon) / delivery.threshold) * 100
     );
+    const selected = 100 - progress;
     const deliveryFee = !delivery.enabled ? 0
         : (delivery.threshold > 0 && subtotalAfterCoupon >= delivery.threshold) ? 0
         : delivery.fee;
@@ -486,7 +487,7 @@ const CartPage = () => {
                                 <div className="h-1 flex-1 overflow-hidden bg-gray-200">
                                     <div
                                         className="h-full bg-black"
-                                        style={{ width: `${progress}%` }}
+                                        style={{ width: `${selected}%` }}
                                     />
                                 </div>
                                 <Truck className="h-4 w-4 shrink-0 text-[#002855]" />

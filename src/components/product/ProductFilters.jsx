@@ -25,6 +25,10 @@ const ProductFilters = ({
                             availableMaterials,
                             selectedMaterial,
                             setSelectedMaterial,
+                            // size
+                            availableSizes,
+                            selectedSizes,
+                            setSelectedSizes,
                             // price
                             minPrice,
                             maxPrice,
@@ -55,7 +59,8 @@ const ProductFilters = ({
         selectedBrand !== '' ||
         selectedColor !== '' ||
         selectedMaterial !== '' ||
-        selectedGender !== '';
+        selectedGender !== '' ||
+        (selectedSizes?.length ?? 0) > 0;
 
     const clearAll = () => {
         setSelectedCategory('');
@@ -69,8 +74,21 @@ const ProductFilters = ({
         setSelectedColor('');
         setSelectedMaterial('');
         setSelectedGender('');
+        setSelectedSizes([]);
         setPage(0);
         navigate('/products');
+    };
+
+    const toggleSize = (size) => {
+        const next = selectedSizes.includes(size)
+            ? selectedSizes.filter(s => s !== size)
+            : [...selectedSizes, size];
+        setSelectedSizes(next);
+        setPage(0);
+        const sp = new URLSearchParams(searchParams);
+        sp.delete('sizes');
+        next.forEach(s => sp.append('sizes', s));   // empty selection omits the param entirely
+        setSearchParams(sp);
     };
 
     const handleGenderToggle = (g) => {
@@ -261,6 +279,35 @@ const ProductFilters = ({
                                 {material}
                             </button>
                         ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Size filter */}
+            {isFilterVisible('size') && availableSizes.length > 0 && (
+                <div className="mb-6">
+                    <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
+                        {t('product.size')}
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                        {availableSizes.map(size => {
+                            const active = selectedSizes.includes(size);
+                            return (
+                                <button
+                                    key={size}
+                                    type="button"
+                                    onClick={() => toggleSize(size)}
+                                    className={`text-xs font-semibold uppercase tracking-wide px-3 py-1.5 border transition-colors ${
+                                        active
+                                            ? 'bg-black text-white border-black'
+                                            : 'bg-white text-black border-gray-200 hover:border-black'
+                                    }`}
+                                    aria-pressed={active}
+                                >
+                                    {size}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}

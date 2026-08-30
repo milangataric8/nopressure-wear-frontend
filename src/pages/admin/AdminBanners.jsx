@@ -76,7 +76,6 @@ const AdminBanners = () => {
 
     const validate = () => {
         const e = {};
-        if (!formData.title?.trim()) e.title = t('validation.titleRequired');
         if (!formData.mediaUrl) e.mediaUrl = t('validation.mediaRequired');
         setErrors(e);
         return Object.keys(e).length === 0;

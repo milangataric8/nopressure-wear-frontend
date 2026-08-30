@@ -188,10 +188,20 @@ const AdminProducts = () => {
             };
 
             if (editingProduct) {
+                // Edit mode persists variants/stores immediately via their own endpoints,
+                // so these fields are omitted — sending them (even empty) would clear relations.
                 await updateProduct(editingProduct.id, payload);
                 toast.success(t('messages.productUpdated'));
             } else {
-                const response = await createProduct(payload);
+                const createPayload = {
+                    ...payload,
+                    colorVariantIds: colorVariants.filter(v => !v.isCurrent).map(v => v.productId),
+                    stores: productStores.map(ps => ({
+                        storeLocationId: ps.storeLocationId,
+                        inStock: ps.inStock,
+                    })),
+                };
+                const response = await createProduct(createPayload);
                 const savedProduct = response.data;
 
                 for (const imageUrl of pendingImages) {
@@ -289,6 +299,8 @@ const AdminProducts = () => {
         });
         setEditingProduct(null);
         setPendingImages([]);
+        setColorVariants([]);
+        setProductStores([]);
         setShowForm(false);
         setErrors({});
     };
@@ -308,9 +320,9 @@ const AdminProducts = () => {
                         if (showForm) {
                             resetForm();
                         } else {
+                            // start from a clean slate so no stale draft variants/stores leak in
+                            resetForm();
                             setShowForm(true);
-                            setEditingProduct(null);
-                            setErrors({});
                         }
                     }
                 }
@@ -495,17 +507,6 @@ const AdminProducts = () => {
                                             className={inputClass + " flex-1 justify-items-center"}
                                             placeholder="0"
                                         />
-                                        {/*<input*/}
-                                        {/*    type="text"*/}
-                                        {/*    value={v.sku || ''}*/}
-                                        {/*    onChange={(e) => {*/}
-                                        {/*        const updated = [...formData.variants];*/}
-                                        {/*        updated[idx] = { ...updated[idx], sku: e.target.value };*/}
-                                        {/*        setFormData({ ...formData, variants: updated });*/}
-                                        {/*    }}*/}
-                                        {/*    className={inputClass + " flex-1"}*/}
-                                        {/*    placeholder={t('admin.sizeSku')}*/}
-                                        {/*/>*/}
                                     </div>
                                 ))}
                             </div>
@@ -521,24 +522,20 @@ const AdminProducts = () => {
                             t={t}
                         />
 
-                        {editingProduct && (
-                            <ColorVariantManager
-                                productId={editingProduct.id}
-                                colorVariants={colorVariants}
-                                setColorVariants={setColorVariants}
-                                inputClass={inputClass}
-                            />
-                        )}
+                        <ColorVariantManager
+                            productId={editingProduct?.id}
+                            colorVariants={colorVariants}
+                            setColorVariants={setColorVariants}
+                            inputClass={inputClass}
+                        />
 
-                        {editingProduct && (
-                            <StoreAvailabilityManager
-                                productId={editingProduct.id}
-                                allStores={allStores}
-                                productStores={productStores}
-                                setProductStores={setProductStores}
-                                inputClass={inputClass}
-                            />
-                        )}
+                        <StoreAvailabilityManager
+                            productId={editingProduct?.id}
+                            allStores={allStores}
+                            productStores={productStores}
+                            setProductStores={setProductStores}
+                            inputClass={inputClass}
+                        />
 
                         <ProductMediaManager
                             editingProduct={editingProduct}

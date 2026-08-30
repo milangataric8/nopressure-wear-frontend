@@ -9,6 +9,10 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
     const [variantSearch, setVariantSearch] = useState('');
     const [variantResults, setVariantResults] = useState([]);
 
+    // No productId yet → the product is being created. Draft actions mutate local
+    // state and are submitted with the product; edit mode hits the API immediately.
+    const isDraft = !productId;
+
     const handleSearch = async (q) => {
         setVariantSearch(q);
         if (q.trim().length < 2) {
@@ -28,9 +32,21 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
         }
     };
 
-    const handleLink = async (variantId) => {
+    const handleLink = async (product) => {
+        if (isDraft) {
+            setColorVariants(prev => [...prev, {
+                productId: product.id,
+                name: product.name,
+                colorName: product.colorName,
+                colorHex: product.colorHex,
+                isCurrent: false,
+            }]);
+            setVariantSearch('');
+            setVariantResults([]);
+            return;
+        }
         try {
-            await linkColorVariant(productId, variantId);
+            await linkColorVariant(productId, product.id);
             const r = await getColorVariants(productId);
             setColorVariants(r.data);
             setVariantSearch('');
@@ -42,6 +58,10 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
     };
 
     const handleUnlink = async (variantId) => {
+        if (isDraft) {
+            setColorVariants(prev => prev.filter(v => v.productId !== variantId));
+            return;
+        }
         try {
             const r = await unlinkColorVariant(productId, variantId);
             setColorVariants(r.data);
@@ -102,7 +122,7 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
                             <button
                                 key={p.id}
                                 type="button"
-                                onClick={() => handleLink(p.id)}
+                                onClick={() => handleLink(p)}
                                 className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
                             >
                                 <div className="w-8 h-8 bg-gray-100 flex-shrink-0 overflow-hidden">

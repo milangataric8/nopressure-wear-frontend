@@ -11,7 +11,8 @@ import {
     downloadOrdersPdf, downloadOrdersExcel,
     downloadProductsPdf, downloadProductsExcel,
     downloadCustomersPdf, downloadCustomersExcel,
-    downloadLowStockPdf, downloadLowStockExcel
+    downloadLowStockPdf, downloadLowStockExcel,
+    downloadRevenueByCategoryPdf, downloadRevenueByCategoryExcel
 } from '../../api/reportApi.js';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import DownloadButtons from '../admin/DownloadButtons.jsx';
@@ -262,6 +263,7 @@ const AdminReports = () => {
                     <h2 className="text-xs font-black uppercase tracking-wide text-black mb-6">
                         {t('admin.revenueByCategory')}
                     </h2>
+                    <DownloadButtons pdfFn={downloadRevenueByCategoryPdf} excelFn={downloadRevenueByCategoryExcel} />
                     {revenueByCategory.length === 0 ? (
                         <p className="text-sm text-gray-400 text-center py-10">{t('admin.noDataYet')}</p>
                     ) : (

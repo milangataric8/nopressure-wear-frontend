@@ -40,6 +40,8 @@ const ProductsPage = () => {
     const [showFilters, setShowFilters] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedGender, setSelectedGender] = useState(searchParams.get('gender') || '');
+    const [selectedSizes, setSelectedSizes] = useState(() => searchParams.getAll('sizes'));
+    const [availableSizes, setAvailableSizes] = useState([]);
     const [expandedCategories, setExpandedCategories] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [selectedBrand, setSelectedBrand] = useState('');
@@ -75,6 +77,7 @@ const ProductsPage = () => {
             if (selectedColor) params.colorName = selectedColor;
             if (selectedMaterial) params.material = selectedMaterial;
             if (selectedGender) params.gender = selectedGender;
+            if (selectedSizes.length > 0) params.sizes = selectedSizes;
 
             const response = await searchActiveProducts(params);
 
@@ -86,7 +89,7 @@ const ProductsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, selectedMaterial, selectedGender, categories]);
+    }, [page, searchQuery, selectedCategory, sortBy, sortDir, appliedMinPrice, appliedMaxPrice, selectedBrand, selectedColor, selectedMaterial, selectedGender, selectedSizes, categories]);
 
     const fetchCategories = useCallback(async () => {
         try {
@@ -134,6 +137,7 @@ const ProductsPage = () => {
             setSearchQuery(searchFromUrl);
             setSelectedCategory('');
             setSelectedGender('');
+            setSelectedSizes([]);
             setAppliedMinPrice('');
             setAppliedMaxPrice('');
             setMinPrice('');
@@ -144,6 +148,7 @@ const ProductsPage = () => {
 
         setSelectedCategory(categoryFromUrl ? parseInt(categoryFromUrl) : '');
         setSelectedGender(genderFromUrl || '');
+        setSelectedSizes(searchParams.getAll('sizes'));
         setPage(0);
     }, [searchParams]);
 
@@ -169,6 +174,7 @@ const ProductsPage = () => {
             setAvailableBrands(r.data.brands || []);
             setAvailableColors(r.data.colors || []);
             setAvailableMaterials(r.data.materials || []);
+            setAvailableSizes(r.data.sizes || []);
         }).catch(() => {});
     }, []);
 
@@ -228,6 +234,9 @@ const ProductsPage = () => {
                         availableMaterials={availableMaterials}
                         selectedMaterial={selectedMaterial}
                         setSelectedMaterial={setSelectedMaterial}
+                        availableSizes={availableSizes}
+                        selectedSizes={selectedSizes}
+                        setSelectedSizes={setSelectedSizes}
                         minPrice={minPrice}
                         maxPrice={maxPrice}
                         setMinPrice={setMinPrice}
@@ -311,6 +320,7 @@ const ProductsPage = () => {
                         availableColors={availableColors}
                         selectedBrand={selectedBrand}
                         selectedMaterial={selectedMaterial}
+                        selectedSizes={selectedSizes}
                         appliedMinPrice={appliedMinPrice}
                         appliedMaxPrice={appliedMaxPrice}
                         searchQuery={searchQuery}
@@ -318,6 +328,17 @@ const ProductsPage = () => {
                         onRemoveColor={() => { setSelectedColor(''); setPage(0); }}
                         onRemoveBrand={() => { setSelectedBrand(''); setPage(0); }}
                         onRemoveMaterial={() => { setSelectedMaterial(''); setPage(0); }}
+                        onRemoveSize={(size) => {
+                            setSelectedSizes(prev => prev.filter(s => s !== size));
+                            setPage(0);
+                            setSearchParams(prev => {
+                                const sp = new URLSearchParams(prev);
+                                const remaining = sp.getAll('sizes').filter(s => s !== size);
+                                sp.delete('sizes');
+                                remaining.forEach(s => sp.append('sizes', s));
+                                return sp;
+                            });
+                        }}
                         onRemovePrice={() => { setMinPrice(''); setMaxPrice(''); setAppliedMinPrice(''); setAppliedMaxPrice(''); setPage(0); }}
                         onRemoveSearch={() => { setSearchQuery(''); setSearchInput(''); setPage(0); navigate('/products'); }}
                         onRemoveGender={() => { setSelectedGender(''); setPage(0); setSearchParams(prev => { const sp = new URLSearchParams(prev); sp.delete('gender'); return sp; }); }}
@@ -326,7 +347,7 @@ const ProductsPage = () => {
                             setSelectedCategory(''); setSelectedColor(''); setSelectedBrand('');
                             setSelectedMaterial(''); setAppliedMinPrice(''); setAppliedMaxPrice('');
                             setMinPrice(''); setMaxPrice(''); setSearchQuery(''); setSearchInput('');
-                            setSelectedGender(''); setSearchParams({});
+                            setSelectedGender(''); setSelectedSizes([]); setSearchParams({});
                         }}
                     />
 

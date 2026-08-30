@@ -18,7 +18,7 @@ const downloadFile = (url, filename) => {
 export const downloadOrdersPdf = () =>
     downloadFile('/reports/orders/pdf', 'orders-report.pdf');
 export const downloadOrdersExcel = () =>
-    ('/reports/orders/excel', 'orders-report.xlsx');
+    downloadFile('/reports/orders/excel', 'orders-report.xlsx');
 export const downloadProductsPdf = () =>
     downloadFile('/reports/products/pdf', 'products-report.pdf');
 export const downloadProductsExcel = () =>
@@ -31,3 +31,7 @@ export const downloadLowStockPdf = (threshold = 10) =>
     downloadFile(`/reports/low-stock/pdf?threshold=${threshold}`, 'low-stock-report.pdf');
 export const downloadLowStockExcel = (threshold = 10) =>
     downloadFile(`/reports/low-stock/excel?threshold=${threshold}`, 'low-stock-report.xlsx');
+export const downloadRevenueByCategoryPdf = () =>
+    downloadFile('/reports/revenue-by-category/pdf', 'revenue-by-category-report.pdf');
+export const downloadRevenueByCategoryExcel = () =>
+    downloadFile('/reports/revenue-by-category/excel', 'revenue-by-category-report.xlsx');

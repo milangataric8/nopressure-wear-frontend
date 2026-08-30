@@ -7,7 +7,9 @@ export const getActiveProducts = (params) =>
 export const getProductById = (id) =>
     axiosInstance.get(`/products/${id}`);
 export const searchActiveProducts = (params) =>
-    axiosInstance.get('/products/search', { params });
+    // indexes: null → array params repeat as `sizes=M&sizes=L` (no `[]`), which Spring's
+    // `List<ProductSize> sizes` binds; scalar params are unaffected
+    axiosInstance.get('/products/search', { params, paramsSerializer: { indexes: null } });
 export const getProductFilters = () =>
     axiosInstance.get('/products/filters');
 export const createProduct = (data) =>

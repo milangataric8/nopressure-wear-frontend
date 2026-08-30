@@ -12,9 +12,19 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
     const { t } = useTranslation();
     const [selectedStoreId, setSelectedStoreId] = useState('');
 
-    const handleToggleStock = async (psId) => {
+    // No productId yet → the product is being created. Draft actions mutate local
+    // state and are submitted with the product; edit mode hits the API immediately.
+    const isDraft = !productId;
+
+    const handleToggleStock = async (ps) => {
+        if (isDraft) {
+            setProductStores(prev => prev.map(s =>
+                (s.id ?? s.tempId) === (ps.id ?? ps.tempId) ? { ...s, inStock: !s.inStock } : s
+            ));
+            return;
+        }
         try {
-            await toggleProductStoreStock(psId);
+            await toggleProductStoreStock(ps.id);
             const updated = await getAllStoresForProduct(productId);
             setProductStores(updated.data);
         } catch (e) {
@@ -23,6 +33,10 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
     };
 
     const handleRemove = async (ps) => {
+        if (isDraft) {
+            setProductStores(prev => prev.filter(s => (s.id ?? s.tempId) !== (ps.id ?? ps.tempId)));
+            return;
+        }
         try {
             await removeProductFromStore(productId, ps.storeLocationId);
             setProductStores(prev => prev.filter(s => s.id !== ps.id));
@@ -34,6 +48,20 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
 
     const handleAdd = async () => {
         if (!selectedStoreId) return;
+        if (isDraft) {
+            const store = allStores.find(s => s.id === parseInt(selectedStoreId));
+            if (!store) return;
+            setProductStores(prev => [...prev, {
+                tempId: crypto.randomUUID(),
+                storeLocationId: store.id,
+                storeName: store.name,
+                storeCity: store.city,
+                storeStreet: store.street,
+                inStock: true,
+            }]);
+            setSelectedStoreId('');
+            return;
+        }
         try {
             await addProductToStore(productId, {
                 storeLocationId: parseInt(selectedStoreId),
@@ -60,7 +88,7 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
             {/* Linked stores */}
             <div className="space-y-2 mb-3">
                 {productStores.map(ps => (
-                    <div key={ps.id} className="flex items-center justify-between border border-gray-200 px-3 py-2">
+                    <div key={ps.id ?? ps.tempId} className="flex items-center justify-between border border-gray-200 px-3 py-2">
                         <div>
                             <p className="text-xs font-semibold text-black">{ps.storeName}</p>
                             <p className="text-xs text-gray-400">{ps.storeCity} — {ps.storeStreet}</p>
@@ -68,7 +96,7 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
                         <div className="flex items-center gap-3">
                             <button
                                 type="button"
-                                onClick={() => handleToggleStock(ps.id)}
+                                onClick={() => handleToggleStock(ps)}
                                 className={`text-xs font-semibold uppercase px-2 py-0.5 ${
                                     ps.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                                 }`}

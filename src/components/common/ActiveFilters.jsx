@@ -2,10 +2,10 @@ import {t} from "i18next";
 
 const ActiveFilters = ({
                            selectedCategory, categories, selectedColor, availableColors,
-                           selectedBrand, selectedMaterial, appliedMinPrice, appliedMaxPrice,
+                           selectedBrand, selectedMaterial, selectedSizes, appliedMinPrice, appliedMaxPrice,
                            searchQuery, selectedGender,
                            onRemoveCategory, onRemoveColor, onRemoveBrand,
-                           onRemoveMaterial, onRemovePrice, onRemoveSearch, onRemoveGender, onClearAll
+                           onRemoveMaterial, onRemoveSize, onRemovePrice, onRemoveSearch, onRemoveGender, onClearAll
                        }) => {
     const activeFilters = [];
 
@@ -22,6 +22,11 @@ const ActiveFilters = ({
     }
     if (selectedMaterial) {
         activeFilters.push({ label: selectedMaterial, onRemove: onRemoveMaterial });
+    }
+    if (selectedSizes?.length) {
+        selectedSizes.forEach(size => {
+            activeFilters.push({ label: size, onRemove: () => onRemoveSize(size) });
+        });
     }
     if (appliedMinPrice !== '' || appliedMaxPrice !== '') {
         activeFilters.push({

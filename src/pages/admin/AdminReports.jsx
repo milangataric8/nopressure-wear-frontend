@@ -298,24 +298,25 @@ const AdminReports = () => {
                         <p className="text-sm text-gray-400 text-center py-10">{t('admin.wellStocked')}</p>
                     ) : (
                         <div className="space-y-3">
-                            {lowStock.map(product => (
-                                <div key={product.id} className="flex items-center gap-3 py-2 border-b border-gray-100">
+                            {lowStock.map(item => (
+                                <div key={item.variantid} className="flex items-center gap-3 py-2 border-b border-gray-100">
                                     <div className="w-10 h-10 bg-gray-100 flex-shrink-0 overflow-hidden">
-                                        {product.imageurl ? (
-                                            <img src={getImageUrl(product.imageurl)} alt={product.name} className="w-full h-full object-contain" />
+                                        {item.imageurl ? (
+                                            <img src={getImageUrl(item.imageurl)} alt={item.name} className="w-full h-full object-contain" />
                                         ) : (
                                             <div className="w-full h-full bg-gray-200" />
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-semibold text-black truncate">{product.name}</p>
+                                        <p className="text-xs font-semibold text-black truncate">{item.name}</p>
+                                        <p className="text-xs text-gray-400">{item.size}</p>
                                     </div>
                                     <span className={`text-xs font-bold px-2 py-0.5 ${
-                                        Number(product.stockquantity) === 0
+                                        Number(item.stockquantity) === 0
                                             ? 'bg-red-100 text-red-700'
                                             : 'bg-yellow-100 text-yellow-700'
                                     }`}>
-                                        {t('admin.leftInStock', { count: product.stockquantity })}
+                                        {t('admin.leftInStock', { count: item.stockquantity })}
                                     </span>
                                 </div>
                             ))}

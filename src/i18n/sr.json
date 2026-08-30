@@ -208,6 +208,7 @@
     "popupDurationHint": "Koliko dugo popap ostaje otvoren. 0 = dok se ručno ne zatvori.",
     "sizesAndStock": "Veličine i zalihe",
     "sizesHint": "Unesite zalihe po veličini. Ukupna zaliha se izračunava automatski.",
+    "stockManagedPerSize": "Zalihe se upravljaju po veličini.",
     "sizeSku": "SKU veličine (opciono)",
     "legal": "Pravne stranice",
     "manageLegal": "Upravljajte sadržajem pravnih stranica (Privatnost, Uslovi, Povraćaj, Impresum)",

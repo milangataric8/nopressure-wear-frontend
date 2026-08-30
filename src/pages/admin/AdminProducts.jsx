@@ -179,8 +179,8 @@ const AdminProducts = () => {
                 // backend re-applies typography rules and returns the source of truth
                 description: normalizeWhitespace(formData.description),
                 price: parseFloat(formData.price),
-                stockQuantity: 0,
                 categoryId: formData.categoryId ? parseInt(formData.categoryId) : null,
+                // product-level stock is gone; the backend derives it from the variants
                 variants: formData.variants.map(v => ({
                     size: v.size,
                     stockQuantity: parseInt(v.stockQuantity) || 0
@@ -243,7 +243,7 @@ const AdminProducts = () => {
             gender: product.gender ?? 'UNISEX',
             variants: ALL_SIZES.map(size => {
                 const found = product.variants?.find(v => v.size === size);
-                return { size, stockQuantity: found?.stockQuantity ?? 0 /*, sku: found?.sku ?? ''*/ };
+                return { size, stockQuantity: found?.stockQuantity ?? 0 };
             }),
         });
         setShowForm(true);

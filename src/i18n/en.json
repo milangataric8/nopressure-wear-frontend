@@ -208,6 +208,7 @@
     "popupDurationHint": "How long the popup stays open. 0 = until manually closed.",
     "sizesAndStock": "Sizes & Stock",
     "sizesHint": "Set stock per size. Total stock is calculated automatically.",
+    "stockManagedPerSize": "Stock is managed per size.",
     "sizeSku": "Size SKU (optional)",
     "legal": "Legal Pages",
     "manageLegal": "Manage legal page content (Privacy, Terms, Returns, Imprint)",

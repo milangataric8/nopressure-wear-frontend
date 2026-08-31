@@ -310,7 +310,7 @@ const AdminNotifications = () => {
                 <button
                     onClick={handleSend}
                     disabled={sending || !message.trim() || selectedChannels.length === 0}
-                    className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors disabled:opacity-30"
+                    className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-3 hover:bg-gray-800 transition-colors disabled:opacity-30"
                 >
                     {sending ? t('admin.sending') : t('admin.sendNotification')}
                 </button>

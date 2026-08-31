@@ -491,10 +491,10 @@ const AdminProducts = () => {
                         <div>
                             <label className={labelClass}>{t('admin.sizesAndStock')}</label>
                             <p className="text-xs text-gray-400 mb-3">{t('admin.sizesHint')}</p>
-                            <div className="space-y-2">
+                            <div className="space-y-1">
                                 {formData.variants.map((v, idx) => (
-                                    <div key={v.size} className="flex items-center gap-3">
-                                        <span className="w-110 text-lg font-bold text-black shrink-0 border-b border-gray-200 self-end">{v.size}</span>
+                                    <div key={v.size} className="grid grid-cols-[1fr_auto] items-center gap-4 py-2 border-b border-gray-100">
+                                        <span className="min-w-0 text-sm font-semibold text-black">{v.size}</span>
                                         <input
                                             type="number"
                                             min="0"
@@ -504,7 +504,7 @@ const AdminProducts = () => {
                                                 updated[idx] = { ...updated[idx], stockQuantity: e.target.value };
                                                 setFormData({ ...formData, variants: updated });
                                             }}
-                                            className={inputClass + " flex-1 justify-items-center"}
+                                            className="w-20 border border-gray-300 px-3 py-2 text-sm text-right focus:outline-none focus:border-black transition-colors"
                                             placeholder="0"
                                         />
                                     </div>
@@ -557,7 +557,7 @@ const AdminProducts = () => {
                             />
                         </div>
 
-                        <div className="md:col-span-2 flex gap-3">
+                        <div className="md:col-span-2 flex gap-3 [&>button]:flex-1">
                             <button
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"

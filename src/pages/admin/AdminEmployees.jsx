@@ -215,7 +215,7 @@ const AdminEmployees = () => {
                             />
                         </div>
 
-                        <div className="md:col-span-2 flex gap-3">
+                        <div className="md:col-span-2 flex gap-3 [&>button]:flex-1">
                             <button
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
@@ -277,7 +277,7 @@ const AdminEmployees = () => {
                             />
                         </div>
 
-                        <div className="md:col-span-2 flex gap-3">
+                        <div className="md:col-span-2 flex gap-3 [&>button]:flex-1">
                             <button
                                 type="submit"
                                 className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"

@@ -519,7 +519,7 @@ const AdminBanners = () => {
                             />
                         </div>
 
-                        <div className="md:col-span-2 flex gap-3">
+                        <div className="md:col-span-2 flex gap-3 [&>button]:flex-1">
                             <button
                                 type="submit"
                                 disabled={uploading}

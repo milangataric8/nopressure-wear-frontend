@@ -116,27 +116,25 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
             </div>
 
             {/* Add store */}
-            <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                    <select
-                        value={selectedStoreId}
-                        onChange={(e) => setSelectedStoreId(e.target.value)}
-                        className={inputClass}
-                    >
-                        <option value="">{t('admin.selectStorePlaceholder')}</option>
-                        {allStores
-                            .filter(s => !productStores.some(ps => ps.storeLocationId === s.id))
-                            .map(store => (
-                                <option key={store.id} value={store.id}>
-                                    {store.name} — {store.city}
-                                </option>
-                            ))}
-                    </select>
-                </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                <select
+                    value={selectedStoreId}
+                    onChange={(e) => setSelectedStoreId(e.target.value)}
+                    className={`${inputClass} w-full sm:flex-1`}
+                >
+                    <option value="">{t('admin.selectStorePlaceholder')}</option>
+                    {allStores
+                        .filter(s => !productStores.some(ps => ps.storeLocationId === s.id))
+                        .map(store => (
+                            <option key={store.id} value={store.id}>
+                                {store.name} — {store.city}
+                            </option>
+                        ))}
+                </select>
                 <button
                     type="button"
                     onClick={handleAdd}
-                    className="bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800 transition-colors"
+                    className="w-full sm:w-auto bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-800 transition-colors"
                 >
                     {t('store.addStore')}
                 </button>

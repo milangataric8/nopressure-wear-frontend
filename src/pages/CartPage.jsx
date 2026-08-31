@@ -110,7 +110,7 @@ const CartPage = () => {
 
     useEffect(() => {
         if (isAuthenticated()) {
-            fetchCart();
+            void fetchCart();
         }
     }, []);
 
@@ -197,7 +197,7 @@ const CartPage = () => {
                 const response = await updateCartItem(user.id, cartItemId, { productId, quantity });
                 setCart(response.data);
             } catch (e) {
-                fetchCart(); // several clicks may have queued up — re-sync from server rather than roll back
+                await fetchCart(); // several clicks may have queued up — re-sync from server rather than roll back
                 toast.error(e.response?.data?.message || 'Failed to update quantity');
             }
         }, 500);
@@ -231,7 +231,7 @@ const CartPage = () => {
                 try {
                     await removeCartItem(user.id, cartItemId);
                 } catch (e) {
-                    setCart(previousCart);
+                    await fetchCart();
                     setCartCount(previousCart?.items.length ?? 0);
                     toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
                 }
@@ -261,7 +261,7 @@ const CartPage = () => {
                 try {
                     await clearCart(user.id);
                 } catch (e) {
-                    setCart(previousCart);
+                    await fetchCart();
                     setCartCount(previousCart?.items.length ?? 0);
                     toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
                 }
@@ -307,7 +307,7 @@ const CartPage = () => {
             return;
         }
         // a pending remove must hit the server before the order is built, or the item comes back
-        if (pending) pending.commit();
+        if (pending) await pending.commit();
         setCheckingOut(true);
         try {
             await saveAddressIfNeeded();

@@ -521,15 +521,23 @@ const AdminReports = () => {
 
             {/* Recent Orders */}
             <div className="border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xs font-black uppercase tracking-wide text-black">
-                        {t('admin.recentOrders')}
-                    </h2>
-                    <div className="flex items-center gap-4">
-                        <DownloadButtons pdfFn={downloadOrdersPdf} excelFn={downloadOrdersExcel} />
-                        <Link to="/admin/orders" className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors">
-                            {t('product.viewAll')} →
-                        </Link>
+                <div className="mb-6">
+                    <div className="flex items-center justify-between gap-4">
+                        <h2 className="text-xs font-black uppercase tracking-wide text-black">
+                            {t('admin.recentOrders')}
+                        </h2>
+                        <div className="flex items-center gap-4">
+                            <div className="hidden sm:block">
+                                <DownloadButtons pdfFn={downloadOrdersPdf} excelFn={downloadOrdersExcel} layout="flex gap-2" />
+                            </div>
+                            <Link to="/admin/orders" className="whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors">
+                                {t('product.viewAll')} →
+                            </Link>
+                        </div>
+                    </div>
+                    {/* Export buttons drop to their own 50/50 row on mobile */}
+                    <div className="mt-3 sm:hidden">
+                        <DownloadButtons pdfFn={downloadOrdersPdf} excelFn={downloadOrdersExcel} layout="grid grid-cols-2 gap-3" />
                     </div>
                 </div>
                 {recentOrders.length === 0 ? (

@@ -191,8 +191,8 @@ const AdminNotifications = () => {
                                     {t('admin.removeBackground')}
                                 </span>
                             </label>
-                            <label className="cursor-pointer inline-block">
-                            <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                            <label className="cursor-pointer block w-full">
+                            <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2.5 text-center hover:bg-gray-50 transition-colors">
                                 {uploading ? t('common.uploading') : t('admin.uploadImage')}
                             </div>
                             <input
@@ -236,7 +236,7 @@ const AdminNotifications = () => {
                 </div>
 
                 {/* Colors */}
-                <div className="flex gap-6 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
                             {t('admin.backgroundColor') || 'Background'}

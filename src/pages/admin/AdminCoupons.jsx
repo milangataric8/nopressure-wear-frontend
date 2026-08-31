@@ -243,7 +243,7 @@ const AdminCoupons = () => {
                         <div className="md:col-span-2 flex gap-3">
                             <button
                                 type="submit"
-                                className="bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
+                                className="w-full sm:w-auto bg-black text-white text-sm font-semibold uppercase tracking-wide px-8 py-2.5 hover:bg-gray-800 transition-colors"
                             >
                                 {t('common.create')}
                             </button>

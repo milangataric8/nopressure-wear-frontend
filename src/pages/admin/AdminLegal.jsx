@@ -52,7 +52,7 @@ const AdminLegal = () => {
     };
 
     const tabClass = (active) =>
-        `px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
+        `whitespace-nowrap px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-colors ${
             active ? 'bg-black text-white' : 'text-gray-500 hover:text-black'
         }`;
 
@@ -63,17 +63,19 @@ const AdminLegal = () => {
                 subtitle={t('admin.manageLegal')}
             />
 
-            {/* Page tabs */}
-            <div className="flex border border-gray-200 w-fit mb-6">
-                {PAGES.map(p => (
-                    <button
-                        key={p.key}
-                        onClick={() => setActivePage(p.key)}
-                        className={tabClass(activePage === p.key)}
-                    >
-                        {t(p.labelKey)}
-                    </button>
-                ))}
+            {/* Page tabs — the bar scrolls sideways on mobile so the page itself never does */}
+            <div className="-mx-6 px-6 mb-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex border border-gray-200 w-max md:w-fit">
+                    {PAGES.map(p => (
+                        <button
+                            key={p.key}
+                            onClick={() => setActivePage(p.key)}
+                            className={tabClass(activePage === p.key)}
+                        >
+                            {t(p.labelKey)}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Language tabs */}

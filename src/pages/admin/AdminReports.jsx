@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,8 +15,17 @@ import {
     downloadRevenueByCategoryPdf, downloadRevenueByCategoryExcel
 } from '../../api/reportApi.js';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import Pagination from '../../components/common/Pagination';
 import DownloadButtons from '../admin/DownloadButtons.jsx';
 import {useCurrency} from "../../context/CurrencyContext.jsx";
+
+// Threshold at or below which a variant counts as low stock. Defined once so the
+// report fetch and both export buttons stay in sync.
+const LOW_STOCK_THRESHOLD = 5;
+const LOW_STOCK_PAGE_SIZE = 5;
+const REVENUE_PAGE_SIZE = 5;
+// Must match the ProductSize enum on the backend. A size missing here sorts to the front.
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 const AdminReports = () => {
     const { t } = useTranslation();
@@ -30,6 +39,10 @@ const AdminReports = () => {
     const [paymentStats, setPaymentStats] = useState({});
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [lowStockPage, setLowStockPage] = useState(0);
+    const [expandedProduct, setExpandedProduct] = useState(null);
+    const [revenuePage, setRevenuePage] = useState(0);
+    const [expandedCategory, setExpandedCategory] = useState(null);
     const { format } = useCurrency();
 
     useEffect(() => {
@@ -39,7 +52,7 @@ const AdminReports = () => {
             getOrdersByStatus(),
             getTopProducts(5),
             getTopCustomers(5),
-            getLowStock(10),
+            getLowStock(LOW_STOCK_THRESHOLD),
             getRevenueByCategory(),
             getPaymentStats(),
             getRecentOrders(5),
@@ -57,6 +70,94 @@ const AdminReports = () => {
             .finally(() => setLoading(false));
     }, []);
 
+    // Flat per-variant rows from the API grouped into one entry per product. Products
+    // share names across colors, so grouping by productid keeps each color a distinct row.
+    const lowStockGroups = useMemo(() => {
+        const map = new Map();
+
+        for (const item of lowStock) {
+            if (!map.has(item.productId)) {
+                map.set(item.productId, {
+                    productId: item.productId,
+                    name: item.name,
+                    imageUrl: item.imageUrl,
+                    colorName: item.colorName,
+                    gender: item.gender,
+                    variants: [],
+                });
+            }
+            map.get(item.productId).variants.push({
+                variantId: item.variantId,
+                size: item.size,
+                stock: Number(item.stockQuantity) || 0,
+            });
+        }
+
+        return [...map.values()]
+            .map(g => ({
+                ...g,
+                variants: [...g.variants].sort(
+                    (a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)
+                ),
+                minStock: Math.min(...g.variants.map(v => v.stock)),
+            }))
+            .sort((a, b) => a.minStock - b.minStock || a.name.localeCompare(b.name));
+    }, [lowStock]);
+
+    const lowStockTotalPages = Math.ceil(lowStockGroups.length / LOW_STOCK_PAGE_SIZE);
+    const lowStockPageItems = lowStockGroups.slice(
+        lowStockPage * LOW_STOCK_PAGE_SIZE,
+        lowStockPage * LOW_STOCK_PAGE_SIZE + LOW_STOCK_PAGE_SIZE
+    );
+
+    // Paging away should not leave a stale expanded id pointing at an off-page product.
+    const changeLowStockPage = updater => {
+        setLowStockPage(updater);
+        setExpandedProduct(null);
+    };
+
+    // Revenue rows grouped under their parent category. A row whose parentid is null is a
+    // top-level category; it seeds its own group and, if it has no children, renders as a
+    // plain row with no expand affordance.
+    const revenueGroups = useMemo(() => {
+        const map = new Map();
+
+        for (const item of revenueByCategory) {
+            const groupId = item.parentid ?? item.categoryid;
+            const groupName = item.parentname ?? item.categoryname;
+
+            if (!map.has(groupId)) {
+                map.set(groupId, { groupId, groupName, children: [], total: 0 });
+            }
+            const group = map.get(groupId);
+            group.children.push({
+                categoryId: item.categoryid,
+                name: item.categoryname,
+                revenue: Number(item.revenue) || 0,
+                isParentItself: !item.parentid,
+            });
+            group.total += Number(item.revenue) || 0;
+        }
+
+        return [...map.values()]
+            .map(g => ({
+                ...g,
+                children: [...g.children].sort((a, b) => b.revenue - a.revenue),
+            }))
+            .sort((a, b) => b.total - a.total);
+    }, [revenueByCategory]);
+
+    const revenueTotalPages = Math.ceil(revenueGroups.length / REVENUE_PAGE_SIZE);
+    const revenuePageItems = revenueGroups.slice(
+        revenuePage * REVENUE_PAGE_SIZE,
+        revenuePage * REVENUE_PAGE_SIZE + REVENUE_PAGE_SIZE
+    );
+
+    const changeRevenuePage = updater => {
+        setRevenuePage(updater);
+        setExpandedCategory(null);
+    };
+
     if (loading) return <LoadingSpinner />;
 
     const statusColors = {
@@ -71,8 +172,11 @@ const AdminReports = () => {
         ? Math.max(...revenueByMonth.map(r => Number(r.revenue)))
         : 0;
 
-    const maxCategoryRevenue = revenueByCategory.length > 0
-        ? Math.max(...revenueByCategory.map(r => Number(r.revenue)))
+    // Bars scale against the largest group total across the whole dataset, never per page,
+    // so widths stay comparable as the admin pages through. Subcategory bars use the same
+    // divisor rather than the parent total.
+    const maxGroupRevenue = revenueGroups.length > 0
+        ? Math.max(...revenueGroups.map(g => g.total))
         : 0;
 
     return (
@@ -264,25 +368,80 @@ const AdminReports = () => {
                         {t('admin.revenueByCategory')}
                     </h2>
                     <DownloadButtons pdfFn={downloadRevenueByCategoryPdf} excelFn={downloadRevenueByCategoryExcel} />
-                    {revenueByCategory.length === 0 ? (
+                    {revenueGroups.length === 0 ? (
                         <p className="text-sm text-gray-400 text-center py-10">{t('admin.noDataYet')}</p>
                     ) : (
-                        <div className="space-y-3">
-                            {revenueByCategory.map(item => (
-                                <div key={item.category} className="flex items-center gap-3">
-                                    <span className="text-xs text-gray-500 w-24 flex-shrink-0 truncate">{item.category}</span>
-                                    <div className="flex-1 bg-gray-100 h-5 relative">
-                                        <div
-                                            className="bg-black h-5"
-                                            style={{ width: `${maxCategoryRevenue > 0 ? (Number(item.revenue) / maxCategoryRevenue) * 100 : 0}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-semibold text-black w-28 text-right">
-                                        {format(item.revenue)}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
+                        <>
+                            <div className="divide-y divide-gray-100">
+                                {revenuePageItems.map(group => {
+                                    const expandable = group.children.length > 1;
+                                    const open = expandable && expandedCategory === group.groupId;
+                                    const width = maxGroupRevenue > 0 ? (group.total / maxGroupRevenue) * 100 : 0;
+
+                                    const header = (
+                                        <>
+                                            <span className="text-xs text-gray-500 w-24 flex-shrink-0 truncate">
+                                                {group.groupName}
+                                            </span>
+                                            <div className="flex-1 bg-gray-100 h-5 relative">
+                                                <div className="bg-black h-5" style={{ width: `${width}%` }} />
+                                            </div>
+                                            <span className="text-xs font-semibold text-black w-28 text-right">
+                                                {format(group.total)}
+                                            </span>
+                                            {expandable && (
+                                                <span className={`text-gray-400 text-xs transition-transform ${open ? 'rotate-90' : ''}`}>
+                                                    ›
+                                                </span>
+                                            )}
+                                        </>
+                                    );
+
+                                    return (
+                                        <div key={group.groupId}>
+                                            {expandable ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setExpandedCategory(open ? null : group.groupId)}
+                                                    aria-expanded={open}
+                                                    className="w-full flex items-center gap-3 py-3 text-left hover:bg-gray-50 transition-colors"
+                                                >
+                                                    {header}
+                                                </button>
+                                            ) : (
+                                                <div className="flex items-center gap-3 py-3">{header}</div>
+                                            )}
+
+                                            {open && (
+                                                <div className="pb-3 pl-6 space-y-2">
+                                                    {group.children.map(child => (
+                                                        <div key={child.categoryId} className="flex items-center gap-3">
+                                                            <span className="text-xs text-gray-400 w-20 flex-shrink-0 truncate">
+                                                                {child.isParentItself ? t('admin.directlyInCategory') : child.name}
+                                                            </span>
+                                                            <div className="flex-1 bg-gray-100 h-4 relative">
+                                                                <div
+                                                                    className="bg-gray-400 h-4"
+                                                                    style={{ width: `${maxGroupRevenue > 0 ? (child.revenue / maxGroupRevenue) * 100 : 0}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className="text-xs text-gray-600 w-28 text-right">
+                                                                {format(child.revenue)}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <Pagination
+                                page={revenuePage}
+                                totalPages={revenueTotalPages}
+                                setPage={changeRevenuePage}
+                            />
+                        </>
                     )}
                 </div>
 
@@ -292,35 +451,70 @@ const AdminReports = () => {
                         {t('admin.lowStockAlert')}
                     </h2>
                     <DownloadButtons pdfFn={() =>
-                        downloadLowStockPdf(10)} excelFn={() =>
-                        downloadLowStockExcel(10)} />
-                    {lowStock.length === 0 ? (
+                        downloadLowStockPdf(LOW_STOCK_THRESHOLD)} excelFn={() =>
+                        downloadLowStockExcel(LOW_STOCK_THRESHOLD)} />
+                    {lowStockGroups.length === 0 ? (
                         <p className="text-sm text-gray-400 text-center py-10">{t('admin.wellStocked')}</p>
                     ) : (
-                        <div className="space-y-3">
-                            {lowStock.map(item => (
-                                <div key={item.variantid} className="flex items-center gap-3 py-2 border-b border-gray-100">
-                                    <div className="w-10 h-10 bg-gray-100 flex-shrink-0 overflow-hidden">
-                                        {item.imageurl ? (
-                                            <img src={getImageUrl(item.imageurl)} alt={item.name} className="w-full h-full object-contain" />
-                                        ) : (
-                                            <div className="w-full h-full bg-gray-200" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-semibold text-black truncate">{item.name}</p>
-                                        <p className="text-xs text-gray-400">{item.size}</p>
-                                    </div>
-                                    <span className={`text-xs font-bold px-2 py-0.5 ${
-                                        Number(item.stockquantity) === 0
-                                            ? 'bg-red-100 text-red-700'
-                                            : 'bg-yellow-100 text-yellow-700'
-                                    }`}>
-                                        {t('admin.leftInStock', { count: item.stockquantity })}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
+                        <>
+                            <div className="divide-y divide-gray-100">
+                                {lowStockPageItems.map(group => {
+                                    const open = expandedProduct === group.productId;
+                                    return (
+                                        <div key={group.productId}>
+                                            <button
+                                                type="button"
+                                                onClick={() => setExpandedProduct(open ? null : group.productId)}
+                                                aria-expanded={open}
+                                                className="w-full flex items-center gap-3 py-3 text-left hover:bg-gray-50 transition-colors"
+                                            >
+                                                <div className="w-10 h-10 bg-gray-100 flex-shrink-0 overflow-hidden">
+                                                    {group.imageUrl ? (
+                                                        <img src={getImageUrl(group.imageUrl)} alt={group.name} className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gray-200" />
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-xs font-semibold text-black truncate">{group.name}</p>
+                                                    <p className="text-xs text-gray-400">
+                                                        {[group.colorName, group.gender].filter(Boolean).join(' | ')}
+                                                    </p>
+                                                </div>
+                                                <span className={`text-xs font-bold px-2 py-0.5 ${
+                                                    group.minStock === 0
+                                                        ? 'bg-red-100 text-red-700'
+                                                        : 'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {t('admin.criticalSizes', { count: group.variants.length })}
+                                                </span>
+                                                <span className={`text-gray-400 text-xs transition-transform ${open ? 'rotate-90' : ''}`}>
+                                                    ›
+                                                </span>
+                                            </button>
+
+                                            {open && (
+                                                <div className="pb-3 pl-13 space-y-1.5">
+                                                    {group.variants.map(v => (
+                                                        <div key={v.variantId} className="flex items-center justify-between pr-2">
+                                                            <span className="text-xs text-gray-600">{v.size}</span>
+                                                            <span className={`text-xs font-bold px-2 py-0.5 ${
+                                                                v.stock === 0
+                                                                    ? 'bg-red-100 text-red-700'
+                                                                    : 'bg-yellow-100 text-yellow-700'
+                                                            }`}>
+                                                                {t('admin.leftInStock', { count: v.stock })}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <Pagination page={lowStockPage} totalPages={lowStockTotalPages} setPage={changeLowStockPage} />
+                        </>
                     )}
                 </div>
             </div>

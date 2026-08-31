@@ -100,7 +100,7 @@ const AdminDashboard = () => {
                                         to={item.to}
                                         className="border border-gray-200 p-6 hover:border-black transition-colors group"
                                     >
-                                        <h3 className="text-sm font-black uppercase tracking-tight text-black mb-2 group-hover:underline">
+                                        <h3 className="text-sm font-black uppercase tracking-tight text-black mb-2">
                                             {item.title}
                                         </h3>
                                         <p className="text-xs text-gray-500">{item.desc}</p>

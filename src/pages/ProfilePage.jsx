@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { getSavedCards, createSetupIntent, deleteCard } from '../api/paymentApi';
 import AddCardForm from "../components/common/AddCardForm.jsx";
 import { useTranslation } from 'react-i18next';
@@ -57,8 +56,8 @@ const ProfilePage = () => {
     }, [user.id]);
 
     useEffect(() => {
-        fetchUserData();
-        fetchAddresses();
+        void fetchUserData();
+        void fetchAddresses();
     }, [fetchUserData, fetchAddresses]);
 
     useEffect(() => {
@@ -275,6 +274,11 @@ const ProfilePage = () => {
                                 <div key={address.id} className="border border-gray-200 p-5">
                                     <p className="text-sm font-semibold text-black mb-1">
                                         {address.street}
+                                        {address.main && (
+                                            <span className="ml-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                                {t('cart.mainAddressBadge')}
+                                            </span>
+                                        )}
                                     </p>
                                     <p className="text-xs text-gray-500">
                                         {address.city}, {address.postalCode}

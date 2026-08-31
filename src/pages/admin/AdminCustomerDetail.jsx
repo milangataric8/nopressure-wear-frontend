@@ -61,11 +61,11 @@ const AdminCustomerDetail = () => {
     }, [customerId, page]);
 
     useEffect(() => {
-        fetchCustomer();
+        void fetchCustomer();
     }, [fetchCustomer]);
 
     useEffect(() => {
-        fetchOrders();
+        void fetchOrders();
     }, [fetchOrders]);
 
     const getStatusStyle = (status) => {

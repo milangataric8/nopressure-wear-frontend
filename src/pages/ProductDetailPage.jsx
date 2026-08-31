@@ -73,7 +73,7 @@ const ProductDetailPage = () => {
     }, [id, navigate]);
 
     useEffect(() => {
-        fetchProduct();
+        void fetchProduct();
     }, [fetchProduct]);
 
     useEffect(() => {

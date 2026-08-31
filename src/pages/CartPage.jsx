@@ -68,26 +68,37 @@ const CartPage = () => {
     });
     const [errors, setErrors] = useState({});
 
-    const validateCheckout = () => {
+    // Pure — returns errors, touches no state
+    const collectAddressErrors = () => {
         const e = {};
+        const needsNewAddress = !isAuthenticated() || showNewAddress;
 
-        if (!isAuthenticated()) {
-            if (!guestInfo.fullName?.trim()) e.fullName = t('validation.nameRequired');
-            if (!guestInfo.email?.trim()) e.email = t('validation.emailRequired');
-            else if (!EMAIL_REGEX.test(guestInfo.email)) e.email = t('validation.emailInvalid');
-            if (!guestInfo.phone?.trim()) e.phone = t('validation.phoneRequired');
-
-            if (!newAddress.street?.trim()) e.street = t('validation.streetRequired');
-            if (!newAddress.city?.trim()) e.city = t('validation.cityRequired');
-            if (!newAddress.postalCode?.trim()) e.postalCode = t('validation.postalCodeRequired');
-            if (!newAddress.country?.trim()) e.country = t('validation.countryRequired');
-        } else if (showNewAddress) {
+        if (needsNewAddress) {
             if (!newAddress.street?.trim()) e.street = t('validation.streetRequired');
             if (!newAddress.city?.trim()) e.city = t('validation.cityRequired');
             if (!newAddress.postalCode?.trim()) e.postalCode = t('validation.postalCodeRequired');
             if (!newAddress.country?.trim()) e.country = t('validation.countryRequired');
         } else if (!selectedAddress) {
             e.address = t('cart.selectAddress');
+        }
+
+        return e;
+    };
+
+    const validateAddress = () => {
+        const e = collectAddressErrors();
+        setErrors(e);
+        return Object.keys(e).length === 0;
+    };
+
+    const validateCheckout = () => {
+        const e = { ...collectAddressErrors() };
+
+        if (!isAuthenticated()) {
+            if (!guestInfo.fullName?.trim()) e.fullName = t('validation.nameRequired');
+            if (!guestInfo.email?.trim()) e.email = t('validation.emailRequired');
+            else if (!EMAIL_REGEX.test(guestInfo.email)) e.email = t('validation.emailInvalid');
+            if (!guestInfo.phone?.trim()) e.phone = t('validation.phoneRequired');
         }
 
         if (!paymentMethod) e.paymentMethod = t('validation.paymentMethodRequired');
@@ -115,11 +126,14 @@ const CartPage = () => {
     }, []);
 
     useEffect(() => {
-        if (user?.id) {
-            getAddressByUser(user.id)
-                .then(r => setAddresses(r.data))
-                .catch(() => {});
-        }
+        if (!user?.id) return;
+        getAddressByUser(user.id)
+            .then(r => {
+                setAddresses(r.data);
+                // Preselect the main address, but never override a choice already made
+                setSelectedAddress(prev => prev ?? r.data.find(a => a.main) ?? null);
+            })
+            .catch(() => toast.error(t('messages.failedToLoadAddresses')));
     }, [user?.id]);
 
     useEffect(() => {
@@ -272,12 +286,11 @@ const CartPage = () => {
     const saveAddressIfNeeded = async () => {
         if (saveAddress && newAddress.street) {
             try {
-                await createAddress(user.id, {
-                    ...newAddress,
-                    isMain: isMainAddress,
-                });
+                await createAddress({ ...newAddress, userId: user.id, main: isMainAddress });
+                // Refresh so a customer who stays on the page sees the new address
+                await getAddressByUser(user.id).then(r => setAddresses(r.data)).catch(() => {});
             } catch (error) {
-                console.log(error.response?.data?.message || 'Failed to save address');
+                toast.error(error.response?.data?.message || t('messages.failedToSaveAddress'));
             }
         }
     };
@@ -668,7 +681,7 @@ const CartPage = () => {
                                 orderingEnabled={addToCartEnabled}
                                 errors={errors}
                                 setErrors={setErrors}
-                                validateCheckout={validateCheckout}
+                                validateAddress={validateAddress}
                             />
                         )}
 

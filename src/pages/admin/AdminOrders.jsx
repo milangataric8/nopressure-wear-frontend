@@ -37,7 +37,7 @@ const AdminOrders = () => {
     }, [page, searchQuery, statusFilter, t]);
 
     useEffect(() => {
-        fetchAllOrders();
+        void fetchAllOrders();
     }, [fetchAllOrders]);
 
     const handleStatusUpdate = async (orderId, status) => {

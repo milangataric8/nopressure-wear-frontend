@@ -66,10 +66,14 @@ const AdminCoupons = () => {
     const validate = () => {
         const e = {};
         if (!formData.code?.trim()) e.code = t('validation.codeRequired');
-        if (formData.discountValue === '' || isNaN(parseFloat(formData.discountValue)) || parseFloat(formData.discountValue) <= 0) {
+        if (formData.discountValue === '' ||
+            isNaN(parseFloat(formData.discountValue)) ||
+            parseFloat(formData.discountValue) <= 0) {
             e.discountValue = t('validation.discountValueInvalid');
         }
-        if (formData.usageLimit === '' || isNaN(parseInt(formData.usageLimit)) || parseInt(formData.usageLimit) <= 0) {
+        if (formData.usageLimit === '' ||
+            isNaN(parseInt(formData.usageLimit)) ||
+            parseInt(formData.usageLimit) <= 0) {
             e.usageLimit = t('validation.required');
         }
         setErrors(e);

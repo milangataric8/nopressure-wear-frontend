@@ -50,7 +50,7 @@ const OrderDetailPage = () => {
     }, [orderId, navigate, isStaff, user.id]);
 
     useEffect(() => {
-        fetchOrder();
+        void fetchOrder();
     }, [fetchOrder]);
 
     const handleStatusUpdate = async (status) => {

@@ -16,14 +16,12 @@ const ShippingAddressSelector = ({
                                      setIsMainAddress,
                                      errors = {},
                                      setErrors,
-                                     validateCheckout,
+                                     validateAddress,
                                  }) => {
     const { t } = useTranslation();
 
     const handleUseAddress = () => {
-        if (!validateCheckout()) {
-            return;
-        }
+        if (!validateAddress()) return;
 
         setSelectedAddress(newAddress);
         setShowNewAddress(false);
@@ -60,7 +58,14 @@ const ShippingAddressSelector = ({
                                     : 'border-gray-200 hover:border-gray-400'
                             }`}
                         >
-                            <p className="text-sm font-medium text-black">{address.street}</p>
+                            <p className="text-sm font-medium text-black">
+                                {address.street}
+                                {address.main && (
+                                    <span className="ml-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                        {t('cart.mainAddressBadge')}
+                                    </span>
+                                )}
+                            </p>
                             <p className="text-xs text-gray-500">{address.city}, {address.postalCode}</p>
                             <p className="text-xs text-gray-500">{address.country}</p>
                         </button>
@@ -136,21 +141,33 @@ const ShippingAddressSelector = ({
                                 <input
                                     type="checkbox"
                                     checked={saveAddress}
-                                    onChange={(e) => setSaveAddress(e.target.checked)}
+                                    onChange={(e) => {
+                                        setSaveAddress(e.target.checked);
+                                        // An unsaved address cannot be main — clear it so state can't lie
+                                        if (!e.target.checked) setIsMainAddress(false);
+                                    }}
                                     className="w-3.5 h-3.5"
                                 />
                                 <span className="text-xs text-gray-500">{t('cart.saveAddress')}</span>
                             </label>
                             {saveAddress && (
-                                <label className="flex items-center gap-2 cursor-pointer ml-5">
-                                    <input
-                                        type="checkbox"
-                                        checked={isMainAddress}
-                                        onChange={(e) => setIsMainAddress(e.target.checked)}
-                                        className="w-3.5 h-3.5"
-                                    />
-                                    <span className="text-xs text-gray-500">{t('cart.mainAddress')}</span>
-                                </label>
+                                addresses.length === 0 ? (
+                                    // The backend forces the first-ever address to be main
+                                    <label className="flex items-center gap-2 ml-5">
+                                        <input type="checkbox" checked disabled className="w-3.5 h-3.5" />
+                                        <span className="text-xs text-gray-400">{t('cart.firstAddressAlwaysMain')}</span>
+                                    </label>
+                                ) : (
+                                    <label className="flex items-center gap-2 cursor-pointer ml-5">
+                                        <input
+                                            type="checkbox"
+                                            checked={isMainAddress}
+                                            onChange={(e) => setIsMainAddress(e.target.checked)}
+                                            className="w-3.5 h-3.5"
+                                        />
+                                        <span className="text-xs text-gray-500">{t('cart.mainAddress')}</span>
+                                    </label>
+                                )
                             )}
                         </div>
                     )}

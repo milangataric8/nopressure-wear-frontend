@@ -43,7 +43,7 @@ const OrdersPage = () => {
     }, [user.id, page]);
 
     useEffect(() => {
-        fetchOrders();
+        void fetchOrders();
     }, [fetchOrders]);
 
     const getStatusStyle = (status) => {

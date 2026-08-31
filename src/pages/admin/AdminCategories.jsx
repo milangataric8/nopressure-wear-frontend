@@ -57,7 +57,7 @@ const AdminCategories = () => {
     });
 
     useEffect(() => {
-        fetchCategories();
+        void fetchCategories();
     }, [page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
@@ -72,6 +72,7 @@ const AdminCategories = () => {
         const e = {};
         if (!formData.name?.trim()) e.name = t('validation.nameRequired');
         setErrors(e);
+
         return Object.keys(e).length === 0;
     };
 

@@ -328,6 +328,8 @@
     "useThisAddress": "Koristi ovu adresu",
     "saveAddress": "Sačuvaj ovu adresu za buduće porudžbine",
     "mainAddress": "Postavi kao glavnu adresu",
+    "mainAddressBadge": "Glavna",
+    "firstAddressAlwaysMain": "Vaša prva adresa se uvek postavlja kao glavna",
     "shippingTo": "Dostava na:",
     "street": "Ulica i broj",
     "city": "Grad",
@@ -400,7 +402,12 @@
     "removed": "Uklonjeno iz omiljenih"
   },
   "address": {
-    "removed": "Adresa uklonjena"
+    "removed": "Adresa uklonjena",
+    "subtitle": "Upravljajte adresama za dostavu",
+    "backToProfile": "← Nazad na profil",
+    "streetPlaceholder": "Ulica i broj",
+    "noneSaved": "Još nema sačuvanih adresa",
+    "addFirst": "Dodaj svoju prvu adresu"
   },
   "review": {
     "description": "Opis",
@@ -703,7 +710,8 @@
     "variantLinked": "Varijanta povezana",
     "variantUnlinked": "Varijanta odvojena",
     "failedToLinkVariant": "Greška pri povezivanju varijante",
-    "failedToUnlinkVariant": "Greška pri odvajanju varijante"
+    "failedToUnlinkVariant": "Greška pri odvajanju varijante",
+    "failedToSaveAddress": "Greška pri čuvanju adrese"
   },
   "store": {
     "addStore": "Dodaj prodavnicu"

@@ -63,7 +63,7 @@ const AdminBanners = () => {
     });
 
     useEffect(() => {
-        fetchBanners();
+        void fetchBanners();
     },[page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {

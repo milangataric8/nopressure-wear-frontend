@@ -30,7 +30,7 @@ const FavoritesPage = () => {
     }, [user?.id]);
 
     useEffect(() => {
-        fetchFavorites();
+        void fetchFavorites();
     }, [fetchFavorites]);
 
     const handleRemove = (productId) => {

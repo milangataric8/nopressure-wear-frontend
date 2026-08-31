@@ -127,11 +127,11 @@ const AdminProducts = () => {
     };
 
     useEffect(() => {
-        fetchProducts();
+        void fetchProducts();
     }, [fetchProducts])
 
     useEffect(() => {
-        fetchCategories();
+        void fetchCategories();
     }, []);
 
     useEffect(() => {

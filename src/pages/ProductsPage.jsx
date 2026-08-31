@@ -101,11 +101,11 @@ const ProductsPage = () => {
     }, []);
 
     useEffect(() => {
-        fetchCategories();
+        void fetchCategories();
     }, [fetchCategories]);
 
     useEffect(() => {
-        fetchProducts();
+        void fetchProducts();
     }, [fetchProducts]);
 
     useEffect(() => {

@@ -22,9 +22,8 @@ const validationError = (message) =>
     Promise.reject({ response: { data: { message } } });
 
 export const uploadImage = (file, removeBackground = false) => {
-    if (!isAllowedImage(file)) {
-        return validationError('Only image files are allowed (jpg, jpeg, png, gif, webp, bmp)');
-    }
+    if (!isAllowedImage(file)) return validationError('Only image files are allowed (jpg, jpeg, png, gif, webp, bmp)');
+
     const formData = new FormData();
     formData.append('file', file);
     return axiosInstance.post(`/upload/image?removeBackground=${removeBackground}`, formData, {

@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider } from './context/AuthContext';
-import { GuestCartProvider } from './context/GuestCartContext';
+import { GuestCartProvider } from './context/GuestCartProvider.jsx';
 import { CurrencyProvider } from './context/CurrencyProvider';
 import { getSettingsMap } from './api/settingsApi';
 import 'react-toastify/dist/ReactToastify.css';

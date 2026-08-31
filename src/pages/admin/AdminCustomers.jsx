@@ -43,7 +43,7 @@ const AdminCustomers = () => {
     });
 
     useEffect(() => {
-        fetchCustomers();
+        void fetchCustomers();
     }, [page, searchQuery, activeFilter]);
 
     return (

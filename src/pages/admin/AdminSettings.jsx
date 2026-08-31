@@ -114,7 +114,7 @@ const AdminSettings = () => {
     }, []);
 
     useEffect(() => {
-        fetchSettings();
+        void fetchSettings();
     }, [fetchSettings]);
 
     const handleEdit = (settings) => {
@@ -144,7 +144,7 @@ const AdminSettings = () => {
     }, []);
 
     useEffect(() => {
-        fetchFilters();
+        void fetchFilters();
     }, [fetchFilters]);
 
     const handleFilterToggle = async (filter) => {

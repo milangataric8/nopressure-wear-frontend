@@ -24,6 +24,7 @@ const AddressPage = () => {
         city: '',
         postalCode: '',
         country: '',
+        main: false,
     });
     const [errors, setErrors] = useState({});
 
@@ -40,7 +41,7 @@ const AddressPage = () => {
     }, [user.id]);
 
     useEffect(() => {
-        fetchAddresses();
+        void fetchAddresses();
     }, [fetchAddresses]);
 
     const handleChange = (e) => {
@@ -87,7 +88,7 @@ const AddressPage = () => {
             fetchAddresses();
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || 'Failed to save address');
+                toast.error(error.response?.data?.message || t('messages.failedToSave'));
             }
         }
     };
@@ -99,6 +100,7 @@ const AddressPage = () => {
             city: address.city,
             postalCode: address.postalCode,
             country: address.country,
+            main: address.main,
         });
         setErrors({});
         setShowForm(true);
@@ -144,7 +146,7 @@ const AddressPage = () => {
                     onClick={() => navigate('/profile')}
                     className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
                 >
-                    ← Back to Profile
+                    {t('address.backToProfile')}
                 </button>
             </div>
 
@@ -153,7 +155,7 @@ const AddressPage = () => {
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
                         {t('profile.addresses')}
                     </h1>
-                    <p className="text-sm text-gray-500">{t('profile.addresses')}</p>
+                    <p className="text-sm text-gray-500">{t('address.subtitle')}</p>
                 </div>
                 <button
                     onClick={() => {showForm ? resetForm() : setShowForm(true)}}
@@ -181,7 +183,7 @@ const AddressPage = () => {
                                 aria-invalid={!!errors.street}
                                 aria-describedby={errors.street ? 'street-error' : undefined}
                                 className={`${inputClass} ${errors.street ? inputError : inputNormal}`}
-                                placeholder="Street and number"
+                                placeholder={t('address.streetPlaceholder')}
                             />
                             {errors.street && <p id="street-error" className="text-xs text-red-500 mt-1">{errors.street}</p>}
                         </div>
@@ -198,7 +200,7 @@ const AddressPage = () => {
                                     aria-invalid={!!errors.city}
                                     aria-describedby={errors.city ? 'city-error' : undefined}
                                     className={`${inputClass} ${errors.city ? inputError : inputNormal}`}
-                                    placeholder="City"
+                                    placeholder={t('cart.city')}
                                 />
                                 {errors.city && <p id="city-error" className="text-xs text-red-500 mt-1">{errors.city}</p>}
                             </div>
@@ -230,9 +232,25 @@ const AddressPage = () => {
                                 aria-invalid={!!errors.country}
                                 aria-describedby={errors.country ? 'country-error' : undefined}
                                 className={`${inputClass} ${errors.country ? inputError : inputNormal}`}
-                                placeholder="Country"
+                                placeholder={t('cart.country')}
                             />
                             {errors.country && <p id="country-error" className="text-xs text-red-500 mt-1">{errors.country}</p>}
+                        </div>
+
+                        <div>
+                            <label className="flex items-center gap-2 cursor-pointer pt-2">
+                                <input
+                                    type="checkbox"
+                                    name="main"
+                                    checked={addressData.main}
+                                    onChange={(e) => setAddressData(prev => ({ ...prev, main: e.target.checked }))}
+                                    disabled={editingAddress?.main}
+                                    className="w-3.5 h-3.5"
+                                />
+                                <span className="text-xs text-gray-500">
+                                    {editingAddress?.main ? t('address.alreadyMain') : t('cart.mainAddress')}
+                                </span>
+                            </label>
                         </div>
 
                         <div className="flex gap-3 pt-2">
@@ -261,12 +279,12 @@ const AddressPage = () => {
             }
             { addresses.length === 0 ? (
                 <div className="border border-gray-200 p-12 text-center">
-                    <p className="text-sm text-gray-400 mb-4">No addresses saved yet</p>
+                    <p className="text-sm text-gray-400 mb-4">{t('address.noneSaved')}</p>
                     <button
                         onClick={() => setShowForm(true)}
                         className="text-xs font-semibold uppercase tracking-wide bg-black text-white px-6 py-2.5 hover:bg-gray-800 transition-colors"
                     >
-                        Add Your First Address
+                        {t('address.addFirst')}
                     </button>
                 </div>
             ) : (
@@ -276,6 +294,11 @@ const AddressPage = () => {
                             <div>
                                 <p className="text-sm font-semibold text-black mb-1">
                                     {address.street}
+                                    {address.main && (
+                                        <span className="ml-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                                                {t('cart.mainAddressBadge')}
+                                            </span>
+                                    )}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                     {address.city}, {address.postalCode}

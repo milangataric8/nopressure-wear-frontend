@@ -327,6 +327,8 @@
     "useThisAddress": "Use This Address",
     "saveAddress": "Save this address for future orders",
     "mainAddress": "Set as main address",
+    "mainAddressBadge": "Main",
+    "firstAddressAlwaysMain": "Your first address is always set as main",
     "shippingTo": "Shipping to:",
     "street": "Street address",
     "city": "City",
@@ -399,7 +401,12 @@
     "removed": "Removed from favourites"
   },
   "address": {
-    "removed": "Address removed"
+    "removed": "Address removed",
+    "subtitle": "Manage your delivery addresses",
+    "backToProfile": "← Back to Profile",
+    "streetPlaceholder": "Street and number",
+    "noneSaved": "No addresses saved yet",
+    "addFirst": "Add Your First Address"
   },
   "review": {
     "description": "Description",
@@ -702,7 +709,8 @@
     "variantLinked": "Variant linked",
     "variantUnlinked": "Variant unlinked",
     "failedToLinkVariant": "Failed to link variant",
-    "failedToUnlinkVariant": "Failed to unlink variant"
+    "failedToUnlinkVariant": "Failed to unlink variant",
+    "failedToSaveAddress": "Failed to save address"
   },
   "store": {
     "addStore": "Add Store"

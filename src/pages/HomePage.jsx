@@ -38,8 +38,8 @@ const HomePage = () => {
     }, []);
 
     useEffect(() => {
-        fetchFeatured();
-        fetchCategories();
+        void fetchFeatured();
+        void fetchCategories();
     }, [fetchFeatured, fetchCategories]);
 
     return (

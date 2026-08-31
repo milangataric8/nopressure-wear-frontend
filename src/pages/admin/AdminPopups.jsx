@@ -48,7 +48,7 @@ const AdminPopups = () => {
     }, []);
 
     useEffect(() => {
-        fetchPopups();
+        void fetchPopups();
     }, [fetchPopups]);
 
     const handleChange = (e) => {

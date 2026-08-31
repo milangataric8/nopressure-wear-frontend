@@ -55,7 +55,7 @@ const AdminEmployees = () => {
     });
 
     useEffect(() => {
-        fetchEmployees();
+        void fetchEmployees();
     },[page, searchQuery, activeFilter]);
 
     const handleChange = (e) => {
@@ -75,7 +75,7 @@ const AdminEmployees = () => {
                 password: '',
                 role: 'EMPLOYEE',
             });
-            fetchEmployees();
+            await fetchEmployees();
         } catch (error) {
             toast.error(error.response?.data?.message || t('messages.failedToSave'));
         }
@@ -86,7 +86,7 @@ const AdminEmployees = () => {
         try {
             await axiosInstance.delete(`/employees/${id}`);
             toast.success(t('messages.employeeDeleted'));
-            fetchEmployees();
+            await fetchEmployees();
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }
@@ -125,7 +125,7 @@ const AdminEmployees = () => {
             toast.success(t('messages.employeeUpdated'));
             setShowEditForm(false);
             setEditingEmployee(null);
-            fetchEmployees();
+            await fetchEmployees();
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.failedToSave'));
         }

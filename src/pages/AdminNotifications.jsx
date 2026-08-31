@@ -41,7 +41,7 @@ const AdminNotifications = () => {
     }, [t]);
 
     useEffect(() => {
-        fetchData();
+        void fetchData();
     }, [fetchData]);
 
     const toggleChannel = (channel) => {

@@ -36,7 +36,7 @@ const AdminStores = () => {
     }, []);
 
     useEffect(() => {
-        fetchStores();
+        void fetchStores();
     }, [fetchStores]);
 
     const handleChange = (e) => {

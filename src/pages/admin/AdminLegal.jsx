@@ -36,7 +36,7 @@ const AdminLegal = () => {
     }, [activePage, activeLang]);
 
     useEffect(() => {
-        fetchContent();
+        void fetchContent();
     }, [fetchContent]);
 
     const handleSave = async () => {

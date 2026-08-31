@@ -12,9 +12,9 @@ const AdminSearchFilter = ({
                            }) => {
     const { t } = useTranslation();
     return (
-        <div className="flex items-center justify-between mb-6 gap-2 md:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2 md:gap-4">
             {/* Active/Inactive filter */}
-            <div className="flex w-1/2">
+            <div className="flex w-full sm:w-1/2">
                 <button
                     onClick={() => { setActiveFilter(prev => prev === true ? null : true); setPage(0); }}
                     className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
@@ -40,7 +40,7 @@ const AdminSearchFilter = ({
             {/* Search */}
             <form
                 onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
-                className="flex w-1/2"
+                className="flex w-full sm:w-1/2"
             >
                 <input
                     type="text"

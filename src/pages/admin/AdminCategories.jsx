@@ -141,7 +141,7 @@ const AdminCategories = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.categories')}
                 subtitle={t('admin.manageCategories')}
@@ -233,17 +233,40 @@ const AdminCategories = () => {
             )}
 
             {/* Categories table */}
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            { categories.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noCategories')}</p>
-                </div>
+            {loading ? (
+                <LoadingSpinner height="h-32" />
+            ) : categories.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-10">{t('admin.noCategories')}</p>
             ) : (
                 <div className="border border-gray-200">
-                    <table className="w-full">
+                    {/* Mobile: flat card list (the desktop tree's expand/collapse doesn't fit a card) */}
+                    <div className="md:hidden divide-y divide-gray-100">
+                        {categories.map(cat => (
+                            <div key={cat.id} className="px-4 py-4 space-y-2">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-black break-words">{cat.name}</p>
+                                        {cat.parentId && (
+                                            <p className="text-xs text-gray-400">
+                                                {categories.find(c => c.id === cat.parentId)?.name || t('admin.subcategory')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <StatusBadge active={cat.active} />
+                                </div>
+                                <div className="flex flex-wrap gap-x-6 gap-y-1 [&_button]:py-3">
+                                    <button onClick={() => handleEdit(cat)} className="text-xs text-gray-500 hover:text-black underline">
+                                        {t('admin.edit')}
+                                    </button>
+                                    <button onClick={() => handleToggle(cat.id)} className="text-xs text-gray-500 hover:text-black underline">
+                                        {cat.active ? t('admin.deactivate') : t('admin.activate')}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <table className="w-full hidden md:table">
                         <thead>
                         <tr className="border-b border-gray-200 bg-gray-50">
                             <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.category')}</th>

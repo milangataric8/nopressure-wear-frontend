@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {getCoupons} from "../../api/couponApi.js";
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
-import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
+import ResponsiveTable from "../../components/admin/ResponsiveTable.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
 import {useCurrency} from "../../context/CurrencyContext.jsx";
@@ -137,7 +137,7 @@ const AdminCoupons = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.coupons')}
                 subtitle={t('admin.manageCoupons')}
@@ -253,72 +253,76 @@ const AdminCoupons = () => {
             )}
 
             {/* Coupons table */}
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            { coupons.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noCoupons')}</p>
-                </div>
+            {loading ? (
+                <LoadingSpinner height="h-32" />
             ) : (
-                <div className="border border-gray-200">
-                    <table className="w-full">
-                        <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.code')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.type')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.value')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.usage')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('profile.expires')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {coupons.map(coupon => (
-                            <tr key={coupon.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="px-4 py-3 text-sm font-bold text-black">{coupon.code}</td>
-                                <td className="hidden md:table-cell px-4 py-3 text-xs text-gray-500">{coupon.discountType}</td>
-                                <td className="px-4 py-3 text-sm font-semibold text-black">
-                                    {coupon.discountType === 'PERCENTAGE'
-                                        ? `${coupon.discountValue}%`
-                                        : format(coupon.discountValue)}
-                                </td>
-                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
-                                    {coupon.usageCount} / {coupon.usageLimit}
-                                </td>
-                                <td className="px-4 py-3 text-xs text-gray-500">
-                                    {coupon.expiresAt
-                                        ? new Date(coupon.expiresAt).toLocaleDateString()
-                                        : '—'}
-                                </td>
-                                <td className="px-4 py-3">
-                                    <StatusBadge active={coupon.active} />
-                                </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            onClick={() => handleToggle(coupon.id)}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                        >
-                                            {coupon.active ? t('admin.deactivate') : t('admin.activate')}
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(coupon.id)}
-                                            className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
-                                        >
-                                            {t('admin.delete')}
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
-                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
-                </div>
+                <ResponsiveTable
+                    rows={coupons}
+                    rowKey={(c) => c.id}
+                    emptyMessage={t('admin.noCoupons')}
+                    page={page}
+                    totalPages={totalPages}
+                    setPage={setPage}
+                    columns={[
+                        {
+                            key: 'code',
+                            label: t('admin.code'),
+                            primary: true,
+                            render: (c) => <span className="text-sm font-bold text-black">{c.code}</span>,
+                        },
+                        {
+                            key: 'type',
+                            label: t('admin.type'),
+                            hideOnMobile: true,
+                            render: (c) => <span className="text-gray-500">{c.discountType}</span>,
+                        },
+                        {
+                            key: 'value',
+                            label: t('admin.value'),
+                            render: (c) => (
+                                <span className="text-sm font-semibold text-black">
+                                    {c.discountType === 'PERCENTAGE' ? `${c.discountValue}%` : format(c.discountValue)}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'usage',
+                            label: t('admin.usage'),
+                            hideOnMobile: true,
+                            render: (c) => <span className="text-sm text-gray-500">{c.usageCount} / {c.usageLimit}</span>,
+                        },
+                        {
+                            key: 'expires',
+                            label: t('profile.expires'),
+                            render: (c) => (
+                                <span className="text-gray-500">
+                                    {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : '—'}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'status',
+                            label: t('order.status'),
+                            render: (c) => <StatusBadge active={c.active} />,
+                        },
+                    ]}
+                    actions={(c) => (
+                        <>
+                            <button
+                                onClick={() => handleToggle(c.id)}
+                                className="text-xs text-gray-500 hover:text-black transition-colors underline"
+                            >
+                                {c.active ? t('admin.deactivate') : t('admin.activate')}
+                            </button>
+                            <button
+                                onClick={() => handleDelete(c.id)}
+                                className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
+                            >
+                                {t('admin.delete')}
+                            </button>
+                        </>
+                    )}
+                />
             )}
         </div>
     );

@@ -93,7 +93,7 @@ const AdminCustomerDetail = () => {
     if (!customer) return null;
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <button
                 onClick={() => navigate('/admin/customers')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"

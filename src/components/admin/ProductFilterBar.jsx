@@ -17,9 +17,9 @@ const ProductFilterBar = ({
     const { t } = useTranslation();
 
     return (
-        <div className="flex items-center justify-between mb-6 gap-2 md:gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-2 md:gap-4">
             {/* Color filter */}
-            <div className="flex w-1/2">
+            <div className="flex w-full md:w-1/2">
                 {availableColors.length > 0 && (
                     <div className="flex gap-2 mb-4 flex-wrap items-center">
                         <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
@@ -90,16 +90,16 @@ const ProductFilterBar = ({
             {/*</div>*/}
 
             {/* Gender filter */}
-            <div className="flex w-1/2">
-                <div className="flex gap-2 mb-4 flex-wrap items-center">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
+            <div className="flex w-full md:w-1/2">
+                <div className="flex gap-2 mb-4 items-center overflow-x-auto md:flex-wrap md:overflow-visible -mx-4 px-4 md:mx-0 md:px-0">
+                    <span className="flex-shrink-0 text-xs font-semibold uppercase tracking-wide text-gray-500 mr-2">
                         {t('product.gender')}:
                     </span>
                     {['MEN', 'WOMEN', 'UNISEX'].map(g => (
                         <button
                             key={g}
                             onClick={() => { setGenderFilter(genderFilter === g ? '' : g); setPage(0); }}
-                            className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                            className={`flex-shrink-0 whitespace-nowrap px-4 py-1.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
                                 genderFilter === g
                                     ? 'bg-black text-white border-black'
                                     : 'border-gray-300 text-gray-500 hover:border-black hover:text-black'

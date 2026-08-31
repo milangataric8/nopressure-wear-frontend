@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getAllStores, createStore, updateStore, toggleStore, deleteStore } from '../../api/storeApi';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
+import ResponsiveTable from '../../components/admin/ResponsiveTable';
 import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
@@ -115,7 +116,7 @@ const AdminStores = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.storeLocations')}
                 subtitle={t('admin.manageStoreLocations')}
@@ -188,64 +189,63 @@ const AdminStores = () => {
             {/* Stores list */}
             {loading ? (
                 <LoadingSpinner />
-            ) : stores.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noStoreLocations')}</p>
-                </div>
             ) : (
-                <div className="border border-gray-200">
-                    <table className="w-full">
-                        <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.storeLocations')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.address')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.contact')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.workingHours')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.actions')}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {stores.map(store => (
-                            <tr key={store.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="px-4 py-3">
-                                    <p className="text-sm font-semibold text-black">{store.name}</p>
-                                </td>
-                                <td className="px-4 py-3">
-                                    <p className="text-xs text-gray-600">{store.street}</p>
-                                    <p className="text-xs text-gray-400">{store.city}, {store.postalCode}, {store.country}</p>
-                                </td>
-                                <td className="hidden md:table-cell px-4 py-3">
-                                    <p className="text-xs text-gray-500">{store.phone || '—'}</p>
-                                    <p className="text-xs text-gray-400">{store.email || '—'}</p>
-                                </td>
-                                <td className="hidden md:table-cell px-4 py-3 text-xs text-gray-500">
-                                    {store.workingHours || '—'}
-                                </td>
-                                <td className="px-4 py-3">
-                                    <StatusBadge active={store.active} />
-                                </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                        <button onClick={() => handleEdit(store)}
-                                                className="text-xs text-gray-500 hover:text-black underline">
-                                            {t('admin.edit')}
-                                        </button>
-                                        <button onClick={() => handleToggle(store.id)}
-                                                className="text-xs text-gray-500 hover:text-black underline">
-                                            {store.active ? t('admin.deactivate') : t('admin.activate')}
-                                        </button>
-                                        <button onClick={() => handleDelete(store.id)}
-                                                className="text-xs text-red-400 hover:text-red-600 underline">
-                                            {t('admin.delete')}
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
+                <ResponsiveTable
+                    rows={stores}
+                    rowKey={(s) => s.id}
+                    emptyMessage={t('admin.noStoreLocations')}
+                    columns={[
+                        {
+                            key: 'name',
+                            label: t('admin.storeLocations'),
+                            primary: true,
+                            render: (s) => <span className="text-sm font-semibold text-black">{s.name}</span>,
+                        },
+                        {
+                            key: 'address',
+                            label: t('admin.address'),
+                            render: (s) => (
+                                <>
+                                    <span className="block text-xs text-gray-600">{s.street}</span>
+                                    <span className="block text-xs text-gray-400">{s.city}, {s.postalCode}, {s.country}</span>
+                                </>
+                            ),
+                        },
+                        {
+                            key: 'contact',
+                            label: t('admin.contact'),
+                            render: (s) => (
+                                <>
+                                    <span className="block text-xs text-gray-500 break-all">{s.phone || '—'}</span>
+                                    <span className="block text-xs text-gray-400 break-all">{s.email || '—'}</span>
+                                </>
+                            ),
+                        },
+                        {
+                            key: 'hours',
+                            label: t('admin.workingHours'),
+                            render: (s) => <span className="text-gray-500">{s.workingHours || '—'}</span>,
+                        },
+                        {
+                            key: 'status',
+                            label: t('order.status'),
+                            render: (s) => <StatusBadge active={s.active} />,
+                        },
+                    ]}
+                    actions={(s) => (
+                        <>
+                            <button onClick={() => handleEdit(s)} className="text-xs text-gray-500 hover:text-black underline">
+                                {t('admin.edit')}
+                            </button>
+                            <button onClick={() => handleToggle(s.id)} className="text-xs text-gray-500 hover:text-black underline">
+                                {s.active ? t('admin.deactivate') : t('admin.activate')}
+                            </button>
+                            <button onClick={() => handleDelete(s.id)} className="text-xs text-red-400 hover:text-red-600 underline">
+                                {t('admin.delete')}
+                            </button>
+                        </>
+                    )}
+                />
             )}
         </div>
     );

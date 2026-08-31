@@ -2,19 +2,19 @@ const CategoryFilterBar = ({ categories, categoryFilter, setCategoryFilter, setP
     return (
         <div className="mb-6 border border-gray-200">
             {/* Root categories */}
-            <div className="flex border-b border-gray-200">
+            <div className="flex flex-wrap md:flex-nowrap md:border-b border-gray-200">
                 {categories.filter(cat => !cat.parentId).map(cat => {
                     const subcats = categories.filter(c => c.parentId === cat.id);
                     const isSelected = categoryFilter === cat.id || subcats.some(s => s.id === categoryFilter);
 
                     return (
-                        <div key={cat.id} className="flex-1 relative border-r border-gray-200 last:border-r-0">
+                        <div key={cat.id} className="flex-1 min-w-[8rem] md:min-w-0 relative border-b md:border-b-0 border-r border-gray-200 last:border-r-0">
                             <button
                                 onClick={() => {
                                     setCategoryFilter(isSelected ? null : cat.id);
                                     setPage(0);
                                 }}
-                                className={`w-full py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                                className={`w-full py-2.5 px-2 text-xs font-semibold uppercase tracking-wide whitespace-nowrap transition-colors ${
                                     isSelected
                                         ? 'bg-gray-800 text-white'
                                         : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-black'

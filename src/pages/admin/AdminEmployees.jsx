@@ -3,9 +3,9 @@ import { toast } from 'react-toastify';
 import axiosInstance from '../../api/axiosInstance'
 import {getEmployees} from "../../api/employeeApi.js";
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
-import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
+import ResponsiveTable from "../../components/admin/ResponsiveTable.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
 
@@ -135,7 +135,7 @@ const AdminEmployees = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.employees')}
                 subtitle={t('admin.manageEmployees')}
@@ -297,68 +297,62 @@ const AdminEmployees = () => {
             )}
 
             {/* Employees table */}
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            { employees.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noEmployees')}</p>
-                </div>
+            {loading ? (
+                <LoadingSpinner height="h-32" />
             ) : (
-                <div className="border border-gray-200">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b border-gray-200 bg-gray-50">
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('product.name')}</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('auth.email')}</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('order.status')}</th>
-                                <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3">{t('admin.actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {employees.map(employee => (
-                            <tr key={employee.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                                <td className="px-3 py-3">
-                                    <p className="text-sm font-semibold text-black">
-                                        {employee.firstName} {employee.lastName}
-                                    </p>
-                                </td>
-                                <td className="px-3 py-3 text-sm text-gray-500">
-                                    {employee.email}
-                                </td>
-                                <td className="px-3 py-3">
-                                    <StatusBadge active={employee.active} />
-                                </td>
-                                <td className="px-3 py-3">
-                                    <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
-                                        <button
-                                            onClick={() => handleEdit(employee)}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                        >
-                                            {t('admin.edit')}
-                                        </button>
-                                        <button
-                                            onClick={() => handleToggle(employee)}
-                                            className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                        >
-                                            {employee.active ? t('admin.deactivate') : t('admin.activate')}
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(employee.id)}
-                                            className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
-                                        >
-                                            {t('admin.delete')}
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
-                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
-                </div>
+                <ResponsiveTable
+                    rows={employees}
+                    rowKey={(e) => e.id}
+                    emptyMessage={t('admin.noEmployees')}
+                    page={page}
+                    totalPages={totalPages}
+                    setPage={setPage}
+                    cellClassName="px-3 py-3"
+                    columns={[
+                        {
+                            key: 'name',
+                            label: t('product.name'),
+                            primary: true,
+                            render: (e) => (
+                                <span className="text-sm font-semibold text-black">
+                                    {e.firstName} {e.lastName}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'email',
+                            label: t('auth.email'),
+                            render: (e) => <span className="text-sm text-gray-500 break-all">{e.email}</span>,
+                        },
+                        {
+                            key: 'status',
+                            label: t('order.status'),
+                            render: (e) => <StatusBadge active={e.active} />,
+                        },
+                    ]}
+                    actions={(e) => (
+                        <>
+                            <button
+                                onClick={() => handleEdit(e)}
+                                className="text-xs text-gray-500 hover:text-black transition-colors underline"
+                            >
+                                {t('admin.edit')}
+                            </button>
+                            <button
+                                onClick={() => handleToggle(e)}
+                                className="text-xs text-gray-500 hover:text-black transition-colors underline"
+                            >
+                                {e.active ? t('admin.deactivate') : t('admin.activate')}
+                            </button>
+                            <button
+                                onClick={() => handleDelete(e.id)}
+                                className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
+                            >
+                                {t('admin.delete')}
+                            </button>
+                        </>
+                    )}
+                />
             )}
         </div>
     );

@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import AdminSearchFilter from "./AdminSearchFilter.jsx";
-import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import ResponsiveTable from "../../components/admin/ResponsiveTable.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +47,7 @@ const AdminCustomers = () => {
     }, [page, searchQuery, activeFilter]);
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
@@ -71,57 +71,51 @@ const AdminCustomers = () => {
             />
 
             {/* Table */}
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            { customers.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('admin.noCustomers')}</p>
-                </div>
+            {loading ? (
+                <LoadingSpinner height="h-32" />
             ) : (
-                <div className="border border-gray-200">
-                    <table className="w-full">
-                        <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('product.name')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('auth.email')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.joined')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {customers.map(customer => (
-                            <tr
-                                key={customer.id}
-                                onClick={() => navigate(`/admin/customers/${customer.id}`)}
-                                className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                            >
-                                <td className="px-4 py-3">
-                                    <p className="text-sm font-semibold text-black">
-                                        {customer.firstName} {customer.lastName}
-                                    </p>
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-500">
-                                    {customer.email}
-                                </td>
-                                <td className="px-4 py-3 text-xs text-gray-500">
-                                    {new Date(customer.createdAt).toLocaleDateString(dateLocale, {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric'
+                <ResponsiveTable
+                    rows={customers}
+                    rowKey={(c) => c.id}
+                    onRowClick={(c) => navigate(`/admin/customers/${c.id}`)}
+                    emptyMessage={t('admin.noCustomers')}
+                    page={page}
+                    totalPages={totalPages}
+                    setPage={setPage}
+                    columns={[
+                        {
+                            key: 'name',
+                            label: t('product.name'),
+                            primary: true,
+                            render: (c) => (
+                                <span className="text-sm font-semibold text-black">
+                                    {c.firstName} {c.lastName}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'email',
+                            label: t('auth.email'),
+                            render: (c) => <span className="text-sm text-gray-500 break-all">{c.email}</span>,
+                        },
+                        {
+                            key: 'joined',
+                            label: t('admin.joined'),
+                            render: (c) => (
+                                <span className="text-gray-500">
+                                    {new Date(c.createdAt).toLocaleDateString(dateLocale, {
+                                        year: 'numeric', month: 'long', day: 'numeric',
                                     })}
-                                </td>
-                                <td className="px-4 py-3">
-                                    <StatusBadge active={customer.active} />
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
-                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
-                </div>
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'status',
+                            label: t('order.status'),
+                            render: (c) => <StatusBadge active={c.active} />,
+                        },
+                    ]}
+                />
             )}
         </div>
     );

@@ -220,7 +220,7 @@ const AdminBanners = () => {
 
     return (
 
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.banners')}
                 subtitle={t('admin.manageBanners')}
@@ -240,7 +240,7 @@ const AdminBanners = () => {
                         setPage={setPage}
                         searchPlaceholder={t('admin.searchBanners')}
                     />
-                    <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setDisplayTitleFilter(prev => prev === true ? null : true)}
@@ -555,9 +555,9 @@ const AdminBanners = () => {
                 ) : (
                     <div className="space-y-4">
                     {filteredBanners.map(banner => (
-                        <div key={banner.id} className="border border-gray-200 p-4 flex gap-4 items-center">
+                        <div key={banner.id} className="border border-gray-200 p-4 flex flex-col sm:flex-row gap-4 sm:items-center">
                             {/* Preview */}
-                            <div className="w-32 h-20 bg-gray-100 flex-shrink-0 overflow-hidden">
+                            <div className="w-full h-40 sm:w-32 sm:h-20 bg-gray-100 flex-shrink-0 overflow-hidden">
                                 {banner.mediaUrl ? (
                                     banner.mediaType === 'VIDEO' ? (
                                         <video
@@ -580,13 +580,13 @@ const AdminBanners = () => {
                             </div>
 
                             {/* Info */}
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-1">
-                                    <h3 className="text-sm font-semibold text-black">{banner.title}</h3>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-1">
+                                    <h3 className="text-sm font-semibold text-black break-words">{banner.title}</h3>
 
                                     <StatusBadge active={banner.active} />
 
-                                    <span className="hidden md:table-cell text-xs text-gray-400 uppercase">{banner.mediaType}</span>
+                                    <span className="text-xs text-gray-400 uppercase">{banner.mediaType}</span>
                                 </div>
                                 {banner.subtitle && (
                                     <p className="text-xs text-gray-500 mb-1">{banner.subtitle}</p>
@@ -595,7 +595,7 @@ const AdminBanners = () => {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 flex-shrink-0 [&_button]:py-3 sm:[&_button]:py-0">
                                 <button
                                     onClick={() => handleEdit(banner)}
                                     className="text-xs text-gray-500 hover:text-black transition-colors underline"

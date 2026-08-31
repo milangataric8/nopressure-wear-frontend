@@ -2,8 +2,8 @@ import {useNavigate} from "react-router-dom";
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {getOrdersByAdmin, updateOrderStatus} from '../../api/orderApi';
-import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import ResponsiveTable from "../../components/admin/ResponsiveTable.jsx";
 import { useTranslation } from 'react-i18next';
 import {useCurrency} from "../../context/CurrencyContext.jsx";
 
@@ -69,8 +69,23 @@ const AdminOrders = () => {
         }
     };
 
+    const statusSelect = (order) => (
+        <select
+            value={order.status}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => { e.stopPropagation(); handleStatusUpdate(order.id, e.target.value); }}
+            className="text-xs border border-gray-300 px-2 py-1.5 focus:outline-none focus:border-black transition-colors"
+        >
+            <option value="PENDING">{t('order.pending')}</option>
+            <option value="CONFIRMED">{t('order.confirmed')}</option>
+            <option value="SHIPPED">{t('order.shipped')}</option>
+            <option value="DELIVERED">{t('order.delivered')}</option>
+            <option value="CANCELLED">{t('order.cancelled')}</option>
+        </select>
+    );
+
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <div className="mb-10">
                 <h1 className="text-3xl font-black uppercase tracking-tight text-black mb-1">
                     {t('admin.orders')}
@@ -81,14 +96,14 @@ const AdminOrders = () => {
             {/* Search */}
             <form
                 onSubmit={(e) => { e.preventDefault(); setSearchQuery(searchInput); setPage(0); }}
-                className="flex gap-3 mb-6"
+                className="flex flex-col sm:flex-row gap-3 mb-6"
             >
                 <input
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                     placeholder={t('admin.searchOrders')}
-                    className="flex-1 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
+                    className="flex-1 min-w-0 border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button
                     type="submit"
@@ -108,7 +123,7 @@ const AdminOrders = () => {
             </form>
 
             {/* Status filter */}
-            <div className="flex border border-gray-200 mb-6">
+            <div className="flex border border-gray-200 mb-6 overflow-x-auto md:overflow-visible">
                 {[
                     { label: t('order.pending'), value: 'PENDING', bg: 'bg-yellow-50', text: 'text-yellow-700', active: 'bg-yellow-100 text-yellow-800' },
                     { label: t('order.confirmed'), value: 'CONFIRMED', bg: 'bg-blue-50', text: 'text-blue-700', active: 'bg-blue-100 text-blue-800' },
@@ -122,7 +137,7 @@ const AdminOrders = () => {
                             setStatusFilter(prev => prev === status.value ? '' : status.value);
                             setPage(0);
                         }}
-                        className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-r border-gray-200 last:border-r-0 ${
+                        className={`flex-none md:flex-1 flex-shrink-0 whitespace-nowrap px-4 md:px-0 py-2.5 text-xs font-semibold uppercase tracking-wide transition-colors border-r border-gray-200 last:border-r-0 ${
                             statusFilter === status.value
                                 ? status.active
                                 : `${status.bg} ${status.text} hover:opacity-80`
@@ -135,72 +150,71 @@ const AdminOrders = () => {
 
             {loading ? (
                 <LoadingSpinner height="h-32" />
-            ) : orders.length === 0 ? (
-                <div className="text-center text-gray-400 py-20">
-                    <p className="text-sm">{t('order.empty')}</p>
-                </div>
             ) : (
-                <div className="border border-gray-200">
-                    <table className="w-full">
-                        <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('admin.order')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.customer')}</th>
-                            <th className="hidden md:table-cell text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.items')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('cart.total')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.status')}</th>
-                            <th className="text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-4 py-3">{t('order.updateStatus')}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {orders.map(order => (
-                            <tr key={order.id}
-                                onClick={() => navigate(`/admin/orders/${order.id}`)}
-                                className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
-                                <td className="px-4 py-3">
-                                    <p className="text-sm font-semibold text-black">{order.orderCode}</p>
-                                    <p className="text-xs text-gray-400">
-                                        {new Date(order.createdAt).toLocaleDateString()}
-                                    </p>
-                                </td>
-                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
-                                    {order.customerFullName}
-                                </td>d
-                                <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-500">
-                                    {t('admin.itemsCount', { count: order.orderItems?.length || 0 })}
-                                </td>
-                                <td className="px-4 py-3 text-sm font-bold text-black">
-                                    {format(order.totalAmount)}
-                                </td>
-                                <td className="px-4 py-3">
-                                        <span className={`text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(order.status)}`}>
-                                            {getStatusLabel(order.status)}
-                                        </span>
-                                </td>
-                                <td className="px-4 py-3">
-                                    <select
-                                        value={order.status}
-                                        onClick={(e) => e.stopPropagation()}
-                                        onChange={(e) => {
-                                            e.stopPropagation();
-                                            handleStatusUpdate(order.id, e.target.value)
-                                        }}
-                                        className="text-xs border border-gray-300 px-2 py-1.5 focus:outline-none focus:border-black transition-colors"
-                                    >
-                                        <option value="PENDING">{t('order.pending')}</option>
-                                        <option value="CONFIRMED">{t('order.confirmed')}</option>
-                                        <option value="SHIPPED">{t('order.shipped')}</option>
-                                        <option value="DELIVERED">{t('order.delivered')}</option>
-                                        <option value="CANCELLED">{t('order.cancelled')}</option>
-                                    </select>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-
-                    <Pagination page={page} totalPages={totalPages} setPage={setPage} />
-                </div>
+                <ResponsiveTable
+                    rows={orders}
+                    rowKey={(o) => o.id}
+                    onRowClick={(o) => navigate(`/admin/orders/${o.id}`)}
+                    emptyMessage={t('order.empty')}
+                    page={page}
+                    totalPages={totalPages}
+                    setPage={setPage}
+                    columns={[
+                        {
+                            key: 'order',
+                            label: t('admin.order'),
+                            primary: true,
+                            render: (o) => (
+                                <>
+                                    <span className="text-sm font-semibold text-black">{o.orderCode}</span>
+                                    <span className="block text-xs font-normal text-gray-400">
+                                        {new Date(o.createdAt).toLocaleDateString()}
+                                    </span>
+                                </>
+                            ),
+                        },
+                        {
+                            key: 'customer',
+                            label: t('order.customer'),
+                            render: (o) => <span className="text-sm text-gray-500">{o.customerFullName}</span>,
+                        },
+                        {
+                            key: 'items',
+                            label: t('order.items'),
+                            render: (o) => (
+                                <span className="text-sm text-gray-500">
+                                    {t('admin.itemsCount', { count: o.orderItems?.length || 0 })}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'total',
+                            label: t('cart.total'),
+                            render: (o) => <span className="text-sm font-bold text-black">{format(o.totalAmount)}</span>,
+                        },
+                        {
+                            key: 'status',
+                            label: t('order.status'),
+                            render: (o) => (
+                                <span className={`inline-block whitespace-nowrap text-xs font-semibold uppercase px-2 py-1 ${getStatusStyle(o.status)}`}>
+                                    {getStatusLabel(o.status)}
+                                </span>
+                            ),
+                        },
+                        {
+                            key: 'updateStatus',
+                            label: t('order.updateStatus'),
+                            hideOnMobile: true,
+                            render: (o) => statusSelect(o),
+                        },
+                    ]}
+                    mobileExtra={(o) => (
+                        <div>
+                            <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">{t('order.updateStatus')}</p>
+                            {statusSelect(o)}
+                        </div>
+                    )}
+                />
             )}
         </div>
     );

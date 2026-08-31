@@ -3,96 +3,107 @@ import { useTranslation } from 'react-i18next';
 import { getImageUrl } from '../../utils/imageUtils';
 import { useCurrency } from '../../context/CurrencyContext';
 import StatusBadge from '../common/StatusBadge';
-import Pagination from '../common/Pagination';
+import ResponsiveTable from './ResponsiveTable';
 
 const ProductsTable = ({ products, page, totalPages, setPage, onEdit, onToggle, onDelete }) => {
     const { t } = useTranslation();
     const { format } = useCurrency();
     const navigate = useNavigate();
 
-    const thClass = "text-left text-xs font-semibold uppercase tracking-wide text-gray-500 px-3 py-3";
+    const genderLabel = (gender) =>
+        t(`product.gender${gender.charAt(0) + gender.slice(1).toLowerCase()}`);
 
     return (
-        <div className="border border-gray-200">
-            <table className="w-full">
-                <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className={thClass}>{t('admin.image')}</th>
-                    <th className={thClass}>{t('product.product')}</th>
-                    <th className={`hidden md:table-cell ${thClass}`}>{t('admin.sku')}</th>
-                    <th className={thClass}>{t('product.price')}</th>
-                    <th className={`hidden md:table-cell ${thClass}`}>{t('product.stock')}</th>
-                    <th className={thClass}>{t('order.status')}</th>
-                    <th className={thClass}>{t('admin.actions')}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {products.map(product => (
-                    <tr
-                        key={product.id}
-                        onClick={() => navigate(`/products/${product.id}`)}
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                    >
-                        <td className="px-3 py-3">
-                            <div className="w-13 h-13 border-2 border-transparent transition-colors overflow-hidden block">
-                                {product.imageUrl ? (
-                                    <img
-                                        src={getImageUrl(product.imageUrl)}
-                                        alt={product.colorName || 'Variant'}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div
-                                        className="w-full h-full"
-                                        style={{ backgroundColor: product.colorHex || '#ccc' }}
-                                    />
-                                )}
-                            </div>
-                        </td>
-                        <td className="px-3 py-3">
-                            <p className="text-xs font-semibold text-black">{product.name}</p>
-                            <p className="text-xs text-gray-400">{product.categoryName || t('admin.noCategory')}</p>
-                            {product.gender && (
+        <ResponsiveTable
+            rows={products}
+            rowKey={(p) => p.id}
+            onRowClick={(p) => navigate(`/products/${p.id}`)}
+            emptyMessage={t('admin.noResults')}
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+            cellClassName="px-3 py-3"
+            columns={[
+                {
+                    key: 'image',
+                    label: t('admin.image'),
+                    hideOnMobile: true,
+                    render: (p) => (
+                        <div className="w-13 h-13 overflow-hidden block">
+                            {p.imageUrl ? (
+                                <img
+                                    src={getImageUrl(p.imageUrl)}
+                                    alt={p.colorName || 'Variant'}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full" style={{ backgroundColor: p.colorHex || '#ccc' }} />
+                            )}
+                        </div>
+                    ),
+                },
+                {
+                    key: 'product',
+                    label: t('product.product'),
+                    primary: true,
+                    render: (p) => (
+                        <>
+                            <span className="block text-xs font-semibold text-black md:text-xs">{p.name}</span>
+                            <span className="block text-xs text-gray-400">{p.categoryName || t('admin.noCategory')}</span>
+                            {p.gender && (
                                 <span className="inline-block mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-gray-400 border border-gray-200 px-1.5 py-0.5">
-                                    {t(`product.gender${product.gender.charAt(0) + product.gender.slice(1).toLowerCase()}`)}
+                                    {genderLabel(p.gender)}
                                 </span>
                             )}
-                        </td>
-                        <td className="hidden md:table-cell px-3 py-3 text-xs text-gray-500">{product.sku}</td>
-                        <td className="px-3 py-3 text-xs font-semibold text-black">{format(product.price)}</td>
-                        <td className="hidden md:table-cell px-3 py-3 text-xs text-black">{product.stockQuantity}</td>
-                        <td className="px-3 py-3">
-                            <StatusBadge active={product.active} />
-                        </td>
-                        <td className="px-3 py-3">
-                            <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-3">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onEdit(product); }}
-                                    className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                >
-                                    {t('admin.edit')}
-                                </button>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onToggle(product.id); }}
-                                    className="text-xs text-gray-500 hover:text-black transition-colors underline"
-                                >
-                                    {product.active ? t('admin.deactivate') : t('admin.activate')}
-                                </button>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); onDelete(product.id); }}
-                                    className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
-                                >
-                                    {t('admin.delete')}
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-
-            <Pagination page={page} totalPages={totalPages} setPage={setPage} />
-        </div>
+                        </>
+                    ),
+                },
+                {
+                    key: 'sku',
+                    label: t('admin.sku'),
+                    hideOnMobile: true,
+                    render: (p) => <span className="text-xs text-gray-500">{p.sku}</span>,
+                },
+                {
+                    key: 'price',
+                    label: t('product.price'),
+                    render: (p) => <span className="text-xs font-semibold text-black">{format(p.price)}</span>,
+                },
+                {
+                    key: 'stock',
+                    label: t('product.stock'),
+                    hideOnMobile: true,
+                    render: (p) => <span className="text-xs text-black">{p.stockQuantity}</span>,
+                },
+                {
+                    key: 'status',
+                    label: t('order.status'),
+                    render: (p) => <StatusBadge active={p.active} />,
+                },
+            ]}
+            actions={(p) => (
+                <>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onEdit(p); }}
+                        className="text-xs text-gray-500 hover:text-black transition-colors underline"
+                    >
+                        {t('admin.edit')}
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onToggle(p.id); }}
+                        className="text-xs text-gray-500 hover:text-black transition-colors underline"
+                    >
+                        {p.active ? t('admin.deactivate') : t('admin.activate')}
+                    </button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(p.id); }}
+                        className="text-xs text-red-400 hover:text-red-600 transition-colors underline"
+                    >
+                        {t('admin.delete')}
+                    </button>
+                </>
+            )}
+        />
     );
 };
 

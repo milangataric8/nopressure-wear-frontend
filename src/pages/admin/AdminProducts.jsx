@@ -311,7 +311,7 @@ const AdminProducts = () => {
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
-        <div className="max-w-7xl mx-auto px-6 py-10">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
             <AdminPageHeader
                 title={t('admin.products')}
                 subtitle={t('admin.manageProducts')}
@@ -576,11 +576,9 @@ const AdminProducts = () => {
                 </div>
             )}
 
-            {loading && <LoadingSpinner />}
-            {
-                loading && <LoadingSpinner height="h-32" />
-            }
-            {(
+            {loading ? (
+                <LoadingSpinner height="h-32" />
+            ) : (
                 <ProductsTable
                     products={products}
                     page={page}

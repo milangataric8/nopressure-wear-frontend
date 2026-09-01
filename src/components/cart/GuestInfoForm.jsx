@@ -1,6 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { inputClass, inputNormal, inputError } from '../../utils/validationUtils';
+import FormField from '../form/FormField';
+import { inputClass } from '../form/inputStyles';
 
+// Checkout's guest-info block, kept in step with the admin forms by using the same
+// FormField + input style helpers. Validation state is still owned by CartPage
+// (validateCheckout populates `errors`); FormField just renders whatever it's given.
 const GuestInfoForm = ({ guestInfo, setGuestInfo, errors = {}, setErrors }) => {
     const { t } = useTranslation();
 
@@ -18,39 +22,39 @@ const GuestInfoForm = ({ guestInfo, setGuestInfo, errors = {}, setErrors }) => {
                 {t('cart.yourInformation')}
             </h3>
             <div className="space-y-3">
-                <div>
+                <FormField id="fullName" name="fullName" error={errors.fullName}>
                     <input
-                        type="text"
+                        id="fullName" name="fullName" type="text"
                         value={guestInfo.fullName}
                         onChange={handleChange('fullName')}
                         placeholder={t('cart.fullName')}
                         aria-invalid={!!errors.fullName}
-                        className={`${inputClass} ${errors.fullName ? inputError : inputNormal}`}
+                        aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+                        className={inputClass(!!errors.fullName)}
                     />
-                    {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
-                </div>
-                <div>
+                </FormField>
+                <FormField id="email" name="email" error={errors.email}>
                     <input
-                        type="email"
+                        id="email" name="email" type="email"
                         value={guestInfo.email}
                         onChange={handleChange('email')}
                         placeholder={t('cart.email')}
                         aria-invalid={!!errors.email}
-                        className={`${inputClass} ${errors.email ? inputError : inputNormal}`}
+                        aria-describedby={errors.email ? 'email-error' : undefined}
+                        className={inputClass(!!errors.email)}
                     />
-                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-                </div>
-                <div>
+                </FormField>
+                <FormField id="phone" name="phone" error={errors.phone}>
                     <input
-                        type="tel"
+                        id="phone" name="phone" type="tel"
                         value={guestInfo.phone}
                         onChange={handleChange('phone')}
                         placeholder={t('cart.phone')}
                         aria-invalid={!!errors.phone}
-                        className={`${inputClass} ${errors.phone ? inputError : inputNormal}`}
+                        aria-describedby={errors.phone ? 'phone-error' : undefined}
+                        className={inputClass(!!errors.phone)}
                     />
-                    {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
-                </div>
+                </FormField>
             </div>
         </div>
     );

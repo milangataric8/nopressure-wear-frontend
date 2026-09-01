@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import AuthBackground from "../components/auth/AuthBackground.jsx";
 import { getSettingsMap } from '../api/settingsApi';
 import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGEX } from '../utils/validationUtils';
+import { adminLandingPath } from '../utils/roles';
 
 const LoginPage = () => {
     const { t } = useTranslation();
@@ -62,8 +63,10 @@ const LoginPage = () => {
         try {
             const response = await login(formData);
             const { id, token, firstName, lastName, email, role } = response.data;
-            loginUser({ id, firstName, lastName, email, role }, token);
-            navigate('/');
+            const loggedInUser = { id, firstName, lastName, email, role };
+            loginUser(loggedInUser, token);
+            // staff land in the admin area (employees on the catalog, not the dashboard)
+            navigate(adminLandingPath(loggedInUser));
         } catch (error) {
             if (applyServerErrors(error, t, setErrors)) {
                 setLoading(false);

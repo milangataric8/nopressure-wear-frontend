@@ -5,6 +5,8 @@ import { getLegalContent, updateLegalContent } from '../../api/legalApi';
 import RichTextEditor from '../../components/common/RichTextEditor';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { richTextRequired } from '../../utils/validators';
+import { focusFirstError } from '../../utils/validateForm';
 
 const PAGES = [
     { key: 'PRIVACY',  labelKey: 'legal.privacyTitle' },
@@ -20,6 +22,7 @@ const AdminLegal = () => {
     const [activePage, setActivePage] = useState('PRIVACY');
     const [activeLang, setActiveLang] = useState('en');
     const [content, setContent] = useState('');
+    const [contentError, setContentError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -40,6 +43,12 @@ const AdminLegal = () => {
     }, [fetchContent]);
 
     const handleSave = async () => {
+        const err = richTextRequired(content);
+        setContentError(err || null);
+        if (err) {
+            focusFirstError({ content: err });
+            return;
+        }
         setSaving(true);
         try {
             await updateLegalContent(activePage, activeLang, content);
@@ -96,20 +105,22 @@ const AdminLegal = () => {
             </div>
 
             {/* Editor */}
-            <div className="border border-gray-200">
+            <div id="content-field" className={`border ${contentError ? 'border-red-500' : 'border-gray-200'}`}>
                 {loading ? (
                     <LoadingSpinner height="h-64" />
                 ) : (
                     <RichTextEditor
                         value={content}
-                        onChange={setContent}
+                        onChange={(v) => { setContent(v); if (contentError) setContentError(null); }}
                         placeholder={`${t(PAGES.find(p => p.key === activePage)?.labelKey)} (${activeLang.toUpperCase()})`}
                     />
                 )}
             </div>
-            <p className="text-xs text-gray-400 mt-1">
-                {t('admin.legalLineBreakHint')}
-            </p>
+            {contentError ? (
+                <p role="alert" className="text-xs text-red-500 mt-1">{t(contentError)}</p>
+            ) : (
+                <p className="text-xs text-gray-400 mt-1">{t('admin.legalLineBreakHint')}</p>
+            )}
 
             <div className="mt-4 flex justify-end">
                 <button

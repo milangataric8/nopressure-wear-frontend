@@ -1,70 +1,57 @@
 import axiosInstance from '../api/axiosInstance';
 
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import { useTranslation } from 'react-i18next';
 import { isPasswordValid } from '../utils/passwordUtils';
-import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../utils/validationUtils';
+import { applyServerErrors } from '../utils/validationUtils';
+import FormField from '../components/form/FormField';
+import PasswordInput from '../components/form/PasswordInput';
+import { inputClass } from '../components/form/inputStyles';
+import { useFormValidation } from '../hooks/useFormValidation';
+import { required, minLength, matches, differentFrom } from '../utils/validators';
+
+const EMPTY = { currentPassword: '', newPassword: '', confirmPassword: '' };
+
+const passwordStrength = (v) =>
+    !v || isPasswordValid(v) ? null : 'messages.passwordNotMeet';
+
+const rules = {
+    currentPassword: [required],
+    newPassword: [required, minLength(8), passwordStrength, differentFrom(all => all.currentPassword)],
+    confirmPassword: [required, matches(all => all.newPassword)],
+};
 
 const ChangePasswordPage = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-    });
-    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: undefined }));
-        }
-    };
-
-    const validate = () => {
-        const e = {};
-        if (!formData.currentPassword) e.currentPassword = t('validation.currentPasswordRequired');
-        if (!formData.newPassword) e.newPassword = t('validation.newPasswordRequired');
-        else if (!isPasswordValid(formData.newPassword)) e.newPassword = t('messages.passwordNotMeet');
-        if (!formData.confirmPassword) e.confirmPassword = t('validation.passwordRequired');
-        else if (formData.newPassword !== formData.confirmPassword) e.confirmPassword = t('auth.passwordsNoMatch');
-        setErrors(e);
-        return Object.keys(e).length === 0;
-    };
+    const form = useFormValidation(EMPTY, rules);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!validate()) {
-            focusFirstError();
-            return;
-        }
+        if (!form.submit()) return;
 
         setLoading(true);
         try {
             await axiosInstance.post(`/auth/change-password/${user.id}`, {
-                currentPassword: formData.currentPassword,
-                newPassword: formData.newPassword,
+                currentPassword: form.values.currentPassword,
+                newPassword: form.values.newPassword,
             });
             toast.success(t('messages.passwordChanged'));
             navigate('/profile');
         } catch (error) {
-            if (applyServerErrors(error, t, setErrors)) {
+            if (applyServerErrors(error, t, form.setErrors)) {
                 // inline
             } else {
                 const msg = error.response?.data?.message || '';
                 if (msg.toLowerCase().includes('current password')) {
-                    setErrors({ currentPassword: t('validation.currentPasswordWrong') });
-                    focusFirstError();
+                    form.setErrors({ currentPassword: t('validation.currentPasswordWrong') });
                 } else {
-                    toast.error(msg || 'Failed to change password');
+                    toast.error(msg || t('messages.failedToSave'));
                 }
             }
         } finally {
@@ -72,16 +59,13 @@ const ChangePasswordPage = () => {
         }
     };
 
-    const inputClass = "w-full border px-4 py-2.5 text-sm focus:outline-none transition-colors";
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
-
     return (
         <div className="max-w-md mx-auto px-6 py-10">
             <button
                 onClick={() => navigate('/profile')}
                 className="text-xs font-medium uppercase tracking-wide text-gray-500 hover:text-black transition-colors mb-8"
             >
-                ← Back to Profile
+                {t('address.backToProfile')}
             </button>
 
             <div className="mb-8">
@@ -90,59 +74,47 @@ const ChangePasswordPage = () => {
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                <div>
-                    <label className={labelClass} htmlFor="currentPassword">{t('profile.currentPassword')}</label>
-                    <input
-                        id="currentPassword"
-                        type="password"
-                        name="currentPassword"
-                        value={formData.currentPassword}
-                        onChange={handleChange}
-                        aria-invalid={!!errors.currentPassword}
-                        aria-describedby={errors.currentPassword ? 'currentPassword-error' : undefined}
-                        className={`${inputClass} ${errors.currentPassword ? inputError : inputNormal}`}
+                <FormField id="currentPassword" name="currentPassword" label={t('profile.currentPassword')} required error={form.errors.currentPassword}>
+                    <PasswordInput
+                        id="currentPassword" name="currentPassword"
+                        value={form.values.currentPassword}
+                        onChange={form.handleChange}
+                        onBlur={form.handleBlur}
+                        autoComplete="current-password"
                         placeholder="••••••••"
+                        aria-invalid={!!form.errors.currentPassword}
+                        aria-describedby={form.errors.currentPassword ? 'currentPassword-error' : undefined}
+                        className={inputClass(!!form.errors.currentPassword)}
                     />
-                    {errors.currentPassword && (
-                        <p id="currentPassword-error" className="text-xs text-red-500 mt-1">{errors.currentPassword}</p>
-                    )}
-                </div>
+                </FormField>
 
-                <div>
-                    <label className={labelClass} htmlFor="newPassword">{t('profile.newPassword')}</label>
-                    <input
-                        id="newPassword"
-                        type="password"
-                        name="newPassword"
-                        value={formData.newPassword}
-                        onChange={handleChange}
-                        aria-invalid={!!errors.newPassword}
-                        aria-describedby={errors.newPassword ? 'newPassword-error' : undefined}
-                        className={`${inputClass} ${errors.newPassword ? inputError : inputNormal}`}
+                <FormField id="newPassword" name="newPassword" label={t('profile.newPassword')} required error={form.errors.newPassword}>
+                    <PasswordInput
+                        id="newPassword" name="newPassword"
+                        value={form.values.newPassword}
+                        onChange={form.handleChange}
+                        onBlur={form.handleBlur}
+                        autoComplete="new-password"
                         placeholder="••••••••"
+                        aria-invalid={!!form.errors.newPassword}
+                        aria-describedby={form.errors.newPassword ? 'newPassword-error' : undefined}
+                        className={inputClass(!!form.errors.newPassword)}
                     />
-                    {errors.newPassword && (
-                        <p id="newPassword-error" className="text-xs text-red-500 mt-1">{errors.newPassword}</p>
-                    )}
-                </div>
+                </FormField>
 
-                <div>
-                    <label className={labelClass} htmlFor="confirmPassword">{t('profile.confirmNewPassword')}</label>
-                    <input
-                        id="confirmPassword"
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        aria-invalid={!!errors.confirmPassword}
-                        aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                        className={`${inputClass} ${errors.confirmPassword ? inputError : inputNormal}`}
+                <FormField id="confirmPassword" name="confirmPassword" label={t('profile.confirmNewPassword')} required error={form.errors.confirmPassword}>
+                    <PasswordInput
+                        id="confirmPassword" name="confirmPassword"
+                        value={form.values.confirmPassword}
+                        onChange={form.handleChange}
+                        onBlur={form.handleBlur}
+                        autoComplete="new-password"
                         placeholder="••••••••"
+                        aria-invalid={!!form.errors.confirmPassword}
+                        aria-describedby={form.errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                        className={inputClass(!!form.errors.confirmPassword)}
                     />
-                    {errors.confirmPassword && (
-                        <p id="confirmPassword-error" className="text-xs text-red-500 mt-1">{errors.confirmPassword}</p>
-                    )}
-                </div>
+                </FormField>
 
                 <button
                     type="submit"

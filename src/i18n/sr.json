@@ -222,7 +222,24 @@
     "deletePersonalData": "Obriši lične podatke",
     "confirmAnonymize": "Trajno anonimizovati lične podatke ovog kupca? Ovo se ne može poništiti.",
     "customerAnonymized": "Podaci kupca su anonimizovani.",
-    "anonymizeFailed": "Anonimizacija nije uspela."
+    "anonymizeFailed": "Anonimizacija nije uspela.",
+    "role": "Rola",
+    "roleHint": "Employee ima pristup samo katalogu. Admin upravlja svime osim izveštajima i zaposlenima.",
+    "confirmRoleChange": "Promeniti rolu korisnika {{name}} sa {{from}} na {{to}}?",
+    "cannotChangeOwnRole": "Ne možete menjati sopstvenu rolu",
+    "roleDescEmployee": "Pristup samo katalogu.",
+    "roleDescAdmin": "Upravlja svime osim izveštajima i zaposlenima.",
+    "roleDescSuperAdmin": "Puna prava nad aplikacijom, uključujući upravljanje zaposlenima i dodelu rola.",
+    "handoverHint": "Ako predajete dužnost: nakon čuvanja zamolite novog super admina da deaktivira vaš nalog — sopstveni nalog ne možete deaktivirati.",
+    "handoverModalTitle": "Dodela super admin role",
+    "handoverModalBody": "Dodeljujete punu kontrolu nad aplikacijom korisniku {{name}} ({{email}}). Ova osoba će moći da upravlja zaposlenima, menja role i pristupa svim podacima.",
+    "handoverConfirmLabel": "Za potvrdu ukucajte: {{text}}",
+    "mustKeepOneSuperAdmin": "Mora postojati bar jedan super admin."
+  },
+  "forbidden": {
+    "title": "Nemate pristup",
+    "text": "Vaš nalog nema ovlašćenje za ovu stranicu.",
+    "back": "Nazad na početnu"
   },
   "legal": {
     "privacyTitle": "Politika privatnosti",
@@ -692,6 +709,8 @@
     "failedToRemoveFromFavorites": "Greška pri uklanjanju iz omiljenih",
     "failedToUpdateFavorites": "Greška pri ažuriranju omiljenih",
     "failedToUpdate": "Greška pri ažuriranju",
+    "forbidden": "Nemate ovlašćenje za ovu akciju.",
+    "superAdminInvariant": "Mora postojati bar jedan aktivan super admin.",
     "failedToUploadLogo": "Greška pri otpremanju loga",
     "confirmDelete": "Da li ste sigurni da želite da obrišete ovo?",
     "itemRemoved": "Artikal uklonjen",
@@ -752,6 +771,18 @@
     "endDateBeforeStart": "Datum završetka mora biti posle datuma početka",
     "couponInvalid": "Kupon je nevažeći ili je istekao",
     "outOfStock": "Ova veličina je rasprodata",
-    "sizeRequired": "Izaberite veličinu"
+    "sizeRequired": "Izaberite veličinu",
+    "minLength": "Minimalno {{count}} karaktera.",
+    "maxLength": "Maksimalno {{count}} karaktera.",
+    "number": "Unesite broj.",
+    "positive": "Vrednost mora biti veća od nule.",
+    "percent": "Vrednost mora biti između 1 i 100.",
+    "passwordSame": "Nova lozinka mora biti različita od trenutne.",
+    "imageRequired": "Slika je obavezna.",
+    "selectOption": "Izaberite opciju."
+  },
+  "password": {
+    "show": "Prikaži lozinku",
+    "hide": "Sakrij lozinku"
   }
 }

@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react';
 import * as Sentry from '@sentry/react';
+import { isAdminOrAbove, isSuperAdmin as isSuperAdminFn, isStaff as isStaffFn, ROLES } from '../utils/roles';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
@@ -36,8 +37,11 @@ export const AuthProvider = ({ children }) => {
         Sentry.setUser(null);
     };
 
-    const isAdmin = () => user?.role === 'ADMIN';
-    const isEmployee = () => user?.role === 'EMPLOYEE';
+    // "ADMIN and above" — includes SUPER_ADMIN. Use isStaff() for "any admin-panel user".
+    const isAdmin = () => isAdminOrAbove(user);
+    const isSuperAdmin = () => isSuperAdminFn(user);
+    const isStaff = () => isStaffFn(user);
+    const isEmployee = () => user?.role === ROLES.EMPLOYEE;
     const isAuthenticated = () => !!token;
 
     return (
@@ -47,6 +51,8 @@ export const AuthProvider = ({ children }) => {
             loginUser,
             logoutUser,
             isAdmin,
+            isSuperAdmin,
+            isStaff,
             isEmployee,
             isAuthenticated,
             cartCount,

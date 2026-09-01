@@ -13,9 +13,16 @@ import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
 import RichTextEditor from '../../components/common/RichTextEditor';
+import FormField from '../../components/form/FormField';
+import { inputClass } from '../../components/form/inputStyles';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { required } from '../../utils/validators';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
+import { applyServerErrors } from '../../utils/validationUtils';
+
+const EMPTY_CATEGORY = { name: '', description: '', parentId: '' };
+const categoryRules = { name: [required] };
 
 const AdminCategories = () => {
     const { t } = useTranslation();
@@ -23,12 +30,7 @@ const AdminCategories = () => {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        parentId: '',
-    });
-    const [errors, setErrors] = useState({});
+    const form = useFormValidation(EMPTY_CATEGORY, categoryRules);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState('');
     const [page, setPage] = useState(0);
@@ -60,35 +62,16 @@ const AdminCategories = () => {
         void fetchCategories();
     }, [page, searchQuery, activeFilter]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: undefined }));
-        }
-    };
-
-    const validate = () => {
-        const e = {};
-        if (!formData.name?.trim()) e.name = t('validation.nameRequired');
-        setErrors(e);
-
-        return Object.keys(e).length === 0;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validate()) {
-            focusFirstError();
-            return;
-        }
+        if (!form.submit()) return;
 
         try {
             const payload = {
-                name: formData.name,
-                description: formData.description,
-                parentId: formData.parentId ? parseInt(formData.parentId) : null,
+                name: form.values.name,
+                description: form.values.description,
+                parentId: form.values.parentId ? parseInt(form.values.parentId) : null,
             };
 
             if (editingCategory) {
@@ -102,7 +85,7 @@ const AdminCategories = () => {
             resetForm();
             fetchCategories();
         } catch (error) {
-            if (!applyServerErrors(error, t, setErrors)) {
+            if (!applyServerErrors(error, t, form.setErrors)) {
                 toast.error(error.response?.data?.message || t('messages.failedToSave'));
             }
         }
@@ -110,12 +93,11 @@ const AdminCategories = () => {
 
     const handleEdit = (category) => {
         setEditingCategory(category);
-        setFormData({
+        form.reset({
             name: category.name,
             description: category.description || '',
             parentId: category.parentId || '',
         });
-        setErrors({});
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -131,13 +113,11 @@ const AdminCategories = () => {
     };
 
     const resetForm = () => {
-        setFormData({ name: '', description: '', parentId: '' });
+        form.reset(EMPTY_CATEGORY);
         setEditingCategory(null);
         setShowForm(false);
-        setErrors({});
     };
 
-    const inputClass = "w-full border px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -146,7 +126,7 @@ const AdminCategories = () => {
                 title={t('admin.categories')}
                 subtitle={t('admin.manageCategories')}
                 buttonLabel={showForm ? t('admin.cancel') : t('admin.newCategory')}
-                onButtonClick={() => { if (showForm) { resetForm(); } else { setShowForm(true); setErrors({}); } }}
+                onButtonClick={() => { if (showForm) { resetForm(); } else { form.reset(EMPTY_CATEGORY); setEditingCategory(null); setShowForm(true); } }}
             />
 
             {!showForm && (
@@ -169,30 +149,30 @@ const AdminCategories = () => {
                         {editingCategory ? t('admin.edit') : t('admin.newCategory')}
                     </h2>
 
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className={labelClass} htmlFor="category-name">{t('product.name')}</label>
+                    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField id="name" name="name" label={t('product.name')} required error={form.errors.name}>
                             <input
-                                id="category-name"
+                                id="name"
                                 type="text"
                                 name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                aria-invalid={!!errors.name}
-                                aria-describedby={errors.name ? 'category-name-error' : undefined}
-                                className={`${inputClass} ${errors.name ? inputError : inputNormal}`}
+                                value={form.values.name}
+                                onChange={form.handleChange}
+                                onBlur={form.handleBlur}
+                                aria-invalid={!!form.errors.name}
+                                aria-describedby={form.errors.name ? 'name-error' : undefined}
+                                className={inputClass(!!form.errors.name)}
                                 placeholder="Category name"
                             />
-                            {errors.name && <p id="category-name-error" className="text-xs text-red-500 mt-1">{errors.name}</p>}
-                        </div>
+                        </FormField>
 
                         <div>
-                            <label className={labelClass}>{t('admin.parentCategory')}</label>
+                            <label className={labelClass} htmlFor="parentId">{t('admin.parentCategory')}</label>
                             <select
+                                id="parentId"
                                 name="parentId"
-                                value={formData.parentId}
-                                onChange={handleChange}
-                                className={`${inputClass} ${inputNormal}`}
+                                value={form.values.parentId}
+                                onChange={form.handleChange}
+                                className={inputClass(false)}
                             >
                                 <option value="">{t('admin.noParent')}</option>
                                 {categories
@@ -207,8 +187,8 @@ const AdminCategories = () => {
                         <div className="md:col-span-2">
                             <label className={labelClass}>{t('admin.description')}</label>
                             <RichTextEditor
-                                value={formData.description}
-                                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                                value={form.values.description}
+                                onChange={(value) => form.setFieldValue('description', value)}
                                 placeholder="Category description..."
                             />
                         </div>

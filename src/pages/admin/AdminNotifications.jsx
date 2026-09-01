@@ -1,16 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { sendNotification, getNotificationHistory, getChannelStatus, deleteNotification } from '../api/notificationApi';
-import { uploadImage } from '../api/uploadApi';
-import { getImageUrl } from '../utils/imageUtils';
-import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
-import RichTextEditor from '../components/common/RichTextEditor';
+import { sendNotification, getNotificationHistory, getChannelStatus, deleteNotification } from '../../api/notificationApi.js';
+import { uploadImage } from '../../api/uploadApi.js';
+import { getImageUrl } from '../../utils/imageUtils.js';
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+import RichTextEditor from '../../components/common/RichTextEditor.jsx';
+import FormField from '../../components/form/FormField.jsx';
+import { inputClass } from '../../components/form/inputStyles.js';
+import { focusFirstError } from '../../utils/validateForm.js';
+import { required, richTextRequired } from '../../utils/validators.js';
 
 const AdminNotifications = () => {
     const { t } = useTranslation();
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
+    const [errors, setErrors] = useState({});
     const [selectedChannels, setSelectedChannels] = useState(['EMAIL']);
     const [channelStatus, setChannelStatus] = useState({});
     const [history, setHistory] = useState([]);
@@ -22,7 +27,7 @@ const AdminNotifications = () => {
     const [bgColor, setBgColor] = useState('#ffffff');
     const [textColor, setTextColor] = useState('#111111');
     const [historySearch, setHistorySearch] = useState('');
-    const [channelFilter, setChannelFilter] = useState('');
+    const [channelFilter/*, setChannelFilter*/] = useState('');
 
 
     const fetchData = useCallback(async () => {
@@ -53,8 +58,16 @@ const AdminNotifications = () => {
     };
 
     const handleSend = async () => {
-        if (!message.trim()) {
-            toast.error(t('messages.messageRequired'));
+        const errs = {};
+        const m = richTextRequired(message);
+        if (m) errs.message = m;
+        if (selectedChannels.includes('EMAIL')) {
+            const s = required(subject);
+            if (s) errs.subject = s;
+        }
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) {
+            focusFirstError(errs);
             return;
         }
         if (selectedChannels.length === 0) {
@@ -223,16 +236,22 @@ const AdminNotifications = () => {
 
                 {/* Subject */}
                 <div className="mb-4">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
-                        {t('admin.subjectEmailOnly')}
-                    </label>
-                    <input
-                        type="text"
-                        value={subject}
-                        onChange={(e) => setSubject(e.target.value)}
-                        placeholder={t('admin.subjectPlaceholder')}
-                        className="w-full border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                    />
+                    <FormField
+                        id="subject" name="subject"
+                        label={t('admin.subjectEmailOnly')}
+                        required={selectedChannels.includes('EMAIL')}
+                        error={errors.subject}
+                    >
+                        <input
+                            id="subject" name="subject" type="text"
+                            value={subject}
+                            onChange={(e) => { setSubject(e.target.value); if (errors.subject) setErrors(prev => ({ ...prev, subject: undefined })); }}
+                            placeholder={t('admin.subjectPlaceholder')}
+                            aria-invalid={!!errors.subject}
+                            aria-describedby={errors.subject ? 'subject-error' : undefined}
+                            className={inputClass(!!errors.subject)}
+                        />
+                    </FormField>
                 </div>
 
                 {/* Colors */}
@@ -248,7 +267,13 @@ const AdminNotifications = () => {
                                 onChange={(e) => setBgColor(e.target.value)}
                                 className="w-12 h-9 border border-gray-300 cursor-pointer"
                             />
-                            <span className="text-xs text-gray-500">{bgColor}</span>
+                            <input
+                                type="text"
+                                name="backgroundColor"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
+                            />
                         </div>
                     </div>
                     <div>
@@ -262,21 +287,35 @@ const AdminNotifications = () => {
                                 onChange={(e) => setTextColor(e.target.value)}
                                 className="w-12 h-9 border border-gray-300 cursor-pointer"
                             />
-                            <span className="text-xs text-gray-500">{textColor}</span>
+                            <input
+                                type="text"
+                                name="backgroundColor"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
+                            />
                         </div>
                     </div>
                 </div>
 
                 {/* Message */}
-                <div className="mb-6">
+                <div className="mb-6" id="message-field">
                     <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
                         {t('admin.notificationMessage')}
+                        <span className="text-red-500" aria-hidden="true"> *</span>
                     </label>
-                    <RichTextEditor
-                        value={message}
-                        onChange={setMessage}
-                        placeholder={t('admin.messagePlaceholder')}
-                    />
+                    <div className={errors.message ? 'border border-red-500' : ''}>
+                        <RichTextEditor
+                            value={message}
+                            onChange={(v) => { setMessage(v); if (errors.message) setErrors(prev => ({ ...prev, message: undefined })); }}
+                            placeholder={t('admin.messagePlaceholder')}
+                        />
+                    </div>
+                    {errors.message && (
+                        <p role="alert" className="text-xs text-red-500 mt-1">
+                            {typeof errors.message === 'object' ? t(errors.message.key, errors.message.params) : t(errors.message)}
+                        </p>
+                    )}
                 </div>
 
                 {/* Preview */}

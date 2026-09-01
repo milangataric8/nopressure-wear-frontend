@@ -25,7 +25,20 @@ import ProductMediaManager from "../../components/admin/ProductMediaManager.jsx"
 import ProductsTable from "../../components/admin/ProductsTable.jsx";
 import ProductFilterBar from "../../components/admin/ProductFilterBar.jsx";
 import CategoryFilterBar from "../../components/admin/CategoryFilterBar.jsx";
-import { inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
+import { applyServerErrors } from '../../utils/validationUtils';
+import FormField from '../../components/form/FormField.jsx';
+import { inputClass as fieldClass } from '../../components/form/inputStyles.js';
+import { validateForm, focusFirstError } from '../../utils/validateForm.js';
+import { required } from '../../utils/validators.js';
+
+const nonNegativeNumber = (v) =>
+    v !== '' && v !== null && v !== undefined && !Number.isNaN(Number(v)) && Number(v) >= 0
+        ? null : 'validation.priceInvalid';
+const productRules = {
+    name: [required],
+    sku: [required],
+    price: [required, nonNegativeNumber],
+};
 import { normalizeWhitespace } from '../../utils/text.js';
 
 const AdminProducts = () => {
@@ -153,22 +166,18 @@ const AdminProducts = () => {
         }
     };
 
-    const validate = () => {
-        const e = {};
-        if (!formData.name?.trim()) e.name = t('validation.nameRequired');
-        if (!formData.sku?.trim()) e.sku = t('validation.skuRequired');
-        if (formData.price === '' || formData.price === null || isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0) {
-            e.price = t('validation.priceInvalid');
-        }
-        setErrors(e);
-        return Object.keys(e).length === 0;
+    const handleBlur = (e) => {
+        const { name } = e.target;
+        setErrors(prev => ({ ...prev, [name]: validateForm(formData, productRules)[name] }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validate()) {
-            focusFirstError();
+        const errs = validateForm(formData, productRules);
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) {
+            focusFirstError(errs);
             return;
         }
 
@@ -305,9 +314,6 @@ const AdminProducts = () => {
         setErrors({});
     };
     const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
-    const errorInputClass = (field) => errors[field]
-        ? `w-full border ${inputError} px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors`
-        : inputClass;
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -371,55 +377,52 @@ const AdminProducts = () => {
                         {editingProduct ? t('admin.edit') : t('admin.newProduct')}
                     </h2>
 
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className={labelClass} htmlFor="product-name">{t('product.name')}</label>
+                    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField id="name" name="name" label={t('product.name')} required error={errors.name}>
                             <input
-                                id="product-name"
+                                id="name"
                                 type="text"
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 aria-invalid={!!errors.name}
-                                aria-describedby={errors.name ? 'product-name-error' : undefined}
-                                className={errorInputClass('name')}
+                                aria-describedby={errors.name ? 'name-error' : undefined}
+                                className={fieldClass(!!errors.name)}
                                 placeholder="Product name"
                             />
-                            {errors.name && <p id="product-name-error" className="text-xs text-red-500 mt-1">{errors.name}</p>}
-                        </div>
+                        </FormField>
 
-                        <div>
-                            <label className={labelClass} htmlFor="product-sku">{t('admin.sku')}</label>
+                        <FormField id="sku" name="sku" label={t('admin.sku')} required error={errors.sku}>
                             <input
-                                id="product-sku"
+                                id="sku"
                                 type="text"
                                 name="sku"
                                 value={formData.sku}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 aria-invalid={!!errors.sku}
-                                aria-describedby={errors.sku ? 'product-sku-error' : undefined}
-                                className={errorInputClass('sku')}
+                                aria-describedby={errors.sku ? 'sku-error' : undefined}
+                                className={fieldClass(!!errors.sku)}
                                 placeholder="PROD-001"
                             />
-                            {errors.sku && <p id="product-sku-error" className="text-xs text-red-500 mt-1">{errors.sku}</p>}
-                        </div>
+                        </FormField>
 
-                        <div>
-                            <label className={labelClass} htmlFor="product-price">{t('product.price')}</label>
+                        <FormField id="price" name="price" label={t('product.price')} required error={errors.price}>
                             <input
-                                id="product-price"
+                                id="price"
                                 type="number"
                                 name="price"
                                 value={formData.price}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 aria-invalid={!!errors.price}
-                                aria-describedby={errors.price ? 'product-price-error' : undefined}
-                                className={errorInputClass('price')}
+                                aria-describedby={errors.price ? 'price-error' : undefined}
+                                className={fieldClass(!!errors.price)}
                                 placeholder="0.00"
                                 step="0.01"
                             />
-                            {errors.price && <p id="product-price-error" className="text-xs text-red-500 mt-1">{errors.price}</p>}
-                        </div>
+                        </FormField>
 
                         <div>
                             <label className={labelClass}>{t('cart.discount')}</label>

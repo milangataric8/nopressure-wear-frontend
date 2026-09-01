@@ -8,8 +8,17 @@ import Pagination from "../../components/common/Pagination.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
 import AdminPageHeader from "../../components/admin/AdminPageHeader.jsx";
 import StatusBadge from "../../components/common/StatusBadge.jsx";
+import FormField from "../../components/form/FormField.jsx";
+import { inputClass } from "../../components/form/inputStyles.js";
+import { validateForm, focusFirstError } from "../../utils/validateForm.js";
+import { required, requiredFile } from "../../utils/validators.js";
 import { useTranslation } from 'react-i18next';
-import { inputError, applyServerErrors, focusFirstError } from '../../utils/validationUtils';
+import { applyServerErrors } from '../../utils/validationUtils';
+
+const bannerRules = {
+    title: [(v, all) => (all.displayTitle && required(v) ? 'validation.required' : null)],
+    mediaUrl: [requiredFile((all) => !!all.mediaUrl, 'validation.mediaRequired')],
+};
 
 const AdminBanners = () => {
     const { t } = useTranslation();
@@ -74,11 +83,9 @@ const AdminBanners = () => {
         }
     };
 
-    const validate = () => {
-        const e = {};
-        if (!formData.mediaUrl) e.mediaUrl = t('validation.mediaRequired');
-        setErrors(e);
-        return Object.keys(e).length === 0;
+    const handleBlur = (e) => {
+        const { name } = e.target;
+        setErrors(prev => ({ ...prev, [name]: validateForm(formData, bannerRules)[name] }));
     };
 
     const handleFileUpload = async (e) => {
@@ -129,8 +136,10 @@ const AdminBanners = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validate()) {
-            focusFirstError();
+        const errs = validateForm(formData, bannerRules);
+        setErrors(errs);
+        if (Object.keys(errs).length > 0) {
+            focusFirstError(errs);
             return;
         }
 
@@ -212,10 +221,6 @@ const AdminBanners = () => {
         setErrors({});
     };
 
-    const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
-    const errorInputClass = (field) => errors[field]
-        ? `w-full border ${inputError} px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors`
-        : inputClass;
     const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
@@ -287,22 +292,21 @@ const AdminBanners = () => {
                     <h2 className="text-sm font-black uppercase tracking-wide text-black mb-6">
                         {editingBanner ? t('admin.edit') : t('admin.newBanner')}
                     </h2>
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className={labelClass} htmlFor="banner-title">{t('admin.title')}</label>
+                    <form onSubmit={handleSubmit} noValidate className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField id="title" name="title" label={t('admin.title')} required={formData.displayTitle} error={errors.title}>
                             <input
-                                id="banner-title"
+                                id="title"
                                 type="text"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 aria-invalid={!!errors.title}
-                                aria-describedby={errors.title ? 'banner-title-error' : undefined}
-                                className={errorInputClass('title')}
+                                aria-describedby={errors.title ? 'title-error' : undefined}
+                                className={inputClass(!!errors.title)}
                                 placeholder="Summer Collection"
                             />
-                            {errors.title && <p id="banner-title-error" className="text-xs text-red-500 mt-1">{errors.title}</p>}
-                        </div>
+                        </FormField>
 
                         <div>
                             <label className={labelClass}>{t('admin.subtitle')}</label>
@@ -311,7 +315,7 @@ const AdminBanners = () => {
                                 name="subtitle"
                                 value={formData.subtitle}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={inputClass(false)}
                                 placeholder="Discover the latest products"
                             />
                         </div>
@@ -322,7 +326,7 @@ const AdminBanners = () => {
                                 name="mediaType"
                                 value={formData.mediaType}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={inputClass(false)}
                             >
                                 <option value="IMAGE">{t('admin.mediaImage')}</option>
                                 <option value="VIDEO">{t('admin.mediaVideo')}</option>
@@ -336,7 +340,7 @@ const AdminBanners = () => {
                                 name="displayOrder"
                                 value={formData.displayOrder}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={inputClass(false)}
                                 placeholder="0"
                             />
                         </div>
@@ -376,9 +380,10 @@ const AdminBanners = () => {
 
                         <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Desktop media */}
-                            <div>
+                            <div id="mediaUrl-field">
                                 <label className={labelClass}>
                                     {t('admin.desktopMedia')}
+                                    <span className="text-red-500" aria-hidden="true"> *</span>
                                     <span className="block text-xs font-normal text-gray-400 normal-case mt-0.5">
                                         {t('admin.desktopMediaHint')}
                                     </span>
@@ -408,7 +413,11 @@ const AdminBanners = () => {
                                         disabled={uploading}
                                     />
                                 </label>
-                                {errors.mediaUrl && <p className="text-xs text-red-500 mt-1">{errors.mediaUrl}</p>}
+                                {errors.mediaUrl && (
+                                    <p role="alert" className="text-xs text-red-500 mt-1">
+                                        {typeof errors.mediaUrl === 'object' ? t(errors.mediaUrl.key, errors.mediaUrl.params) : t(errors.mediaUrl)}
+                                    </p>
+                                )}
 
                                 {/* Preview */}
                                 {formData.mediaUrl && (
@@ -442,7 +451,7 @@ const AdminBanners = () => {
                                 <select
                                     value={formData.mobileMediaType}
                                     onChange={(e) => setFormData(prev => ({ ...prev, mobileMediaType: e.target.value }))}
-                                    className={`${inputClass} mb-2`}
+                                    className={`${inputClass(false)} mb-2`}
                                 >
                                     <option value="IMAGE">{t('admin.mediaImage')}</option>
                                     <option value="VIDEO">{t('admin.mediaVideo')}</option>
@@ -502,7 +511,7 @@ const AdminBanners = () => {
                                 name="buttonText"
                                 value={formData.buttonText}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={inputClass(false)}
                                 placeholder="Shop Now"
                             />
                         </div>
@@ -514,7 +523,7 @@ const AdminBanners = () => {
                                 name="buttonLink"
                                 value={formData.buttonLink}
                                 onChange={handleChange}
-                                className={inputClass}
+                                className={inputClass(false)}
                                 placeholder="/products"
                             />
                         </div>

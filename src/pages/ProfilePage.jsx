@@ -11,6 +11,7 @@ import { getSavedCards, createSetupIntent, deleteCard } from '../api/paymentApi'
 import AddCardForm from "../components/common/AddCardForm.jsx";
 import { useTranslation } from 'react-i18next';
 import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGEX } from '../utils/validationUtils';
+import { isStaff, isSuperAdmin, isAdminOrAbove } from '../utils/roles';
 
 const ProfilePage = () => {
     const { t } = useTranslation();
@@ -162,14 +163,16 @@ const ProfilePage = () => {
                 </h1>
                 <p className="text-sm text-gray-500">{t('profile.subtitle')}</p>
 
-                {(user?.role === 'ADMIN' || user?.role === 'EMPLOYEE') && (
+                {isStaff(user) && (
                     <div className="mt-3">
                         <span className={`text-xs font-semibold uppercase tracking-wide px-3 py-1 ${
-                            user?.role === 'ADMIN'
-                                ? 'bg-black text-white'
-                                : 'bg-gray-200 text-gray-700'
+                            isSuperAdmin(user)
+                                ? 'bg-purple-600 text-white'
+                                : isAdminOrAbove(user)
+                                    ? 'bg-black text-white'
+                                    : 'bg-gray-200 text-gray-700'
                         }`}>
-                            {user?.role}
+                            {user?.role?.replace('_', ' ')}
                         </span>
                     </div>
                 )}

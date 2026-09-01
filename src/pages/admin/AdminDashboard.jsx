@@ -2,61 +2,67 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 import { useTranslation } from 'react-i18next';
 import { useState } from "react";
+import {
+    canAccessCatalog, canManageOrders, canManageCustomers, canManageMarketing,
+    canManageStore, canManageSettings, canManageLegal, canAccessReports, canAccessEmployees,
+} from '../../utils/roles';
 
 const AdminDashboard = () => {
     const { t } = useTranslation();
     const [openSection, setOpenSection] = useState(null);
-    const { isAdmin } = useAuth();
+    const { user } = useAuth();
 
     const toggleSection = (section) => {
         setOpenSection(prev => prev === section ? null : section);
     };
 
     const sections = [
-        ...(isAdmin() ? [{
+        {
             key: 'management',
             title: t('admin.sectionManagement'),
             items: [
-                { to: '/admin/settings', title: t('admin.settings'), desc: t('admin.manageSettings') },
-                { to: '/admin/legal', title: t('admin.legal'), desc: t('admin.manageLegal') },
-                { to: '/admin/reports', title: t('admin.reports'), desc: t('admin.reportDescription') },
-                { to: '/admin/employees', title: t('admin.employees'), desc: t('admin.manageEmployees') },
+                { to: '/admin/settings', title: t('admin.settings'), desc: t('admin.manageSettings'), can: canManageSettings },
+                { to: '/admin/legal', title: t('admin.legal'), desc: t('admin.manageLegal'), can: canManageLegal },
+                { to: '/admin/reports', title: t('admin.reports'), desc: t('admin.reportDescription'), can: canAccessReports },
+                { to: '/admin/employees', title: t('admin.employees'), desc: t('admin.manageEmployees'), can: canAccessEmployees },
             ]
-        }] : []),
+        },
         {
             key: 'catalog',
             title: t('admin.sectionCatalog'),
             items: [
-                { to: '/admin/products', title: t('admin.products'), desc: t('admin.manageProducts') },
-                { to: '/admin/categories', title: t('admin.categories'), desc: t('admin.manageCategories') },
+                { to: '/admin/products', title: t('admin.products'), desc: t('admin.manageProducts'), can: canAccessCatalog },
+                { to: '/admin/categories', title: t('admin.categories'), desc: t('admin.manageCategories'), can: canAccessCatalog },
             ]
         },
         {
             key: 'sales',
             title: t('admin.sectionSales'),
             items: [
-                { to: '/admin/orders', title: t('admin.orders'), desc: t('admin.manageOrders') },
-                { to: '/admin/customers', title: t('admin.customers'), desc: t('admin.manageCustomers') },
-                { to: '/admin/coupons', title: t('admin.coupons'), desc: t('admin.manageCoupons') },
+                { to: '/admin/orders', title: t('admin.orders'), desc: t('admin.manageOrders'), can: canManageOrders },
+                { to: '/admin/customers', title: t('admin.customers'), desc: t('admin.manageCustomers'), can: canManageCustomers },
+                { to: '/admin/coupons', title: t('admin.coupons'), desc: t('admin.manageCoupons'), can: canManageOrders },
             ]
         },
         {
             key: 'marketing',
             title: t('admin.sectionMarketing'),
             items: [
-                { to: '/admin/banners', title: t('admin.banners'), desc: t('admin.manageBanners') },
-                { to: '/admin/popups', title: t('admin.popups'), desc: t('admin.managePopups') },
-                { to: '/admin/notifications', title: t('admin.notifications'), desc: t('admin.sendPromotionalNotifications') },
+                { to: '/admin/banners', title: t('admin.banners'), desc: t('admin.manageBanners'), can: canManageMarketing },
+                { to: '/admin/popups', title: t('admin.popups'), desc: t('admin.managePopups'), can: canManageMarketing },
+                { to: '/admin/notifications', title: t('admin.notifications'), desc: t('admin.sendPromotionalNotifications'), can: canManageMarketing },
             ]
         },
         {
             key: 'store',
             title: t('admin.sectionStore'),
             items: [
-                { to: '/admin/stores', title: t('admin.storeLocations'), desc: t('admin.manageStoreLocations') },
+                { to: '/admin/stores', title: t('admin.storeLocations'), desc: t('admin.manageStoreLocations'), can: canManageStore },
             ]
         },
-    ];
+    ]
+        .map(s => ({ ...s, items: s.items.filter(i => i.can(user)) }))
+        .filter(s => s.items.length > 0);
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">

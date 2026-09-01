@@ -3,6 +3,8 @@ import i18n from '../i18n/i18n';
 
 export const checkout = (userId, couponCode, paymentMethod) =>
     axiosInstance.post(`/orders/${userId}/checkout`, null, {
+        // a 403 here means "email not verified", handled inline — not a role denial
+        skipForbiddenToast: true,
         params: {
             ...(couponCode ? { couponCode } : {}),
             ...(paymentMethod ? { paymentMethod } : {}),
@@ -10,7 +12,7 @@ export const checkout = (userId, couponCode, paymentMethod) =>
         }
     });
 export const guestCheckout = (data) =>
-    axiosInstance.post('/orders/guest-checkout', data, { params: { lang: i18n.language } });
+    axiosInstance.post('/orders/guest-checkout', data, { skipForbiddenToast: true, params: { lang: i18n.language } });
 export const getOrders = (userId, params) =>
     axiosInstance.get(`/orders/${userId}`, { params });
 export const getOrderById = (userId, orderId) =>

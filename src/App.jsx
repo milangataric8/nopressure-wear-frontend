@@ -1,6 +1,13 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from './hooks/useAuth';
+import RoleRoute from './components/common/RoleRoute';
+import ForbiddenPage from './pages/admin/ForbiddenPage';
+import {
+    isStaff, isAdminOrAbove,
+    canAccessCatalog, canManageOrders, canManageCustomers, canManageMarketing,
+    canManageStore, canManageSettings, canManageLegal, canAccessReports, canAccessEmployees,
+} from './utils/roles';
 import { getCart } from './api/cartApi';
 import { getSettingsMap } from './api/settingsApi';
 import { getFavoriteCount } from './api/favoriteApi';
@@ -37,7 +44,7 @@ import AdminStores from "./pages/admin/AdminStores.jsx";
 import FavoritesPage from './pages/FavoritesPage';
 import AdminReports from "./pages/admin/AdminReports.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
-import AdminNotifications from "./pages/AdminNotifications.jsx";
+import AdminNotifications from "./pages/admin/AdminNotifications.jsx";
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import PrivacyPolicyPage from './pages/legal/PrivacyPolicyPage';
 import TermsPage from './pages/legal/TermsPage';
@@ -135,17 +142,22 @@ function App() {
                     <Route path="/orders/:orderId" element={
                         <ProtectedRoute><OrderDetailPage /></ProtectedRoute>
                     } />
+                    <Route path="/admin/forbidden" element={
+                        <ProtectedRoute><ForbiddenPage /></ProtectedRoute>
+                    } />
                     <Route path="/admin" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminDashboard /></ProtectedRoute>
+                        <RoleRoute allow={isStaff}>
+                            {isAdminOrAbove(user) ? <AdminDashboard /> : <Navigate to="/admin/products" replace />}
+                        </RoleRoute>
                     } />
                     <Route path="/admin/products" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminProducts /></ProtectedRoute>
+                        <RoleRoute allow={canAccessCatalog}><AdminProducts /></RoleRoute>
                     } />
                     <Route path="/admin/categories" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminCategories /></ProtectedRoute>
+                        <RoleRoute allow={canAccessCatalog}><AdminCategories /></RoleRoute>
                     } />
                     <Route path="/admin/orders" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminOrders /></ProtectedRoute>
+                        <RoleRoute allow={canManageOrders}><AdminOrders /></RoleRoute>
                     } />
                     <Route path="/profile" element={
                         <ProtectedRoute><ProfilePage /></ProtectedRoute>
@@ -157,48 +169,45 @@ function App() {
                         <ProtectedRoute><ChangePasswordPage /></ProtectedRoute>
                     } />
                     <Route path="/admin/coupons" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminCoupons /></ProtectedRoute>
+                        <RoleRoute allow={canManageOrders}><AdminCoupons /></RoleRoute>
                     } />
                     <Route path="/oauth2/callback" element={<OAuth2CallbackPage />} />
                     <Route path="/admin/employees" element={
-                        <ProtectedRoute adminOnly><AdminEmployees /></ProtectedRoute>
-                    } />
-                    <Route path="/admin/employees" element={
-                        <ProtectedRoute adminOnly><AdminEmployees /></ProtectedRoute>
+                        <RoleRoute allow={canAccessEmployees}><AdminEmployees /></RoleRoute>
                     } />
                     <Route path="/admin/orders/:orderId" element={
-                        <ProtectedRoute adminOnly employeeAllowed><OrderDetailPage /></ProtectedRoute>
+                        <RoleRoute allow={canManageOrders}><OrderDetailPage /></RoleRoute>
                     } />
                     <Route path="/admin/banners" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminBanners /></ProtectedRoute>
+                        <RoleRoute allow={canManageMarketing}><AdminBanners /></RoleRoute>
                     } />
                     <Route path="/admin/customers" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminCustomers /></ProtectedRoute>
+                        <RoleRoute allow={canManageCustomers}><AdminCustomers /></RoleRoute>
                     } />
                     <Route path="/admin/customers/:customerId" element={
-                        <ProtectedRoute adminOnly employeeAllowed><AdminCustomerDetail /></ProtectedRoute>
+                        <RoleRoute allow={canManageCustomers}><AdminCustomerDetail /></RoleRoute>
                     } />
                     <Route path="/admin/settings" element={
-                        <ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>
+                        <RoleRoute allow={canManageSettings}><AdminSettings /></RoleRoute>
                     } />
                     <Route path="/admin/popups" element={
-                        <ProtectedRoute adminOnly><AdminPopups /></ProtectedRoute>
+                        <RoleRoute allow={canManageMarketing}><AdminPopups /></RoleRoute>
                     } />
                     <Route path="/admin/stores" element={
-                        <ProtectedRoute adminOnly><AdminStores /></ProtectedRoute>
+                        <RoleRoute allow={canManageStore}><AdminStores /></RoleRoute>
                     } />
                     <Route path="/favorites" element={
                         <ProtectedRoute><FavoritesPage /></ProtectedRoute>
                     } />
                     <Route path="/admin/reports" element={
-                        <ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>
+                        <RoleRoute allow={canAccessReports}><AdminReports /></RoleRoute>
                     } />
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/admin/notifications" element={
-                        <ProtectedRoute adminOnly><AdminNotifications /></ProtectedRoute>
+                        <RoleRoute allow={canManageMarketing}><AdminNotifications /></RoleRoute>
                     } />
                     <Route path="/admin/legal" element={
-                        <ProtectedRoute adminOnly><AdminLegal /></ProtectedRoute>
+                        <RoleRoute allow={canManageLegal}><AdminLegal /></RoleRoute>
                     } />
                     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                     <Route path="/terms" element={<TermsPage />} />

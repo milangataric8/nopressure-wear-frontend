@@ -11,10 +11,11 @@ import { getSettingsMap } from "../../api/settingsApi.js";
 import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
 import {useCurrency} from "../../context/CurrencyContext.jsx";
-import { ADMIN_NAV } from "../../config/adminNav.js";
+import { visibleAdminNav } from "../../config/adminNav.js";
 
 const Navbar = () => {
-    const { user, logoutUser, isAuthenticated, isAdmin, isEmployee, cartCount, favoriteCount } = useAuth();
+    const { user, logoutUser, isAuthenticated, isStaff, cartCount, favoriteCount } = useAuth();
+    const adminSections = visibleAdminNav(user);
     const { guestCart } = useContext(GuestCartContext);
     const displayCartCount = isAuthenticated() ? cartCount : guestCart.length;
     const navigate = useNavigate();
@@ -281,7 +282,7 @@ const Navbar = () => {
                             )}
 
                             {/* Admin */}
-                            {(isAdmin() || isEmployee()) && (
+                            {isStaff() && adminSections.length > 0 && (
                                 <div
                                     className="relative"
                                     onMouseEnter={() => setActiveDropdown('admin')}
@@ -297,27 +298,24 @@ const Navbar = () => {
                                     {activeDropdown === 'admin' && (
                                         <div className="absolute top-full left-0 pt-4 z-50">
                                             <div className="bg-white border border-gray-200 shadow-lg w-56">
-                                                {ADMIN_NAV.map((group, gi) => {
-                                                    if (group.adminOnly && !isAdmin()) return null;
-                                                    return (
-                                                        <div key={group.section}>
-                                                            {gi > 0 && <div className="border-t border-gray-200 mt-1" />}
-                                                            <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
-                                                                {t(group.section)}
-                                                            </p>
-                                                            {group.items.map(item => (
-                                                                <Link
-                                                                    key={item.to}
-                                                                    to={item.to}
-                                                                    onClick={() => setActiveDropdown(null)}
-                                                                    className={`block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors ${item.bold ? 'font-bold' : ''}`}
-                                                                >
-                                                                    {t(item.label)}
-                                                                </Link>
-                                                            ))}
-                                                        </div>
-                                                    );
-                                                })}
+                                                {adminSections.map((group, gi) => (
+                                                    <div key={group.section}>
+                                                        {gi > 0 && <div className="border-t border-gray-200 mt-1" />}
+                                                        <p className="px-4 pt-3 pb-1 text-xs font-black uppercase tracking-wide text-gray-500">
+                                                            {t(group.section)}
+                                                        </p>
+                                                        {group.items.map(item => (
+                                                            <Link
+                                                                key={item.to}
+                                                                to={item.to}
+                                                                onClick={() => setActiveDropdown(null)}
+                                                                className={`block px-4 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-50 transition-colors ${item.bold ? 'font-bold' : ''}`}
+                                                            >
+                                                                {t(item.label)}
+                                                            </Link>
+                                                        ))}
+                                                    </div>
+                                                ))}
 
                                                 <div className="h-1" />
                                             </div>
@@ -592,28 +590,25 @@ const Navbar = () => {
                                         </>
                                     )}
 
-                                    {(isAdmin() || isEmployee()) && (
+                                    {isStaff() && adminSections.length > 0 && (
                                         <div className="border-t border-gray-200 pt-3">
-                                            {ADMIN_NAV.map((group, gi) => {
-                                                if (group.adminOnly && !isAdmin()) return null;
-                                                return (
-                                                    <div key={group.section}>
-                                                        <p className={`text-xs font-black text-gray-500 uppercase tracking-wide mb-2 ${gi > 0 ? 'mt-3' : ''}`}>
-                                                            {t(group.section)}
-                                                        </p>
-                                                        {group.items.map(item => (
-                                                            <Link
-                                                                key={item.to}
-                                                                to={item.to}
-                                                                onClick={() => setMobileMenuOpen(false)}
-                                                                className={`block text-sm text-gray-600 hover:text-black py-2 ${item.bold ? 'font-bold' : ''}`}
-                                                            >
-                                                                {t(item.label)}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                );
-                                            })}
+                                            {adminSections.map((group, gi) => (
+                                                <div key={group.section}>
+                                                    <p className={`text-xs font-black text-gray-500 uppercase tracking-wide mb-2 ${gi > 0 ? 'mt-3' : ''}`}>
+                                                        {t(group.section)}
+                                                    </p>
+                                                    {group.items.map(item => (
+                                                        <Link
+                                                            key={item.to}
+                                                            to={item.to}
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                            className={`block text-sm text-gray-600 hover:text-black py-2 ${item.bold ? 'font-bold' : ''}`}
+                                                        >
+                                                            {t(item.label)}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            ))}
                                         </div>
                                     )}
                                     <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-medium text-gray-600 hover:text-black py-1">

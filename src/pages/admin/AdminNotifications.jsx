@@ -10,6 +10,7 @@ import FormField from '../../components/form/FormField.jsx';
 import { inputClass } from '../../components/form/inputStyles.js';
 import { focusFirstError } from '../../utils/validateForm.js';
 import { required, richTextRequired } from '../../utils/validators.js';
+import ColorInput from "../../components/admin/ColorInput.jsx";
 
 const AdminNotifications = () => {
     const { t } = useTranslation();
@@ -255,47 +256,20 @@ const AdminNotifications = () => {
                 </div>
 
                 {/* Colors */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
-                            {t('admin.backgroundColor') || 'Background'}
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="color"
-                                value={bgColor}
-                                onChange={(e) => setBgColor(e.target.value)}
-                                className="w-12 h-9 border border-gray-300 cursor-pointer"
-                            />
-                            <input
-                                type="text"
-                                name="backgroundColor"
-                                value={textColor}
-                                onChange={(e) => setTextColor(e.target.value)}
-                                className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1.5">
-                            {t('admin.textColor') || 'Text'}
-                        </label>
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="color"
-                                value={textColor}
-                                onChange={(e) => setTextColor(e.target.value)}
-                                className="w-12 h-9 border border-gray-300 cursor-pointer"
-                            />
-                            <input
-                                type="text"
-                                name="backgroundColor"
-                                value={textColor}
-                                onChange={(e) => setTextColor(e.target.value)}
-                                className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                            />
-                        </div>
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <ColorInput
+                        label={t('admin.backgroundColor')}
+                        name="backgroundColor"
+                        value={bgColor}
+                        onChange={(e) => setBgColor(e.target.value)}
+                    />
+
+                    <ColorInput
+                        label={t('admin.textColor')}
+                        name="textColor"
+                        value={textColor}
+                        onChange={(e) => setTextColor(e.target.value)}
+                    />
                 </div>
 
                 {/* Message */}

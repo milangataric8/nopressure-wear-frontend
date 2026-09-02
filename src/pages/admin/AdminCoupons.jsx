@@ -15,6 +15,7 @@ import { required, positiveNumber } from "../../utils/validators.js";
 import { useTranslation } from 'react-i18next';
 import {useCurrency} from "../../context/CurrencyContext.jsx";
 import { applyServerErrors } from '../../utils/validationUtils';
+import {labelClass} from "../../constants/styles.js";
 
 const EMPTY_COUPON = { code: '', discountType: 'PERCENTAGE', discountValue: '', usageLimit: '', expiresAt: '' };
 const couponRules = {
@@ -101,8 +102,6 @@ const AdminCoupons = () => {
             toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
         }
     };
-
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">

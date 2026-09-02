@@ -9,6 +9,8 @@ import StatusBadge from '../../components/common/StatusBadge';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
 import RichTextEditor from '../../components/common/RichTextEditor';
+import ColorInput from "../../components/admin/ColorInput.jsx";
+import {labelClass} from "../../constants/styles.js";
 
 const AdminPopups = () => {
     const { t } = useTranslation();
@@ -155,7 +157,6 @@ const AdminPopups = () => {
     };
 
     const inputClass = "w-full border border-gray-300 px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors";
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
@@ -297,45 +298,19 @@ const AdminPopups = () => {
                             />
                         </div>
 
-                        <div>
-                            <label className={labelClass}>{t('admin.backgroundColor')}</label>
-                            <div className="flex gap-3 items-center">
-                                <input
-                                    type="color"
-                                    name="backgroundColor"
-                                    value={formData.backgroundColor}
-                                    onChange={handleChange}
-                                    className="w-12 h-10 border border-gray-300 cursor-pointer"
-                                />
-                                <input
-                                    type="text"
-                                    name="backgroundColor"
-                                    value={formData.backgroundColor}
-                                    onChange={handleChange}
-                                    className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                                />
-                            </div>
-                        </div>
+                        <ColorInput
+                            label={t('admin.backgroundColor')}
+                            name="backgroundColor"
+                            value={formData.backgroundColor}
+                            onChange={handleChange}
+                        />
 
-                        <div>
-                            <label className={labelClass}>{t('admin.textColor')}</label>
-                            <div className="flex gap-3 items-center">
-                                <input
-                                    type="color"
-                                    name="textColor"
-                                    value={formData.textColor}
-                                    onChange={handleChange}
-                                    className="w-12 h-10 border border-gray-300 cursor-pointer"
-                                />
-                                <input
-                                    type="text"
-                                    name="textColor"
-                                    value={formData.textColor}
-                                    onChange={handleChange}
-                                    className="flex-1 border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:border-black"
-                                />
-                            </div>
-                        </div>
+                        <ColorInput
+                            label={t('admin.textColor')}
+                            name="textColor"
+                            value={formData.textColor}
+                            onChange={handleChange}
+                        />
 
                         <div className="md:col-span-2">
                             <label className="flex items-center gap-2 cursor-pointer">

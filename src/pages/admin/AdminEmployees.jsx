@@ -16,6 +16,7 @@ import { applyServerErrors } from "../../utils/validationUtils.js";
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROLES, isSuperAdmin } from '../../utils/roles.js';
+import {labelClass} from "../../constants/styles.js";
 
 // Typed exactly (case-sensitive, trimmed) to confirm handing SUPER_ADMIN to someone else.
 const HANDOVER_CONFIRM_TEXT = 'SUPER ADMIN';
@@ -207,8 +208,6 @@ const AdminEmployees = () => {
         if (handoverInput.trim() !== HANDOVER_CONFIRM_TEXT) return;
         await submitEmployeeUpdate(ROLES.SUPER_ADMIN);
     };
-
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     const roleBadge = (role) => (
         <span className={`inline-block whitespace-nowrap px-2 py-1 text-xs font-semibold uppercase ${roleBadgeClass[role] || 'bg-gray-100 text-gray-700'}`}>

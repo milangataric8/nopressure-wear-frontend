@@ -14,6 +14,7 @@ import { validateForm, focusFirstError } from "../../utils/validateForm.js";
 import { required, requiredFile } from "../../utils/validators.js";
 import { useTranslation } from 'react-i18next';
 import { applyServerErrors } from '../../utils/validationUtils';
+import {labelClass} from "../../constants/styles.js";
 
 const bannerRules = {
     title: [(v, all) => (all.displayTitle && required(v) ? 'validation.required' : null)],
@@ -220,8 +221,6 @@ const AdminBanners = () => {
         setShowForm(false);
         setErrors({});
     };
-
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
 

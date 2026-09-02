@@ -20,6 +20,7 @@ import { required } from '../../utils/validators';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { applyServerErrors } from '../../utils/validationUtils';
+import {labelClass} from "../../constants/styles.js";
 
 const EMPTY_CATEGORY = { name: '', description: '', parentId: '' };
 const categoryRules = { name: [required] };
@@ -117,8 +118,6 @@ const AdminCategories = () => {
         setEditingCategory(null);
         setShowForm(false);
     };
-
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">

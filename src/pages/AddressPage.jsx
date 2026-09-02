@@ -9,6 +9,7 @@ import LoadingSpinner from "../components/common/LoadingSpinner.jsx";
 import UndoBar from '../components/common/UndoBar';
 import { useTranslation } from 'react-i18next';
 import { inputNormal, inputError, applyServerErrors, focusFirstError } from '../utils/validationUtils';
+import {labelClass} from "../constants/styles.js";
 
 const AddressPage = () => {
     const { t } = useTranslation();
@@ -136,7 +137,6 @@ const AddressPage = () => {
     };
 
     const inputClass = "w-full border px-3 py-2.5 text-sm text-black placeholder-gray-400 focus:outline-none transition-colors";
-    const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";
 
     return (
         <>

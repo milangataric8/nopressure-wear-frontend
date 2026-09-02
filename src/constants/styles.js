@@ -1,0 +1,1 @@
+export const labelClass = "block text-xs font-semibold text-black uppercase tracking-wide mb-1.5";

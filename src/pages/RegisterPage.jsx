@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { register, resendVerification } from '../api/authApi';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
-import {isPasswordValid} from "../utils/passwordUtils.js";
+import { validatePassword } from "../utils/validatePassword.js";
 import { useTranslation } from 'react-i18next';
 import AuthBackground from "../components/auth/AuthBackground.jsx";
 import { getSettingsMap } from '../api/settingsApi';
@@ -48,8 +48,8 @@ const RegisterPage = () => {
         if (!formData.email?.trim()) e.email = t('validation.emailRequired');
         else if (!EMAIL_REGEX.test(formData.email)) e.email = t('validation.emailInvalid');
 
-        if (!formData.password) e.password = t('validation.passwordRequired');
-        else if (!isPasswordValid(formData.password)) e.password = t('messages.passwordNotMeet');
+        const passwordError = validatePassword(formData.password, { required: true });
+        if (passwordError) e.password = t(passwordError);
 
         if (!formData.confirmPassword) e.confirmPassword = t('validation.passwordRequired');
         else if (formData.password !== formData.confirmPassword) e.confirmPassword = t('auth.passwordsNoMatch');

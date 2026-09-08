@@ -225,6 +225,7 @@
     "anonymizeFailed": "Anonimizacija nije uspela.",
     "role": "Rola",
     "roleHint": "Employee ima pristup samo katalogu. Admin upravlja svime osim izveštajima i zaposlenima.",
+    "tempPasswordNote": "Ovo je privremena lozinka. Zaposleni će morati da je promeni pri prvom logovanju.",
     "confirmRoleChange": "Promeniti rolu korisnika {{name}} sa {{from}} na {{to}}?",
     "cannotChangeOwnRole": "Ne možete menjati sopstvenu rolu",
     "roleDescEmployee": "Pristup samo katalogu.",
@@ -502,6 +503,10 @@
     "currentPassword": "Trenutna lozinka",
     "newPassword": "Nova lozinka",
     "confirmNewPassword": "Potvrdi novu lozinku",
+    "forcedTitle": "Promena lozinke",
+    "forcedDescription": "Iz bezbednosnih razloga morate postaviti novu lozinku pre prvog korišćenja naloga.",
+    "saveAndContinue": "Sačuvaj i nastavi",
+    "minChars": "min. 8 karaktera",
     "update": "Ažuriraj",
     "save": "Sačuvaj"
   },
@@ -751,6 +756,11 @@
     "passwordRequired": "Lozinka je obavezna",
     "passwordTooShort": "Lozinka mora imati najmanje 8 karaktera",
     "passwordsDoNotMatch": "Lozinke se ne podudaraju",
+    "password": {
+      "required": "Lozinka je obavezna",
+      "minLength": "Lozinka mora imati najmanje 8 karaktera",
+      "format": "Lozinka mora sadržati bar jedan broj i jedan specijalan karakter"
+    },
     "currentPasswordRequired": "Trenutna lozinka je obavezna",
     "currentPasswordWrong": "Trenutna lozinka nije ispravna",
     "newPasswordRequired": "Nova lozinka je obavezna",

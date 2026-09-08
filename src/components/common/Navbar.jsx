@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import SocialIcons from "./SocialIcons.jsx";
 import {useCurrency} from "../../context/CurrencyContext.jsx";
 import { visibleAdminNav } from "../../config/adminNav.js";
+import StoreLogo from "../StoreLogo.jsx";
 
 const Navbar = () => {
     const { user, logoutUser, isAuthenticated, isStaff, cartCount, favoriteCount } = useAuth();
@@ -188,19 +189,7 @@ const Navbar = () => {
 
                             {/* Logo — mobile/tablet only, left aligned */}
                             <Link to="/" className="lg:hidden flex items-center flex-shrink-0">
-                                {logoUrl ? (
-                                    <img
-                                        src={logoUrl.startsWith('http')
-                                            ? logoUrl
-                                            : `${import.meta.env.VITE_API_URL}${logoUrl}`}
-                                        alt={storeName}
-                                        className="h-9 w-auto object-contain"
-                                    />
-                                ) : (
-                                    <span className="text-base font-black tracking-tight text-black uppercase">
-                                        {storeName}
-                                    </span>
-                                )}
+                                <StoreLogo logoUrl={logoUrl} storeName={storeName} className={"h-9 w-auto object-contain"} />
                             </Link>
 
                         <div className="hidden lg:flex items-center gap-8">

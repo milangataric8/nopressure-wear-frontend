@@ -11,12 +11,14 @@ import FormField from "../../components/form/FormField.jsx";
 import PasswordInput from "../../components/form/PasswordInput.jsx";
 import { inputClass } from "../../components/form/inputStyles.js";
 import { useFormValidation } from "../../hooks/useFormValidation.js";
-import { required, email as emailRule, minLength } from "../../utils/validators.js";
+import { required, email as emailRule } from "../../utils/validators.js";
+import { validatePassword } from "../../utils/validatePassword.js";
 import { applyServerErrors } from "../../utils/validationUtils.js";
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth.js';
 import { ROLES, isSuperAdmin } from '../../utils/roles.js';
 import {labelClass} from "../../constants/styles.js";
+import PasswordStrength from "../../components/common/PasswordStrength.jsx";
 
 // Typed exactly (case-sensitive, trimmed) to confirm handing SUPER_ADMIN to someone else.
 const HANDOVER_CONFIRM_TEXT = 'SUPER ADMIN';
@@ -34,7 +36,7 @@ const createRules = {
     firstName: [required],
     lastName: [required],
     email: [required, emailRule],
-    password: [required, minLength(8)],
+    password: [(value) => validatePassword(value, { required: true })],
     role: [required],
 };
 const editRules = {
@@ -285,19 +287,24 @@ const AdminEmployees = () => {
                             />
                         </FormField>
 
-                        <FormField id="password" name="password" label={t('auth.password')} required error={createForm.errors.password}>
-                            <PasswordInput
-                                id="password" name="password"
-                                value={createForm.values.password}
-                                onChange={createForm.handleChange}
-                                onBlur={createForm.handleBlur}
-                                autoComplete="new-password"
-                                placeholder="••••••••"
-                                aria-invalid={!!createForm.errors.password}
-                                aria-describedby={createForm.errors.password ? 'password-error' : undefined}
-                                className={inputClass(!!createForm.errors.password)}
-                            />
-                        </FormField>
+                        <div>
+                            <FormField id="password" name="password" label={t('auth.password')} required
+                                       error={createForm.errors.password}>
+                                <PasswordInput
+                                    id="password" name="password"
+                                    value={createForm.values.password}
+                                    onChange={createForm.handleChange}
+                                    onBlur={createForm.handleBlur}
+                                    autoComplete="new-password"
+                                    placeholder="••••••••"
+                                    aria-invalid={!!createForm.errors.password}
+                                    aria-describedby={createForm.errors.password ? 'password-error' : undefined}
+                                    className={inputClass(!!createForm.errors.password)}
+                                />
+                            </FormField>
+                            <PasswordStrength password={createForm.values.password} />
+                            <p className="text-xs text-gray-500 mt-1">{t('admin.tempPasswordNote')}</p>
+                        </div>
 
                         <div className="md:col-span-2">
                             <FormField id="role" name="role" label={t('admin.role')} required error={createForm.errors.role} hint={t('admin.roleHint')}>

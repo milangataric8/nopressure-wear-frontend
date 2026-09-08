@@ -62,9 +62,14 @@ const LoginPage = () => {
         setLoading(true);
         try {
             const response = await login(formData);
-            const { id, token, firstName, lastName, email, role } = response.data;
-            const loggedInUser = { id, firstName, lastName, email, role };
+            const { id, token, firstName, lastName, email, role, passwordChangeRequired } = response.data;
+            const loggedInUser = { id, firstName, lastName, email, role, passwordChangeRequired };
             loginUser(loggedInUser, token);
+            if (passwordChangeRequired) {
+                // Forced first-login change — nothing else is reachable until it's done.
+                navigate('/change-password', { replace: true });
+                return;
+            }
             // staff land in the admin area (employees on the catalog, not the dashboard)
             navigate(adminLandingPath(loggedInUser));
         } catch (error) {

@@ -224,6 +224,7 @@
     "anonymizeFailed": "Failed to anonymize customer.",
     "role": "Role",
     "roleHint": "Employee has catalog access only. Admin manages everything except reports and employees.",
+    "tempPasswordNote": "This is a temporary password. The employee will have to change it on first login.",
     "confirmRoleChange": "Change {{name}}'s role from {{from}} to {{to}}?",
     "cannotChangeOwnRole": "You can't change your own role",
     "roleDescEmployee": "Access to the catalog only.",
@@ -501,6 +502,10 @@
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "confirmNewPassword": "Confirm New Password",
+    "forcedTitle": "Change Password",
+    "forcedDescription": "For security reasons you must set a new password before using your account for the first time.",
+    "saveAndContinue": "Save and continue",
+    "minChars": "min. 8 characters",
     "update": "Update",
     "save": "Save"
   },
@@ -750,6 +755,11 @@
     "passwordRequired": "Password is required",
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordsDoNotMatch": "Passwords do not match",
+    "password": {
+      "required": "Password is required",
+      "minLength": "Password must be at least 8 characters",
+      "format": "Password must contain at least one number and one special character"
+    },
     "currentPasswordRequired": "Current password is required",
     "currentPasswordWrong": "Current password is incorrect",
     "newPasswordRequired": "New password is required",

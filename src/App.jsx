@@ -117,14 +117,24 @@ function App() {
         trackPageview(location.pathname + location.search);
     }, [location]);
 
+    // Forced first-login password change: the user is locked to /change-password
+    // until they set a new password. Not a security boundary (the backend blocks
+    // every endpoint while the flag is up) — this just keeps them off pages that
+    // would only 403, and hides the chrome so there's nothing to click away to.
+    const forcePasswordChange = !!user?.passwordChangeRequired;
+
     const hideFooter = ['/login', '/register', '/forgot-password', '/reset-password'].includes(location.pathname)
-        || location.pathname.startsWith('/admin');
+        || location.pathname.startsWith('/admin')
+        || forcePasswordChange;
 
     return (
         <>
             <ScrollToTop />
-            <Navbar />
-            <div className="pt-16 md:pt-24">
+            {!forcePasswordChange && <Navbar />}
+            <div className={forcePasswordChange ? '' : 'pt-16 md:pt-24'}>
+                {forcePasswordChange && location.pathname !== '/change-password' ? (
+                    <Navigate to="/change-password" replace />
+                ) : (
                 <Routes>
                     <Route path="*" element={<NotFoundPage />} />
                     <Route path="/" element={<HomePage />} />
@@ -214,6 +224,7 @@ function App() {
                     <Route path="/returns" element={<ReturnsPage />} />
                     <Route path="/imprint" element={<ImprintPage />} />
                 </Routes>
+                )}
             </div>
             {!hideFooter && <Footer />}
             <CookieBanner />

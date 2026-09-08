@@ -28,12 +28,27 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         const status = error.response?.status;
+        const code = error.response?.data?.code;
         const isAuthEndpoint = error.config?.url?.startsWith('/auth/');
 
         if (status === 401 && !isAuthEndpoint) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login';
+        } else if (status === 403 && code === 'PASSWORD_CHANGE_REQUIRED') {
+            // The flag was raised mid-session (e.g. SUPER_ADMIN reset this user's
+            // password). Must run BEFORE the generic 403 toast below, or the user
+            // gets "not authorized" and never lands on the change-password page.
+            try {
+                const stored = JSON.parse(localStorage.getItem('user') || 'null');
+                if (stored && !stored.passwordChangeRequired) {
+                    stored.passwordChangeRequired = true;
+                    localStorage.setItem('user', JSON.stringify(stored));
+                }
+            } catch { /* ignore malformed storage */ }
+            if (window.location.pathname !== '/change-password') {
+                window.location.href = '/change-password';
+            }
         } else if (status === 403 && !isAuthEndpoint && !error.config?.skipForbiddenToast) {
             toast.error(t('messages.forbidden'));
         }

@@ -17,7 +17,7 @@ const AdminSearchFilter = ({
             <div className="flex w-full sm:w-1/2">
                 <button
                     onClick={() => { setActiveFilter(prev => prev === true ? null : true); setPage(0); }}
-                    className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                    className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wide border transition-colors ${
                         activeFilter === true
                             ? 'bg-green-600 text-white border-green-600'
                             : 'bg-white text-gray-500 border-gray-300 hover:border-green-600 hover:text-green-600'
@@ -27,7 +27,7 @@ const AdminSearchFilter = ({
                 </button>
                 <button
                     onClick={() => { setActiveFilter(prev => prev === false ? null : false); setPage(0); }}
-                    className={`flex-1 py-2.5 text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                    className={`flex-1 py-3 text-xs font-semibold uppercase tracking-wide border transition-colors ${
                         activeFilter === false
                             ? 'bg-red-600 text-white border-red-600'
                             : 'bg-white text-gray-500 border-gray-300 hover:border-red-600 hover:text-red-600'

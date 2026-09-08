@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import PasswordStrength from "../components/common/PasswordStrength.jsx";
-import {isPasswordValid} from "../utils/passwordUtils.js";
+import { validatePassword } from "../utils/validatePassword.js";
 import { useTranslation } from 'react-i18next';
 
 const ResetPasswordPage = () => {
@@ -32,8 +32,9 @@ const ResetPasswordPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!isPasswordValid(formData.newPassword)) {
-            toast.error(t('messages.passwordNotMeet'));
+        const passwordError = validatePassword(formData.newPassword, { required: true });
+        if (passwordError) {
+            toast.error(t(passwordError));
             return;
         }
 

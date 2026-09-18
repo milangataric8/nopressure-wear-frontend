@@ -443,6 +443,8 @@
     "reviewDeleted": "Review deleted"
   },
   "auth": {
+    "registrationSettingsError": "Unable to check whether registration is available. Please try again.",
+    "retrySettings": "Try again",
     "login": "Sign In",
     "register": "Create Account",
     "email": "Email",

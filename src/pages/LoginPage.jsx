@@ -16,7 +16,7 @@ const LoginPage = () => {
     const [errors, setErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
     const [loginEnabled, setLoginEnabled] = useState(true);
-    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registrationEnabled, setRegistrationEnabled] = useState(null);
     const { loginUser } = useAuth();
     const navigate = useNavigate();
     const [params] = useSearchParams();

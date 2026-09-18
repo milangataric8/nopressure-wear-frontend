@@ -11,7 +11,9 @@ import { inputNormal, inputError, applyServerErrors, focusFirstError, EMAIL_REGE
 
 const RegisterPage = () => {
     const { t } = useTranslation();
-    const [registrationEnabled, setRegistrationEnabled] = useState(true);
+    const [registrationEnabled, setRegistrationEnabled] = useState(null);
+    const [settingsError, setSettingsError] = useState(false);
+    const [settingsAttempt, setSettingsAttempt] = useState(0);
     const [registeredEmail, setRegisteredEmail] = useState(null);
     const [formData, setFormData] = useState({
         firstName: '',
@@ -26,10 +28,14 @@ const RegisterPage = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
+        let cancelled = false;
         getSettingsMap().then(r => {
-            setRegistrationEnabled(r.data.registration_enabled !== 'false');
-        }).catch(() => {});
-    }, []);
+            if (!cancelled) setRegistrationEnabled(r.data.registration_enabled !== 'false');
+        }).catch(() => {
+            if (!cancelled) setSettingsError(true);
+        });
+        return () => { cancelled = true; };
+    }, [settingsAttempt]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -127,6 +133,35 @@ const RegisterPage = () => {
                         <Link to="/login" className="text-sm text-gray-500 hover:underline">
                             {t('auth.signIn')}
                         </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (registrationEnabled === null) {
+        return (
+            <div className="min-h-screen flex">
+                <AuthBackground />
+                <div className="flex-1 flex items-center justify-center px-6 py-12">
+                    <div className="w-full max-w-sm text-center">
+                        {settingsError ? (
+                            <>
+                                <p role="alert" className="text-sm text-gray-500 mb-6">{t('auth.registrationSettingsError')}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSettingsError(false);
+                                        setSettingsAttempt(attempt => attempt + 1);
+                                    }}
+                                    className="text-black font-semibold hover:underline text-sm"
+                                >
+                                    {t('auth.retrySettings')}
+                                </button>
+                            </>
+                        ) : (
+                            <p role="status" className="text-sm text-gray-500">{t('common.loading')}</p>
+                        )}
                     </div>
                 </div>
             </div>

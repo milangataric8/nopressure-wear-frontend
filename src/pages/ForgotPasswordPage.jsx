@@ -14,10 +14,13 @@ const ForgotPasswordPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await forgotPassword(email);
+            await forgotPassword(email.trim());
             setSent(true);
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to send reset email');
+            const key = error.response?.data?.messageKey;
+            toast.error(key ? t(key, { defaultValue: 'Failed to send reset email' })
+                : error.response ? 'Failed to send reset email'
+                    : 'Unable to connect. Please try again shortly.');
         } finally {
             setLoading(false);
         }
@@ -29,7 +32,7 @@ const ForgotPasswordPage = () => {
                 <div className="w-full max-w-sm text-center">
                     <h1 className="text-2xl font-bold text-black mb-4">Check your email</h1>
                     <p className="text-sm text-gray-500 mb-8">
-                        We sent a password reset link to <strong>{email}</strong>.
+                        If an account exists for <strong>{email.trim()}</strong>, a password reset link will be sent.
                         The link expires in 1 hour.
                     </p>
                     <Link

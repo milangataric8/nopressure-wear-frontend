@@ -257,7 +257,7 @@ const ProductDetailPage = () => {
                 {/* Images */}
                 <div>
                     {/* Main image */}
-                    <div className="bg-gray-100 aspect-square flex items-center justify-center overflow-hidden mb-3">
+                    <div className="bg-white aspect-square flex items-center justify-center overflow-hidden mb-3">
                         {selectedImage ? (
                             <img
                                 src={optimizedImage(selectedImage, { width: 1000 })}
@@ -292,7 +292,7 @@ const ProductDetailPage = () => {
                                         setSelectedImage(img.imageUrl);
                                         setSelectedImageIndex(index);
                                     }}
-                                    className={`w-16 h-16 bg-gray-100 overflow-hidden flex-shrink-0 border-2 transition-colors ${
+                                    className={`w-16 h-16 bg-white overflow-hidden flex-shrink-0 border-2 transition-colors ${
                                         selectedImage === img.imageUrl
                                             ? 'border-black'
                                             : 'border-transparent hover:border-gray-300'

@@ -17,7 +17,7 @@ const SimilarProducts = ({ similarProducts, reviewsEnabled }) => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8">
                 {similarProducts.map(sp => (
                     <Link key={sp.id} to={`/products/${sp.id}`} className="group">
-                        <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
+                        <div className="bg-white aspect-square flex items-center justify-center mb-3 overflow-hidden">
                             {sp.imageUrl ? (
                                 <img
                                     src={optimizedImage(sp.imageUrl, { width: 500 })}

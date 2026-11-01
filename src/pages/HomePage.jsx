@@ -95,7 +95,7 @@ const HomePage = () => {
                                 to={`/products/${product.id}`}
                                 className="group cursor-pointer block"
                             >
-                                <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
+                                <div className="bg-white aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                     {product.imageUrl ? (
                                         <img
                                             src={optimizedImage(product.imageUrl, { width: 500 })}

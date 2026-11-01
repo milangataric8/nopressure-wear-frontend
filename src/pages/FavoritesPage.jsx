@@ -111,7 +111,7 @@ const FavoritesPage = () => {
                             </button>
 
                             <Link to={`/products/${fav.productId}`} className="block">
-                                <div className="bg-gray-100 aspect-square flex items-center justify-center mb-3 overflow-hidden">
+                                <div className="bg-white aspect-square flex items-center justify-center mb-3 overflow-hidden">
                                     {fav.productImageUrl ? (
                                         <img
                                             src={getImageUrl(fav.productImageUrl)}

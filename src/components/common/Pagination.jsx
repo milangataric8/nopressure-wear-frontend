@@ -2,7 +2,7 @@ const Pagination = ({ page, totalPages, setPage }) => {
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex justify-center items-center gap-4 p-4 border-t border-gray-200">
+        <div className="flex justify-center items-center gap-4 p-4">
             <button
                 onClick={() => setPage(p => Math.max(0, p - 1))}
                 disabled={page === 0}

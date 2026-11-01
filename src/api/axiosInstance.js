@@ -9,11 +9,17 @@ const axiosInstance = axios.create({
     },
 });
 
-// Request interceptor — adding JWT token for every request
+// Public auth requests must work even if localStorage contains an expired session.
+const publicAuthPaths = new Set([
+    '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password',
+    '/auth/verify-email', '/auth/resend-verification',
+]);
+
+// Keep bearer authentication for protected requests, including /auth/me and /auth/change-password.
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');
-        if (token) {
+        if (token && !publicAuthPaths.has(config.url?.split('?')[0])) {
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;

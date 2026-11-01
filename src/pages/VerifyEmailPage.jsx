@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { verifyEmail } from '../api/authApi';
@@ -6,14 +6,21 @@ import { verifyEmail } from '../api/authApi';
 const VerifyEmailPage = () => {
     const [params] = useSearchParams();
     const [status, setStatus] = useState('loading');
+    const verification = useRef(null);
     const { t } = useTranslation();
 
     useEffect(() => {
         const token = params.get('token');
         if (!token) { setStatus('error'); return; }
-        verifyEmail(token)
-            .then(() => setStatus('success'))
-            .catch(() => setStatus('error'));
+        // React StrictMode runs effect setup twice; reuse the same token request.
+        if (verification.current?.token !== token) {
+            verification.current = { token, promise: verifyEmail(token) };
+        }
+        let cancelled = false;
+        verification.current.promise
+            .then(() => { if (!cancelled) setStatus('success'); })
+            .catch(() => { if (!cancelled) setStatus('error'); });
+        return () => { cancelled = true; };
     }, [params]);
 
     return (

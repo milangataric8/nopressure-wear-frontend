@@ -1,3 +1,4 @@
+import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getAllBanners, createBanner, updateBanner, toggleBanner, deleteBanner } from '../../api/bannerApi';
@@ -23,6 +24,7 @@ const bannerRules = {
 
 const AdminBanners = () => {
     const { t } = useTranslation();
+    const backgroundRemovalEnabled = useBackgroundRemovalEnabled();
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -100,7 +102,7 @@ const AdminBanners = () => {
             if (formData.mediaType === 'VIDEO') {
                 response = await uploadVideo(file);
             } else {
-                response = await uploadImage(file, removeBgBanner);
+                response = await uploadImage(file, backgroundRemovalEnabled && removeBgBanner);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
             if (errors.mediaUrl) setErrors(prev => ({ ...prev, mediaUrl: undefined }));
@@ -123,7 +125,7 @@ const AdminBanners = () => {
             if (formData.mobileMediaType === 'VIDEO') {
                 response = await uploadVideo(file);
             } else {
-                response = await uploadImage(file, removeBgBannerMobile);
+                response = await uploadImage(file, backgroundRemovalEnabled && removeBgBannerMobile);
             }
             setFormData(prev => ({ ...prev, mobileMediaUrl: response.data.url }));
             toast.success(t('messages.fileUploaded'));
@@ -387,8 +389,7 @@ const AdminBanners = () => {
                                         {t('admin.desktopMediaHint')}
                                     </span>
                                 </label>
-                                {formData.mediaType === 'IMAGE' && (
-                                    <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                {backgroundRemovalEnabled && formData.mediaType === 'IMAGE' && (<label className="flex items-center gap-2 cursor-pointer mb-2">
                                         <input
                                             type="checkbox"
                                             checked={removeBgBanner}
@@ -398,8 +399,7 @@ const AdminBanners = () => {
                                         <span className="text-xs text-gray-500 uppercase tracking-wide">
                                             {t('admin.removeBackground')}
                                         </span>
-                                    </label>
-                                )}
+                                    </label>)}
                                 <label className="cursor-pointer block">
                                     <div className={`border text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors ${errors.mediaUrl ? 'border-red-500' : 'border-gray-300'}`}>
                                         {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}
@@ -455,8 +455,7 @@ const AdminBanners = () => {
                                     <option value="IMAGE">{t('admin.mediaImage')}</option>
                                     <option value="VIDEO">{t('admin.mediaVideo')}</option>
                                 </select>
-                                {formData.mobileMediaType === 'IMAGE' && (
-                                    <label className="flex items-center gap-2 cursor-pointer mb-2">
+                                {backgroundRemovalEnabled && formData.mobileMediaType === 'IMAGE' && (<label className="flex items-center gap-2 cursor-pointer mb-2">
                                         <input
                                             type="checkbox"
                                             checked={removeBgBannerMobile}
@@ -466,8 +465,7 @@ const AdminBanners = () => {
                                         <span className="text-xs text-gray-500 uppercase tracking-wide">
                                             {t('admin.removeBackground')}
                                         </span>
-                                    </label>
-                                )}
+                                    </label>)}
                                 <label className="cursor-pointer block">
                                     <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
                                         {uploadingMobile ? t('common.uploading') : `${t('common.upload')} ${formData.mobileMediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}

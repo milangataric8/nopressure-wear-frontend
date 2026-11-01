@@ -1,3 +1,4 @@
+import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getAllPopups, createPopup, updatePopup, togglePopup, deletePopup } from '../../api/popupApi';
@@ -14,6 +15,7 @@ import {labelClass} from "../../constants/styles.js";
 
 const AdminPopups = () => {
     const { t } = useTranslation();
+    const backgroundRemovalEnabled = useBackgroundRemovalEnabled();
     const [popups, setPopups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -71,7 +73,7 @@ const AdminPopups = () => {
             if (formData.mediaType === 'VIDEO') {
                 response = await uploadVideo(file);
             } else {
-                response = await uploadImage(file, removeBgPopup);
+                response = await uploadImage(file, backgroundRemovalEnabled && removeBgPopup);
             }
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
             toast.success(t('messages.fileUploaded'));
@@ -238,8 +240,7 @@ const AdminPopups = () => {
                             <label className={labelClass}>
                                 {t('common.upload')} {formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}
                             </label>
-                            {formData.mediaType === 'IMAGE' && (
-                                <label className="flex items-center gap-2 cursor-pointer mb-2">
+                            {backgroundRemovalEnabled && formData.mediaType === 'IMAGE' && (<label className="flex items-center gap-2 cursor-pointer mb-2">
                                     <input
                                         type="checkbox"
                                         checked={removeBgPopup}
@@ -249,8 +250,7 @@ const AdminPopups = () => {
                                     <span className="text-xs text-gray-500 uppercase tracking-wide">
                                         {t('admin.removeBackground')}
                                     </span>
-                                </label>
-                            )}
+                                </label>)}
                             <label className="cursor-pointer block">
                                 <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
                                     {uploading ? t('common.uploading') : `${t('common.upload')} ${formData.mediaType === 'VIDEO' ? t('admin.mediaVideo') : t('admin.mediaImage')}`}

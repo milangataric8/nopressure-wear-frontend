@@ -1,3 +1,4 @@
+import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +17,7 @@ const ProductMediaManager = ({
                                  labelClass,
                              }) => {
     const { t } = useTranslation();
+    const backgroundRemovalEnabled = useBackgroundRemovalEnabled();
     const [removeBg, setRemoveBg] = useState(false);
     const [removeBgAdditional, setRemoveBgAdditional] = useState(false);
 
@@ -24,12 +26,12 @@ const ProductMediaManager = ({
         if (!file) return;
         e.target.value = '';
         try {
-            const response = await uploadImage(file, removeBg);
+            const response = await uploadImage(file, backgroundRemovalEnabled && removeBg);
             setFormData(prev => ({ ...prev, imageUrl: response.data.url }));
             if (response.data.warning) {
                 toast.warning(t('messages.imageUploadBgFailed'));
             } else {
-                toast.success(removeBg ? t('messages.imageUploadedBgRemoved') : t('messages.mainImageUploaded'));
+                toast.success(backgroundRemovalEnabled && removeBg ? t('messages.imageUploadedBgRemoved') : t('messages.mainImageUploaded'));
             }
         } catch (err) {
             toast.error(err.response?.data?.message || t('messages.failedToUploadImage'));
@@ -41,7 +43,7 @@ const ProductMediaManager = ({
         if (!file) return;
         e.target.value = '';
         try {
-            const uploadResponse = await uploadImage(file, removeBgAdditional);
+            const uploadResponse = await uploadImage(file, backgroundRemovalEnabled && removeBgAdditional);
             const url = uploadResponse.data.url;
 
             if (editingProduct) {
@@ -94,7 +96,7 @@ const ProductMediaManager = ({
             <div className="md:col-span-2">
                 <label className={labelClass}>{t('admin.mainImage')}</label>
                 <div className="flex items-center gap-3 mb-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    {backgroundRemovalEnabled && (<label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={removeBg}
@@ -104,7 +106,7 @@ const ProductMediaManager = ({
                         <span className="text-xs text-gray-500 uppercase tracking-wide">
                             {t('admin.removeBackground')}
                         </span>
-                    </label>
+                    </label>)}
                 </div>
                 <label className="cursor-pointer block">
                     <div className="border border-gray-300 text-center py-2.5 text-xs font-semibold uppercase tracking-wide text-black hover:bg-gray-50 transition-colors">
@@ -168,7 +170,7 @@ const ProductMediaManager = ({
                 </div>
 
                 <div className="flex items-center gap-3 mb-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    {backgroundRemovalEnabled && (<label className="flex items-center gap-2 cursor-pointer">
                         <input
                             type="checkbox"
                             checked={removeBgAdditional}
@@ -178,7 +180,7 @@ const ProductMediaManager = ({
                         <span className="text-xs text-gray-500 uppercase tracking-wide">
                             {t('admin.removeBackground')}
                         </span>
-                    </label>
+                    </label>)}
                 </div>
 
                 <label className="cursor-pointer block">

@@ -1,3 +1,4 @@
+import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -14,6 +15,7 @@ import ColorInput from "../../components/admin/ColorInput.jsx";
 
 const AdminNotifications = () => {
     const { t } = useTranslation();
+    const backgroundRemovalEnabled = useBackgroundRemovalEnabled();
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
@@ -194,7 +196,7 @@ const AdminNotifications = () => {
                         </div>
                     ) : (
                         <div>
-                            <label className="flex items-center gap-2 cursor-pointer mb-2">
+                            {backgroundRemovalEnabled && (<label className="flex items-center gap-2 cursor-pointer mb-2">
                                 <input
                                     type="checkbox"
                                     checked={removeBgNotification}
@@ -204,7 +206,7 @@ const AdminNotifications = () => {
                                 <span className="text-xs text-gray-500 uppercase tracking-wide">
                                     {t('admin.removeBackground')}
                                 </span>
-                            </label>
+                            </label>)}
                             <label className="cursor-pointer block w-full">
                             <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2.5 text-center hover:bg-gray-50 transition-colors">
                                 {uploading ? t('common.uploading') : t('admin.uploadImage')}
@@ -220,7 +222,7 @@ const AdminNotifications = () => {
                                     e.target.value = '';
                                     setUploading(true);
                                     try {
-                                        const response = await uploadImage(file, removeBgNotification);
+                                        const response = await uploadImage(file, backgroundRemovalEnabled && removeBgNotification);
                                         setImageUrl(response.data.url);
                                         toast.success(t('messages.imageUploaded'));
                                     } catch (e) {

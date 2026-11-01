@@ -1,3 +1,4 @@
+import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getSettings, updateSettings } from '../../api/settingsApi';
@@ -10,6 +11,7 @@ import { normalizeWhitespace } from "../../utils/text.js";
 
 const AdminSettings = () => {
     const { t } = useTranslation();
+    const backgroundRemovalEnabled = useBackgroundRemovalEnabled();
     const [settings, setSettings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
@@ -293,7 +295,7 @@ const AdminSettings = () => {
                                                             className="h-16 w-28 object-cover border border-gray-200"
                                                         />
                                                     )}
-                                                    <label className="flex items-center gap-2 cursor-pointer">
+                                                    {backgroundRemovalEnabled && (<label className="flex items-center gap-2 cursor-pointer">
                                                         <input
                                                             type="checkbox"
                                                             checked={removeBgAuth}
@@ -303,7 +305,7 @@ const AdminSettings = () => {
                                                         <span className="text-xs text-gray-500 uppercase tracking-wide">
                                                             {t('admin.removeBackground')}
                                                         </span>
-                                                    </label>
+                                                    </label>)}
                                                     <label className="cursor-pointer">
                                                         <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
                                                             {setting.value ? t('settings.changeImage') : t('settings.uploadImage')}
@@ -317,7 +319,7 @@ const AdminSettings = () => {
                                                                 if (!file) return;
                                                                 e.target.value = '';
                                                                 try {
-                                                                    const response = await uploadImage(file, removeBgAuth);
+                                                                    const response = await uploadImage(file, backgroundRemovalEnabled && removeBgAuth);
                                                                     await updateSettings(setting.id, response.data.url);
                                                                     toast.success(t('messages.settingUpdated'));
                                                                     fetchSettings();
@@ -489,7 +491,7 @@ const AdminSettings = () => {
                                                         />
                                                     )}
                                                     <div className="flex flex-col gap-2">
-                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                        {backgroundRemovalEnabled && (<label className="flex items-center gap-2 cursor-pointer">
                                                             <input
                                                                 type="checkbox"
                                                                 checked={removeBg}
@@ -499,7 +501,7 @@ const AdminSettings = () => {
                                                             <span className="text-xs text-gray-500 uppercase tracking-wide">
                                                                 {t('admin.removeBackground')}
                                                             </span>
-                                                        </label>
+                                                        </label>)}
                                                         <label className="cursor-pointer">
                                                             <div className="border border-gray-300 text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-50 transition-colors">
                                                                 {setting.value ? t('settings.changeLogo') : t('settings.uploadLogo')}
@@ -513,7 +515,7 @@ const AdminSettings = () => {
                                                                     if (!file) return;
                                                                     e.target.value = '';
                                                                     try {
-                                                                        const response = await uploadImage(file, removeBg);
+                                                                        const response = await uploadImage(file, backgroundRemovalEnabled && removeBg);
                                                                         await updateSettings(setting.id, response.data.url);
                                                                         toast.success(t('messages.logoUpdated'));
                                                                         fetchSettings();

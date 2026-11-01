@@ -130,14 +130,18 @@ const Navbar = () => {
         <div ref={dropdownRef} className="fixed top-0 left-0 right-0 z-50">
             {/* Top mini navbar */}
             <div className="bg-gray-100 border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-6 h-8 flex items-center justify-between">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 h-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
                     {/* Social icons — left */}
-                    <div className="flex items-center">
+                    <div className="flex items-center min-w-0 overflow-hidden">
                         <SocialIcons settings={socialSettings} size="sm" />
                     </div>
 
+                    <span className="text-[10px] sm:text-xs text-black text-center whitespace-nowrap">
+                        Be relaxed. Shop easy.
+                    </span>
+
                     {/* Auth links + language — right */}
-                    <div className="flex items-center gap-6 ml-auto">
+                    <div className="flex items-center gap-2 sm:gap-6 min-w-0 max-w-full justify-self-end overflow-x-auto whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0">
                         {storeSettings.multilanguage_enabled !== 'false' && (
                             <div className="flex items-center gap-1.5">
                                 <button

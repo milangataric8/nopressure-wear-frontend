@@ -1,5 +1,6 @@
+import { Truck } from 'lucide-react';
 import { useState, useEffect, useCallback, useContext } from 'react';
-import {useParams, useNavigate} from 'react-router-dom';
+import {Link, useParams, useNavigate} from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getProductById } from '../api/productApi';
 import { addToCart } from '../api/cartApi';
@@ -23,9 +24,13 @@ import FindInStore from "../components/product/FindInStore.jsx";
 import ProductColorVariants from "../components/product/ProductColorVariants.jsx";
 import Seo from '../components/seo/Seo';
 import ShareButton from '../components/product/ShareButton';
+import { useCurrency } from '../context/CurrencyContext';
 
 const ProductDetailPage = () => {
     const { t } = useTranslation();
+    const { format } = useCurrency();
+    const [purchaseSettings, setPurchaseSettings] = useState(null);
+    const [showSizeGuide, setShowSizeGuide] = useState(false);
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, isAuthenticated, setCartCount, cartCount, favoriteCount, setFavoriteCount } = useAuth();
@@ -42,7 +47,7 @@ const ProductDetailPage = () => {
     const [findInStoreEnabled, setFindInStoreEnabled] = useState(false);
     const [favoritesEnabled, setFavoritesEnabled] = useState(true);
     const [reviewsEnabled, setReviewsEnabled] = useState(true);
-    const [addToCartEnabled, setAddToCartEnabled] = useState(true);
+    const [addToCartEnabled, setAddToCartEnabled] = useState(false);
     const [storesLoading, setStoresLoading] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
     const [reviews, setReviews] = useState([]);
@@ -78,6 +83,7 @@ const ProductDetailPage = () => {
             setFavoritesEnabled(r.data.favorites_enabled !== 'false');
             setReviewsEnabled(r.data.reviews_enabled !== 'false');
             setAddToCartEnabled(r.data.add_to_cart_enabled !== 'false');
+            setPurchaseSettings(r.data);
         }).catch(() => {});
     }, []);
 
@@ -133,6 +139,7 @@ const ProductDetailPage = () => {
         : null;
 
     const handleAddToCart = async () => {
+        if (!addToCartEnabled) return;
         if (!selectedSize) {
             toast.error(t('product.selectSizeFirst'));
             return;
@@ -344,9 +351,16 @@ const ProductDetailPage = () => {
                         </div>
                     }
 
-                    <p className="text-xs text-gray-400 mb-6">
+                    <p className="text-xs text-gray-400 mb-2">
                         {t('product.productCode')}: {product.sku}
                     </p>
+
+                    {product.gender && (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('product.gender')}:</span>
+                            <span>{t(`product.gender${product.gender.charAt(0) + product.gender.slice(1).toLowerCase()}`)}</span>
+                        </div>
+                    )}
 
                     <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200">
                         <PriceDisplay
@@ -372,10 +386,25 @@ const ProductDetailPage = () => {
                     {/* Size selector */}
                     {product.variants && product.variants.length > 0 && (
                         <div className="mb-6">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-black block mb-3">
-                                {t('product.size')}
-                            </span>
-                            <div className="flex gap-2 flex-wrap">
+                            <div className="flex items-center justify-between gap-3 mb-3">
+                                <span className="text-xs font-semibold uppercase tracking-wide text-black">{t('product.size')}</span>
+                                <button type="button" onClick={() => setShowSizeGuide(open => !open)}
+                                    aria-expanded={showSizeGuide} aria-controls="product-size-guide"
+                                    className="text-xs text-black underline underline-offset-4 py-2">
+                                    {t('product.sizeGuide')}
+                                </button>
+                            </div>
+                            {showSizeGuide && (
+                                <div id="product-size-guide" className="border border-gray-200 p-4 mb-4 text-sm text-gray-600 space-y-3">
+                                    <p>{t('product.sizeGuideIntro')}</p>
+                                    <ol className="list-decimal pl-5 space-y-2">
+                                        <li>{t('product.sizeGuideWidth')}</li>
+                                        <li>{t('product.sizeGuideLength')}</li>
+                                    </ol>
+                                    <p>{t('product.sizeGuideHelp')} <Link to="/contact" className="text-black underline">{t('product.contactForSize')}</Link></p>
+                                </div>
+                            )}
+                            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${product.variants.length}, minmax(0, 1fr))` }}>
                                 {product.variants.map(v => (
                                     <button
                                         key={v.size}
@@ -386,7 +415,8 @@ const ProductDetailPage = () => {
                                             }
                                         }}
                                         disabled={!v.inStock}
-                                        className={`w-14 h-10 text-sm font-semibold border transition-colors ${
+                                        aria-pressed={selectedSize === v.size}
+                                        className={`w-full h-12 rounded-none text-sm font-semibold border transition-colors ${
                                             selectedSize === v.size
                                                 ? 'border-black bg-black text-white'
                                                 : v.inStock
@@ -430,27 +460,39 @@ const ProductDetailPage = () => {
                         </div>
                     )}
 
-                    {addToCartEnabled ? (
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={(product.totalStock ?? product.stockQuantity) === 0 || !selectedSize || addingToCart}
-                            className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:opacity-30"
-                        >
-                            {(product.totalStock ?? product.stockQuantity) === 0
-                                ? t('product.soldOut')
-                                : !selectedSize
-                                    ? t('product.selectSizeFirst')
-                                    : addingToCart
-                                        ? t('product.adding')
-                                        : t('product.addToCart')}
+                    <div data-product-purchase-bar className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:static md:border-0 md:p-0">
+                        <button type="button" onClick={handleAddToCart}
+                            disabled={!addToCartEnabled || (product.totalStock ?? product.stockQuantity) === 0 || !selectedSize || addingToCart}
+                            aria-describedby={!addToCartEnabled && purchaseSettings ? 'purchase-unavailable' : undefined}
+                            className="w-full rounded-none bg-black text-white text-sm font-semibold uppercase tracking-wide py-4 hover:bg-gray-800 transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed">
+                            {!addToCartEnabled ? t('product.addToCart')
+                                : (product.totalStock ?? product.stockQuantity) === 0 ? t('product.soldOut')
+                                    : !selectedSize ? t('product.selectSizeFirst')
+                                        : addingToCart ? t('product.adding') : t('product.addToCart')}
                         </button>
-                    ) : (
-                        <button
-                            disabled
-                            className="w-full bg-gray-200 text-gray-400 text-sm font-semibold uppercase tracking-wide py-4 cursor-not-allowed"
-                        >
-                            {t('product.addToCart')}
-                        </button>
+                        {!addToCartEnabled && purchaseSettings && (
+                            <p id="purchase-unavailable" role="status" className="mt-2 text-center text-sm text-red-600">
+                                {t('product.purchaseUnavailable')}
+                            </p>
+                        )}
+                    </div>
+
+                    {purchaseSettings && (
+                        <div className="mt-5 space-y-2 text-sm text-gray-600">
+                            {purchaseSettings.delivery_enabled !== 'false' && (
+                                <p className="flex items-start gap-2">
+                                    <Truck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#002855]" />
+                                    <span>{Number(purchaseSettings.delivery_fee) === 0
+                                    ? t('product.freeDelivery')
+                                    : purchaseSettings.delivery_fee && t('product.deliveryCost', { amount: format(Number(purchaseSettings.delivery_fee)) })}
+                                    {Number(purchaseSettings.free_shipping_threshold) > 0 && Number(purchaseSettings.delivery_fee) > 0 && (
+                                        <> · {t('product.freeDeliveryThreshold', { amount: format(Number(purchaseSettings.free_shipping_threshold)) })}</>
+                                    )}
+                                    </span>
+                                </p>
+                            )}
+                            <Link to="/returns" className="inline-block text-black underline underline-offset-4">{t('product.deliveryReturns')}</Link>
+                        </div>
                     )}
 
                     {findInStoreEnabled && (
@@ -469,12 +511,7 @@ const ProductDetailPage = () => {
                         </div>
                     )}
 
-                    {product.gender && (
-                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('product.gender')}:</span>
-                            <span>{t(`product.gender${product.gender.charAt(0) + product.gender.slice(1).toLowerCase()}`)}</span>
-                        </div>
-                    )}
+
                 </div>
             </div>
 

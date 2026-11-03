@@ -59,11 +59,7 @@ const ProductDetailPage = () => {
             setProduct(response.data);
             setSelectedSize(null);
             setQuantity(1);
-            if (response.data.images && response.data.images.length > 0) {
-                setSelectedImage(response.data.images[0].imageUrl);
-            } else {
-                setSelectedImage(response.data.imageUrl);
-            }
+            setSelectedImage(response.data.imageUrl || response.data.images?.[0]?.imageUrl);
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.productNotFound'));
             navigate('/products');
@@ -186,7 +182,7 @@ const ProductDetailPage = () => {
 
     const allImages = product ? [
         ...(product.imageUrl ? [{ id: 'main', imageUrl: product.imageUrl, isPrimary: true }] : []),
-        ...(product.images || [])
+        ...(product.images || []).filter(image => image.imageUrl !== product.imageUrl)
     ] : [];
 
     const toggleSection = (section) => {

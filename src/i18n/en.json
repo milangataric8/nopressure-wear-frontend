@@ -255,6 +255,8 @@
     "learnMore": "Learn more"
   },
   "product": {
+    "modelCount_one": "{{count}} model",
+    "modelCount_other": "{{count}} models",
     "allProducts": "All Products",
     "hideFilters": "← Hide Filters",
     "showFilters": "→ Show Filters",

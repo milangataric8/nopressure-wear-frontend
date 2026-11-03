@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getProductFilters, searchActiveProducts } from '../api/productApi';
+import { getProductFilters, getCatalogModels } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
-import { optimizedImage } from '../utils/imageUtils';
 import { getVisibleFilters } from '../api/filterApi';
 import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/common/Skeleton';
 import Pagination from "../components/common/Pagination.jsx";
 import useFormatPrice from '../hooks/useFormatPrice';
-import StarRating from '../components/common/StarRating';
-import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import CatalogModelCard from "../components/product/CatalogModelCard.jsx";
 import ActiveFilters from "../components/common/ActiveFilters.jsx";
 import {getSettingsMap} from "../api/settingsApi.js";
 import ProductFilters from "../components/product/ProductFilters.jsx";
@@ -42,6 +40,8 @@ const ProductsPage = () => {
     const [selectedGender, setSelectedGender] = useState(searchParams.get('gender') || '');
     const [selectedSizes, setSelectedSizes] = useState(() => searchParams.getAll('sizes'));
     const [availableSizes, setAvailableSizes] = useState([]);
+    const [availableGenders, setAvailableGenders] = useState([]);
+    const [priceRangeAvailable, setPriceRangeAvailable] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState([]);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [selectedBrand, setSelectedBrand] = useState('');
@@ -54,13 +54,15 @@ const ProductsPage = () => {
     const [reviewsEnabled, setReviewsEnabled] = useState(true);
     const navigate = useNavigate();
 
-    const rootCategories = categories.filter(cat => !cat.parentId);
+    const [activeCategoryIds, setActiveCategoryIds] = useState(null);
+    const catalogCategories = activeCategoryIds === null ? [] : categories.filter(cat =>
+        activeCategoryIds.includes(cat.id) || categories.some(child => child.parentId === cat.id && activeCategoryIds.includes(child.id)));
+    const rootCategories = catalogCategories.filter(cat => !cat.parentId);
 
     const getSubcategories = (parentId) =>
-        categories.filter(cat => cat.parentId === parentId);
+        catalogCategories.filter(cat => cat.parentId === parentId);
 
     const fetchProducts = useCallback(async () => {
-        if (categories.length === 0) return;
         setLoading(true);
         try {
             const params = {
@@ -79,7 +81,7 @@ const ProductsPage = () => {
             if (selectedGender) params.gender = selectedGender;
             if (selectedSizes.length > 0) params.sizes = selectedSizes;
 
-            const response = await searchActiveProducts(params);
+            const response = await getCatalogModels(params);
 
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
@@ -166,15 +168,19 @@ const ProductsPage = () => {
 
     const isFilterVisible = (fieldName) => {
         if (filterConfig.length === 0) return false;
+        if (fieldName === 'price' && !priceRangeAvailable) return false;
         return filterConfig.some(f => f.fieldName.toLowerCase() === fieldName.toLowerCase());
     };
 
     useEffect(() => {
         getProductFilters().then(r => {
-            setAvailableBrands(r.data.brands || []);
+            setAvailableBrands((r.data.brands || []).filter(v => v?.trim()));
+            setActiveCategoryIds(r.data.categoryIds || []);
             setAvailableColors(r.data.colors || []);
-            setAvailableMaterials(r.data.materials || []);
+            setAvailableMaterials((r.data.materials || []).filter(v => v?.trim()));
             setAvailableSizes(r.data.sizes || []);
+            setAvailableGenders(r.data.genders || []);
+            setPriceRangeAvailable(r.data.priceRangeAvailable === true);
         }).catch(() => {});
     }, []);
 
@@ -209,7 +215,7 @@ const ProductsPage = () => {
                     })()}
                 </h1>
                 <span className="text-sm text-gray-400">
-                    {totalElements} {totalElements === 1 ? t('product.product') : t('product.products')}
+                    {t('product.modelCount', { count: totalElements })}
                 </span>
             </div>
 
@@ -234,6 +240,7 @@ const ProductsPage = () => {
                         availableMaterials={availableMaterials}
                         selectedMaterial={selectedMaterial}
                         setSelectedMaterial={setSelectedMaterial}
+                        availableGenders={availableGenders}
                         availableSizes={availableSizes}
                         selectedSizes={selectedSizes}
                         setSelectedSizes={setSelectedSizes}
@@ -259,7 +266,7 @@ const ProductsPage = () => {
                 {/* Products section — right side */}
                 <div className="flex-1">
                     {/* Sort + Filter toggle */}
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
                         <button
                             onClick={() => setShowFilters(!showFilters)}
                             className="text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-black transition-colors"
@@ -272,6 +279,7 @@ const ProductsPage = () => {
                                 {t('product.sortBy')}
                             </span>
                             <select
+                                aria-label={t('product.sortBy')}
                                 value={sortBy}
                                 onChange={(e) => { setSortBy(e.target.value); setPage(0); }}
                                 className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black transition-colors"
@@ -370,98 +378,9 @@ const ProductsPage = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8">
-                            {products.map(product => (
-                                <Link
-                                    key={product.id}
-                                    to={`/products/${product.id}`}
-                                    className="group cursor-pointer block"
-                                >
-                                    <div className="bg-white aspect-square flex items-center justify-center mb-3 overflow-hidden">
-                                        {product.imageUrl ? (
-                                            <img
-                                                src={optimizedImage(product.imageUrl, { width: 500 })}
-                                                alt={product.name}
-                                                className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                                                loading="lazy"
-                                            />
-                                        ) : (
-                                            <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-400 mb-0.5">
-                                            {product.categoryName || t('product.uncategorized')}
-                                        </p>
-                                        <h3 className="text-sm font-semibold text-black mb-1 truncate">
-                                            {product.name}
-                                        </h3>
-                                        <p className="text-xs text-gray-400 mb-0.5">
-                                            {product.gender}
-                                        </p>
-                                        {/* Color variants */}
-                                        {(product.colorVariants?.length > 0 || product.colorHex) && (
-                                            <div className="flex gap-1 mt-2 flex-wrap">
-                                                {/* Current product */}
-                                                {(
-                                                    <div
-                                                        className="w-8 h-8 border-2 border-transparent hover:border-black overflow-hidden flex-shrink-0"
-                                                        title={product.colorName}
-                                                    >
-                                                        {product.imageUrl ? (
-                                                            <img
-                                                                src={optimizedImage(product.imageUrl, { width: 120, crop: 'fill' })}
-                                                                alt={product.colorName || ''}
-                                                                className="w-full h-full object-cover"
-                                                                loading="lazy"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
-                                                        )}
-                                                    </div>
-                                                )}
-
-                                                {/* Variants */}
-                                                {product.colorVariants?.map(variant => (
-                                                    <button
-                                                        key={variant.variantId}
-                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/products/${variant.variantId}`); }}
-                                                        className="w-8 h-8 border-2 border-transparent hover:border-black transition-colors overflow-hidden flex-shrink-0"
-                                                        title={variant.colorName}
-                                                    >
-                                                        {variant.imageUrl ? (
-                                                            <img
-                                                                src={optimizedImage(variant.imageUrl, { width: 120, crop: 'fill' })}
-                                                                alt={variant.colorName || ''}
-                                                                className="w-full h-full object-cover"
-                                                                loading="lazy"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />
-                                                        )}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        <div className="flex items-center justify-between">
-                                            <PriceDisplay
-                                                price={product.price}
-                                                discountPrice={product.discountPrice}
-                                                discountPercentage={product.discountPercentage}
-                                                size="md"
-                                            />
-                                            <span className={`text-xs ${
-                                                product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
-                                            }`}>
-                                                {product.stockQuantity > 0 ? t('product.inStock') : t('product.soldOut')}
-                                            </span>
-                                        </div>
-
-                                        {reviewsEnabled &&
-                                            <StarRating rating={product.averageRating || 0} count={product.ratingCount || 0} size="sm" />
-                                        }
-                                    </div>
-                                </Link>
+                            {products.map(model => (
+                                <CatalogModelCard key={model.id + ':' + model.options.map(option => option.id).join(',')}
+                                    model={model} reviewsEnabled={reviewsEnabled} />
                             ))}
                         </div>
                     )}

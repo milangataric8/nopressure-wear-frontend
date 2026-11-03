@@ -256,6 +256,9 @@
     "learnMore": "Saznaj više"
   },
   "product": {
+    "modelCount_one": "{{count}} model",
+    "modelCount_few": "{{count}} modela",
+    "modelCount_other": "{{count}} modela",
     "allProducts": "Svi proizvodi",
     "hideFilters": "← Sakrij filtere",
     "showFilters": "→ Prikaži filtere",

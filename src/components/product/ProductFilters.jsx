@@ -5,6 +5,7 @@ const LIGHT_COLORS = ['#FFFFFF', '#FFFF00', '#FFD700', '#FFC0CB', '#F5F5DC', '#C
 
 const ProductFilters = ({
                             isMobile,
+                            availableGenders = [],
                             isFilterVisible,
                             // categories
                             rootCategories,
@@ -108,12 +109,12 @@ const ProductFilters = ({
     return (
         <div className={isMobile ? 'w-full' : 'w-56 flex-shrink-0'}>
             {/* Gender filter */}
-            <div className="mb-8">
+            {availableGenders.length > 1 && <div className="mb-8">
                 <h3 className="text-xs font-black uppercase tracking-wide text-black mb-3">
                     {t('product.gender')}
                 </h3>
                 <div className="flex gap-2 flex-wrap">
-                    {['MEN', 'WOMEN', 'UNISEX'].map(g => (
+                    {availableGenders.map(g => (
                         <button
                             key={g}
                             onClick={() => handleGenderToggle(g)}
@@ -127,10 +128,10 @@ const ProductFilters = ({
                         </button>
                     ))}
                 </div>
-            </div>
+            </div>}
 
             {/* Categories */}
-            {isFilterVisible('category') && (
+            {isFilterVisible('category') && rootCategories.length > 0 && (
                 <div className="mb-8">
                     <h3 className="text-xs font-black uppercase tracking-wide text-black mb-4">
                         {t('product.categories')}

@@ -32,3 +32,4 @@ export const linkColorVariant = (productId, variantProductId) =>
     axiosInstance.post(`/products/${productId}/variants/${variantProductId}`);
 export const unlinkColorVariant = (productId, variantProductId) =>
     axiosInstance.delete(`/products/${productId}/variants/${variantProductId}`);
+export const getCatalogModels = (params) => axiosInstance.get('/products/catalog', { params, paramsSerializer: { indexes: null } });

@@ -18,9 +18,9 @@ const ForgotPasswordPage = () => {
             setSent(true);
         } catch (error) {
             const key = error.response?.data?.messageKey;
-            toast.error(key ? t(key, { defaultValue: 'Failed to send reset email' })
-                : error.response ? 'Failed to send reset email'
-                    : 'Unable to connect. Please try again shortly.');
+            toast.error(key ? t(key, { defaultValue: t('auth.resetEmailFailed') })
+                : error.response ? t('auth.resetEmailFailed')
+                    : t('auth.connectionFailed'));
         } finally {
             setLoading(false);
         }
@@ -30,10 +30,9 @@ const ForgotPasswordPage = () => {
         return (
             <div className="min-h-screen flex items-center justify-center px-4">
                 <div className="w-full max-w-sm text-center">
-                    <h1 className="text-2xl font-bold text-black mb-4">Check your email</h1>
+                    <h1 className="text-2xl font-bold text-black mb-4">{t('auth.checkInboxTitle')}</h1>
                     <p className="text-sm text-gray-500 mb-8">
-                        If an account exists for <strong>{email.trim()}</strong>, a password reset link will be sent.
-                        The link expires in 1 hour.
+                        {t('auth.resetEmailSent', { email: email.trim() })}
                     </p>
                     <Link
                         to="/login"
@@ -52,7 +51,7 @@ const ForgotPasswordPage = () => {
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-black mb-1">{t('auth.forgotPassword')}</h1>
                     <p className="text-sm text-gray-500">
-                        Enter your email and we'll send you a reset link
+                        {t('auth.forgotPasswordSubtitle')}
                     </p>
                 </div>
 
@@ -76,12 +75,12 @@ const ForgotPasswordPage = () => {
                         disabled={loading}
                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-800 transition-colors disabled:opacity-50"
                     >
-                        {loading ? 'Sending...' : 'Send Reset Link'}
+                        {loading ? t('auth.sendingResetLink') : t('auth.sendResetLink')}
                     </button>
                 </form>
 
                 <p className="text-sm text-gray-500 mt-6 text-center">
-                    Remember your password?{' '}
+                    {t('auth.rememberPassword')}{' '}
                     <Link to="/login" className="text-black font-semibold hover:underline">
                         {t('auth.signIn')}
                     </Link>

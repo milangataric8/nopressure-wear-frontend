@@ -444,6 +444,18 @@
     "reviewDeleted": "Recenzija obrisana"
   },
   "auth": {
+    "resetEmailFailed": "Slanje linka za promenu lozinke nije uspelo. Pokušajte ponovo.",
+    "connectionFailed": "Povezivanje nije uspelo. Pokušajte ponovo za nekoliko trenutaka.",
+    "resetEmailSent": "Ako postoji nalog sa adresom {{email}}, poslaćemo link za promenu lozinke. Link važi jedan sat.",
+    "forgotPasswordSubtitle": "Unesite email adresu i poslaćemo vam link za promenu lozinke.",
+    "sendingResetLink": "Slanje…",
+    "sendResetLink": "Pošalji link",
+    "rememberPassword": "Sećate se lozinke?",
+    "invalidResetLink": "Link za promenu lozinke nije važeći.",
+    "resetPasswordFailed": "Promena lozinke nije uspela. Pokušajte ponovo.",
+    "resetPassword": "Promeni lozinku",
+    "resetPasswordSubtitle": "Unesite novu lozinku.",
+    "resettingPassword": "Promena lozinke…",
     "registrationSettingsError": "Nije moguće proveriti da li je registracija dostupna. Pokušajte ponovo.",
     "retrySettings": "Pokušaj ponovo",
     "login": "Prijava",
@@ -522,6 +534,8 @@
     "callUs": "Pozovite nas"
   },
   "common": {
+    "previousPage": "Prethodna",
+    "nextPage": "Sledeća",
     "loading": "Učitavanje...",
     "save": "Sačuvaj",
     "cancel": "Otkaži",
@@ -796,5 +810,12 @@
   "password": {
     "show": "Prikaži lozinku",
     "hide": "Sakrij lozinku"
+  },
+  "notFound": {
+    "code": "Greška 404",
+    "title": "Stranica nije pronađena",
+    "description": "Stranica koju tražite ne postoji ili je premeštena.",
+    "goBack": "Nazad",
+    "goHome": "Na početnu"
   }
 }

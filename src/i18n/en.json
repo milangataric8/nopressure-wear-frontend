@@ -443,6 +443,18 @@
     "reviewDeleted": "Review deleted"
   },
   "auth": {
+    "resetEmailFailed": "Failed to send reset email. Please try again.",
+    "connectionFailed": "Unable to connect. Please try again shortly.",
+    "resetEmailSent": "If an account exists for {{email}}, a password reset link will be sent. The link expires in one hour.",
+    "forgotPasswordSubtitle": "Enter your email and we’ll send you a reset link.",
+    "sendingResetLink": "Sending…",
+    "sendResetLink": "Send Reset Link",
+    "rememberPassword": "Remember your password?",
+    "invalidResetLink": "Invalid password reset link.",
+    "resetPasswordFailed": "Failed to reset password. Please try again.",
+    "resetPassword": "Reset Password",
+    "resetPasswordSubtitle": "Enter your new password.",
+    "resettingPassword": "Resetting…",
     "registrationSettingsError": "Unable to check whether registration is available. Please try again.",
     "retrySettings": "Try again",
     "login": "Sign In",
@@ -521,6 +533,8 @@
     "callUs": "Call us"
   },
   "common": {
+    "previousPage": "Previous",
+    "nextPage": "Next",
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
@@ -795,5 +809,12 @@
   "password": {
     "show": "Show password",
     "hide": "Hide password"
+  },
+  "notFound": {
+    "code": "Error 404",
+    "title": "Not Found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "goBack": "Go Back",
+    "goHome": "Go Home"
   }
 }

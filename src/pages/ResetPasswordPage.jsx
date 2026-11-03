@@ -18,12 +18,12 @@ const ResetPasswordPage = () => {
     useEffect(() => {
         const tokenFromUrl = searchParams.get('token');
         if (!tokenFromUrl) {
-            toast.error('Invalid reset link');
+            toast.error(t('auth.invalidResetLink'));
             navigate('/login');
         } else {
             setToken(tokenFromUrl);
         }
-    }, [searchParams, navigate]);
+    }, [searchParams, navigate, t]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,7 +52,9 @@ const ResetPasswordPage = () => {
             toast.success(t('messages.passwordChanged'));
             navigate('/login');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to reset password');
+            const key = error.response?.data?.messageKey;
+            toast.error(key ? t(key, { defaultValue: t('auth.resetPasswordFailed') })
+                : error.response ? t('auth.resetPasswordFailed') : t('auth.connectionFailed'));
         } finally {
             setLoading(false);
         }
@@ -62,8 +64,8 @@ const ResetPasswordPage = () => {
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-black mb-1">Reset Password</h1>
-                    <p className="text-sm text-gray-500">Enter your new password</p>
+                    <h1 className="text-2xl font-bold text-black mb-1">{t('auth.resetPassword')}</h1>
+                    <p className="text-sm text-gray-500">{t('auth.resetPasswordSubtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +103,7 @@ const ResetPasswordPage = () => {
                         {formData.confirmPassword && formData.newPassword !== formData.confirmPassword && (
                             <p className="text-xs text-red-500 mt-1">{t('auth.passwordsNoMatch')}</p>
                         )}
-                        {formData.confirmPassword && formData.password === formData.confirmPassword && (
+                        {formData.confirmPassword && formData.newPassword === formData.confirmPassword && (
                             <p className="text-xs text-green-600 mt-1">✓ {t('auth.passwordsMatch')}</p>
                         )}
                     </div>
@@ -111,7 +113,7 @@ const ResetPasswordPage = () => {
                         disabled={loading}
                         className="w-full bg-black text-white text-sm font-semibold uppercase tracking-wide py-3 hover:bg-gray-800 transition-colors disabled:opacity-50"
                     >
-                        {loading ? 'Resetting...' : 'Reset Password'}
+                        {loading ? t('auth.resettingPassword') : t('auth.resetPassword')}
                     </button>
                 </form>
 

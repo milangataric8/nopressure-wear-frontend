@@ -33,6 +33,7 @@ const Navbar = () => {
     const { t, i18n } = useTranslation();
     const [socialSettings, setSocialSettings] = useState({});
     const [storeSettings, setStoreSettings] = useState({});
+    const [registrationEnabled, setRegistrationEnabled] = useState(false);
     const { format } = useCurrency();
     const rootCategories = (categories || []).filter(cat => !cat.parentId);
 
@@ -92,10 +93,16 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-        getSettingsMap().then(r => setStoreSettings(r.data)).catch(() => {});
+        getSettingsMap().then(r => {
+            setStoreSettings(r.data);
+            setRegistrationEnabled(r.data.registration_enabled !== 'false');
+        }).catch(() => {});
 
         const handler = () => {
-            getSettingsMap().then(r => setStoreSettings(r.data)).catch(() => {});
+            getSettingsMap().then(r => {
+                setStoreSettings(r.data);
+                setRegistrationEnabled(r.data.registration_enabled !== 'false');
+            }).catch(() => {});
         };
         window.addEventListener('settings-updated', handler);
         return () => window.removeEventListener('settings-updated', handler);
@@ -174,9 +181,11 @@ const Navbar = () => {
                                 <Link to="/login" className="text-xs text-black hover:text-black transition-colors">
                                     {t('nav.signIn')}
                                 </Link>
-                                <Link to="/register" className="text-xs text-black hover:text-black transition-colors">
-                                    {t('nav.joinUs')}
-                                </Link>
+                                {registrationEnabled && (
+                                    <Link to="/register" className="text-xs text-black hover:text-black transition-colors">
+                                        {t('nav.joinUs')}
+                                    </Link>
+                                )}
                             </>
                         )}
                     </div>

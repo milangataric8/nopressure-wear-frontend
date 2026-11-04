@@ -1,28 +1,25 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import useFormatPrice from '../hooks/useFormatPrice';
+import { selectCollectionModels } from '../utils/selectCollectionModels';
 import { Link } from 'react-router-dom';
-import { getActiveProducts } from '../api/productApi';
+import { getCatalogModels } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
-import { optimizedImage } from "../utils/imageUtils.js";
 import {toast} from "react-toastify";
 import HeroBanner from "../components/common/HeroBanner.jsx";
 import HomePopup from "../components/common/HomePopup.jsx";
-import PriceDisplay from "../components/common/PriceDisplay.jsx";
+import CatalogModelCard from "../components/product/CatalogModelCard.jsx";
 import Seo from '../components/seo/Seo';
 
 const HomePage = () => {
     const { t } = useTranslation();
-    useFormatPrice();
-    const navigate = useNavigate();
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [categories, setCategories] = useState([]);
 
     const fetchFeatured = useCallback(async () => {
         try {
-            const response = await getActiveProducts({ page: 0, size: 4 });
-            setFeaturedProducts(response.data.content);
+            const response = await getCatalogModels({ page: 0, size: 100, sort: 'name,asc' });
+            const models = selectCollectionModels(response.data.content);
+            setFeaturedProducts(models);
         } catch (e) {
             toast.error(e.response?.data?.message || t('messages.failedToLoad'));
         }
@@ -78,7 +75,7 @@ const HomePage = () => {
                 <div className="max-w-7xl mx-auto px-6 py-16 border-t border-gray-200">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-xl font-black uppercase tracking-tight text-black">
-                            {t('product.bestSelling')}
+                            {t('product.featuredModels')}
                         </h2>
                         <Link
                             to="/products"
@@ -89,92 +86,8 @@ const HomePage = () => {
                     </div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8">
-                        {featuredProducts.map(product => (
-                            <Link
-                                key={product.id}
-                                to={`/products/${product.id}`}
-                                className="group cursor-pointer block"
-                            >
-                                <div className="bg-white aspect-square flex items-center justify-center mb-3 overflow-hidden">
-                                    {product.imageUrl ? (
-                                        <img
-                                            src={optimizedImage(product.imageUrl, { width: 500 })}
-                                            alt={product.name}
-                                            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                                            loading="lazy"
-                                        />
-                                    ) : (
-                                        <span className="text-gray-400 text-xs">{t('common.noImage')}</span>
-                                    )}
-                                </div>
-                                <div>
-                                    <p className="text-xs text-gray-400 mb-0.5">
-                                        {product.categoryName || t('product.uncategorized')}
-                                    </p>
-                                    <h3 className="text-sm font-semibold text-black mb-1 truncate">
-                                        {product.name}
-                                    </h3>
-                                    {/* Color variants */}
-                                    {(product.colorVariants?.length > 0 || product.colorHex) && (
-                                        <div className="flex gap-1 mt-2 flex-wrap">
-                                            {/* Current product */}
-                                            {product.colorHex && (
-                                                <Link
-                                                    to={`/products/${product.id}`}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    className="w-8 h-8 border-2 border-transparent hover:border-black overflow-hidden flex-shrink-0"
-                                                    title={product.colorName}
-                                                >
-                                                    {product.imageUrl ? (
-                                                        <img
-                                                            src={optimizedImage(product.imageUrl, { width: 120, crop: 'fill' })}
-                                                            alt={product.colorName || ''}
-                                                            className="w-full h-full object-cover"
-                                                            loading="lazy"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full" style={{ backgroundColor: product.colorHex }} />
-                                                    )}
-                                                </Link>
-                                            )}
-
-                                            {/* Variants */}
-                                            {product.colorVariants?.map(variant => (
-                                                <button
-                                                    key={variant.variantId}
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigate(`/products/${variant.variantId}`); }}
-                                                    className="w-8 h-8 border-2 border-transparent hover:border-black transition-colors overflow-hidden flex-shrink-0"
-                                                    title={variant.colorName}
-                                                >
-                                                    {variant.imageUrl ? (
-                                                        <img
-                                                            src={optimizedImage(variant.imageUrl, { width: 120, crop: 'fill' })}
-                                                            alt={variant.colorName || ''}
-                                                            className="w-full h-full object-cover"
-                                                            loading="lazy"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full" style={{ backgroundColor: variant.colorHex || '#ccc' }} />
-                                                    )}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                    <div className="flex items-center justify-between">
-                                        <PriceDisplay
-                                            price={product.price}
-                                            discountPrice={product.discountPrice}
-                                            discountPercentage={product.discountPercentage}
-                                            size="md"
-                                        />
-                                        <span className={`text-xs ${
-                                            product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'
-                                        }`}>
-                                            {product.stockQuantity > 0 ? t('product.inStock') : t('product.soldOut')}
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
+                        {featuredProducts.map(model => (
+                            <CatalogModelCard key={model.id} model={model} reviewsEnabled={false} />
                         ))}
                     </div>
                 </div>

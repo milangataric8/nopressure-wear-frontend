@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { getAllStores, createStore, updateStore, toggleStore, deleteStore } from '../../api/storeApi';
@@ -31,7 +32,7 @@ const AdminStores = () => {
             const response = await getAllStores();
             setStores(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -58,7 +59,7 @@ const AdminStores = () => {
             resetForm();
             fetchStores();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
         }
     };
 
@@ -83,7 +84,7 @@ const AdminStores = () => {
             await toggleStore(id);
             fetchStores();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 
@@ -94,7 +95,7 @@ const AdminStores = () => {
             toast.success(t('messages.storeDeleted'));
             fetchStores();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 

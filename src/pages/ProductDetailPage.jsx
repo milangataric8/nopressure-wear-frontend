@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { Truck } from 'lucide-react';
 import { useState, useEffect, useCallback, useContext } from 'react';
 import {Link, useParams, useNavigate} from 'react-router-dom';
@@ -66,7 +67,7 @@ const ProductDetailPage = () => {
             setQuantity(1);
             setSelectedImage(response.data.imageUrl || response.data.images?.[0]?.imageUrl);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.productNotFound'));
+            toast.error(getApiErrorMessage(e, 'messages.productNotFound'));
             navigate('/products');
         } finally {
             setLoading(false);
@@ -128,7 +129,7 @@ const ProductDetailPage = () => {
             setProductStores(response.data);
             setShowFindInStore(true);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadStores'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadStores'));
         } finally {
             setStoresLoading(false);
         }
@@ -155,7 +156,7 @@ const ProductDetailPage = () => {
             setCartCount(cartCount + quantity);
             toast.success(t('messages.addedToCart'));
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToAddToCart'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToAddToCart'));
         } finally {
             setAddingToCart(false);
         }
@@ -183,7 +184,7 @@ const ProductDetailPage = () => {
         } catch (e) {
             setIsFavorited(previousFavorited);
             setFavoriteCount(previousCount);
-            toast.error(e.response?.data?.message || t('messages.failedToUpdateFavorites'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdateFavorites'));
         }
     };
 
@@ -216,7 +217,7 @@ const ProductDetailPage = () => {
             const prodResponse = await getProductById(product.id);
             setProduct(prodResponse.data);
         } catch (error) {
-            toast.error(error.response?.data?.message || t('review.failedToSubmit'));
+            toast.error(getApiErrorMessage(error, 'review.failedToSubmit'));
         } finally {
             setSubmittingReview(false);
         }
@@ -231,7 +232,7 @@ const ProductDetailPage = () => {
             const prodResponse = await getProductById(product.id);
             setProduct(prodResponse.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('review.failedToDelete'));
+            toast.error(getApiErrorMessage(e, 'review.failedToDelete'));
         }
     };
 

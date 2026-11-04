@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import axiosInstance from '../api/axiosInstance';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -42,7 +43,7 @@ const ProfilePage = () => {
                 email: u.email,
             });
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadProfile'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadProfile'));
         } finally {
             setLoading(false);
         }
@@ -53,7 +54,7 @@ const ProfilePage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadAddresses'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadAddresses'));
         }
     }, [user.id]);
 
@@ -76,7 +77,7 @@ const ProfilePage = () => {
             setSetupClientSecret(response.data.clientSecret);
             setShowAddCard(true);
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to initialize card setup');
+            toast.error(getApiErrorMessage(e, 'messages.failedToInitializeCardSetup'));
         }
     };
 
@@ -95,7 +96,7 @@ const ProfilePage = () => {
             toast.success(t('messages.cardRemoved'));
             setSavedCards(prev => prev.filter(c => c.id !== paymentMethodId));
         } catch (e) {
-            toast.error(e.response?.data?.message || 'Failed to remove card');
+            toast.error(getApiErrorMessage(e, 'messages.failedToRemoveCard'));
         }
     };
 
@@ -144,7 +145,7 @@ const ProfilePage = () => {
             setProfileData(prev => ({ ...prev, password: '' }));
         } catch (e) {
             if (!applyServerErrors(e, t, setErrors)) {
-                toast.error(e.response?.data?.message || 'Failed to update profile');
+                toast.error(getApiErrorMessage(e, 'messages.failedToUpdateProfile'));
             }
         } finally {
             setSaving(false);

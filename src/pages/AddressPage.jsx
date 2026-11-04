@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import axiosInstance from '../api/axiosInstance';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -35,7 +36,7 @@ const AddressPage = () => {
             const response = await axiosInstance.get(`/addresses/user/${user.id}`);
             setAddresses(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadAddresses'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadAddresses'));
         } finally {
             setLoading(false);
         }
@@ -89,7 +90,7 @@ const AddressPage = () => {
             fetchAddresses();
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         }
     };
@@ -123,7 +124,7 @@ const AddressPage = () => {
                     await axiosInstance.delete(`/addresses/${id}`);
                 } catch (e) {
                     setAddresses(previousAddresses);
-                    toast.error(e.response?.data?.message || t('messages.failedToSave'));
+                    toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
                 }
             },
         });

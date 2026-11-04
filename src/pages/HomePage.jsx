@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { selectCollectionModels } from '../utils/selectCollectionModels';
@@ -21,7 +22,7 @@ const HomePage = () => {
             const models = selectCollectionModels(response.data.content);
             setFeaturedProducts(models);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         }
     }, []);
 
@@ -30,7 +31,7 @@ const HomePage = () => {
             const response = await getCategories();
             setCategories(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         }
     }, []);
 

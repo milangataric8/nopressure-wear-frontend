@@ -66,7 +66,7 @@ function App() {
                     const response = await getCart(user.id);
                     setCartCount(response.data.items.length);
                 } catch (e) {
-                    console.log(e.response?.data?.message || 'We have a problem with cart');
+                    console.error('Unable to load cart', e.response?.data?.code || e.response?.status);
                 }
             }
         };
@@ -97,10 +97,10 @@ function App() {
                     // Multi-language off → force default language
                     i18n.changeLanguage(s.default_language);
                 } else if (s.multilanguage_enabled !== 'false') {
-                    // Multi-language on → use saved choice, or default if none saved
+                    // Multi-language on → keep explicit choice; otherwise start in Serbian
                     const saved = localStorage.getItem('i18nextLng');
-                    if (!saved && s.default_language) {
-                        i18n.changeLanguage(s.default_language);
+                    if (!saved) {
+                        i18n.changeLanguage('sr');
                     }
                 }
             }).catch(() => {});

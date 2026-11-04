@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 // `error` accepts three shapes:
 //   - i18n key string ('validation.required')  → translated here
 //   - { key, params }                          → interpolated here
-//   - plain server text ('Email is taken')     → shown as-is (t() echoes unknown keys)
+//   - already translated client text            → shown as-is
 const FormField = ({ id, name, label, required, error, hint, children }) => {
     const { t } = useTranslation();
     const fieldId = id || name;

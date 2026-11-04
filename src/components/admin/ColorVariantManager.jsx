@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
             setVariantResults([]);
             toast.success(t('messages.variantLinked'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLinkVariant'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLinkVariant'));
         }
     };
 
@@ -67,7 +68,7 @@ const ColorVariantManager = ({ productId, colorVariants, setColorVariants, input
             setColorVariants(r.data);
             toast.success(t('messages.variantUnlinked'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUnlinkVariant'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUnlinkVariant'));
         }
     };
 

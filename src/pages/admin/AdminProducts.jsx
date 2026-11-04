@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import {useState, useEffect, useCallback} from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -125,7 +126,7 @@ const AdminProducts = () => {
             setProducts(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -136,7 +137,7 @@ const AdminProducts = () => {
             const response = await getCategories();
             setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || t('messages.failedToLoadCategories'));
+            console.log(getApiErrorMessage(e, 'messages.failedToLoadCategories'));
         }
     };
 
@@ -230,7 +231,7 @@ const AdminProducts = () => {
             fetchProducts();
         } catch (e) {
             if (!applyServerErrors(e, t, setErrors)) {
-                toast.error(e.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
             }
         }
     };
@@ -275,7 +276,7 @@ const AdminProducts = () => {
             await activateDeactivateProduct(id);
             fetchProducts();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToToggleProduct'))
+            toast.error(getApiErrorMessage(e, 'messages.failedToToggleProduct'))
         }
     };
 

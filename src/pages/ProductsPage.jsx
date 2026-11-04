@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -87,7 +88,7 @@ const ProductsPage = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadProducts'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadProducts'));
         } finally {
             setLoading(false);
         }
@@ -98,7 +99,7 @@ const ProductsPage = () => {
             const response = await getCategories();
             setCategories(response.data.content || response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || t('messages.failedToLoadCategories'));
+            console.log(getApiErrorMessage(e, 'messages.failedToLoadCategories'));
         }
     }, []);
 

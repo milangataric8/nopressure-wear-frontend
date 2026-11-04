@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect, useContext, useRef } from 'react';
 import {useNavigate} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -113,7 +114,7 @@ const CartPage = () => {
             setCart(response.data);
             setCartCount(response.data.items.length);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadCart'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadCart'));
         } finally {
             setLoading(false);
         }
@@ -212,7 +213,7 @@ const CartPage = () => {
                 setCart(response.data);
             } catch (e) {
                 await fetchCart(); // several clicks may have queued up — re-sync from server rather than roll back
-                toast.error(e.response?.data?.message || 'Failed to update quantity');
+                toast.error(getApiErrorMessage(e, 'messages.failedToUpdateQuantity'));
             }
         }, 500);
     };
@@ -247,7 +248,7 @@ const CartPage = () => {
                 } catch (e) {
                     await fetchCart();
                     setCartCount(previousCart?.items.length ?? 0);
-                    toast.error(e.response?.data?.message || t('messages.failedToRemoveItem'));
+                    toast.error(getApiErrorMessage(e, 'messages.failedToRemoveItem'));
                 }
             },
         });
@@ -277,7 +278,7 @@ const CartPage = () => {
                 } catch (e) {
                     await fetchCart();
                     setCartCount(previousCart?.items.length ?? 0);
-                    toast.error(e.response?.data?.message || t('messages.failedToClearCart'));
+                    toast.error(getApiErrorMessage(e, 'messages.failedToClearCart'));
                 }
             },
         });
@@ -290,7 +291,7 @@ const CartPage = () => {
                 // Refresh so a customer who stays on the page sees the new address
                 await getAddressByUser(user.id).then(r => setAddresses(r.data)).catch(() => {});
             } catch (error) {
-                toast.error(error.response?.data?.message || t('messages.failedToSaveAddress'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSaveAddress'));
             }
         }
     };
@@ -303,13 +304,13 @@ const CartPage = () => {
             toast.success(t('messages.paymentSuccess'));
             navigate('/orders');
         } catch (error) {
-            if (error.response?.status === 403) {
+            if (error.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
                 setEmailNotVerified(true);
             } else if (applyServerErrors(error, t, setErrors)) {
                 setShowPayment(false);
                 setClientSecret(null);
             } else {
-                toast.error(error.response?.data?.message || 'Failed to place order');
+                toast.error(getApiErrorMessage(error, 'messages.failedToPlaceOrder'));
             }
         }
     };
@@ -329,12 +330,12 @@ const CartPage = () => {
             toast.success(t('messages.codSuccess'));
             navigate('/orders');
         } catch (error) {
-            if (error.response?.status === 403) {
+            if (error.response?.data?.code === 'EMAIL_NOT_VERIFIED') {
                 setEmailNotVerified(true);
             } else if (applyServerErrors(error, t, setErrors)) {
                 // inline
             } else {
-                toast.error(error.response?.data?.message || 'Failed to place order');
+                toast.error(getApiErrorMessage(error, 'messages.failedToPlaceOrder'));
             }
         } finally {
             setCheckingOut(false);
@@ -364,7 +365,7 @@ const CartPage = () => {
             setShowPayment(true);
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || 'Failed to initialize payment');
+                toast.error(getApiErrorMessage(error, 'messages.failedToInitializePayment'));
             }
         }
     };
@@ -375,9 +376,9 @@ const CartPage = () => {
         try {
             const response = await validateCoupon(couponCode, user?.id);
             setCouponData(response.data);
-            toast.success(response.data.message);
+            toast.success(t('messages.couponApplied'));
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Invalid coupon');
+            toast.error(getApiErrorMessage(error, 'validation.couponInvalid'));
             setCouponData(null);
         } finally {
             setApplyingCoupon(false);
@@ -413,7 +414,7 @@ const CartPage = () => {
             navigate('/order-confirmation');
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || 'Failed to place order');
+                toast.error(getApiErrorMessage(error, 'messages.failedToPlaceOrder'));
             }
         }
     };

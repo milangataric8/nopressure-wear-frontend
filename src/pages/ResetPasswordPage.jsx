@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import axiosInstance from '../api/axiosInstance';
 
 import { useState, useEffect } from 'react';
@@ -52,9 +53,7 @@ const ResetPasswordPage = () => {
             toast.success(t('messages.passwordChanged'));
             navigate('/login');
         } catch (error) {
-            const key = error.response?.data?.messageKey;
-            toast.error(key ? t(key, { defaultValue: t('auth.resetPasswordFailed') })
-                : error.response ? t('auth.resetPasswordFailed') : t('auth.connectionFailed'));
+            toast.error(getApiErrorMessage(error, 'auth.resetPasswordFailed'));
         } finally {
             setLoading(false);
         }

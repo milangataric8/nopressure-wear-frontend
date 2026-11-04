@@ -1,3 +1,4 @@
+import { getApiFieldErrors } from './apiError.js';
 // Shared helpers for the inline field-validation pattern used across forms.
 // See feature-inline-form-validation-frontend.md.
 
@@ -7,18 +8,10 @@ export const inputError = "border-red-500 focus:border-red-500";
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Maps a server error response's field->key map (err.response.data.errors)
- * through i18n `t()` into the same shape as client-side `errors` state.
- * Returns true (and calls setErrors) if the response carried field errors, false otherwise.
- */
+/** Apply translated API field errors without exposing raw server text. */
 export const applyServerErrors = (err, t, setErrors) => {
-    const serverErrors = err.response?.data?.errors;
-    if (!serverErrors) return false;
-
-    const mapped = Object.fromEntries(
-        Object.entries(serverErrors).map(([field, key]) => [field, t(key)])
-    );
+    const mapped = getApiFieldErrors(err, t);
+    if (!Object.keys(mapped).length) return false;
     setErrors(mapped);
     focusFirstError();
     return true;

@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -68,7 +69,7 @@ const AdminBanners = () => {
             setBanners(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -108,7 +109,7 @@ const AdminBanners = () => {
             if (errors.mediaUrl) setErrors(prev => ({ ...prev, mediaUrl: undefined }));
             toast.success(t('messages.fileUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUploadFile'));
         } finally {
             setUploading(false);
         }
@@ -130,7 +131,7 @@ const AdminBanners = () => {
             setFormData(prev => ({ ...prev, mobileMediaUrl: response.data.url }));
             toast.success(t('messages.fileUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUploadFile'));
         } finally {
             setUploadingMobile(false);
         }
@@ -158,7 +159,7 @@ const AdminBanners = () => {
             fetchBanners();
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         }
     };
@@ -190,7 +191,7 @@ const AdminBanners = () => {
             toast.success(t('messages.bannerDeleted'));
             fetchBanners();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 
@@ -199,7 +200,7 @@ const AdminBanners = () => {
             await toggleBanner(id);
             fetchBanners();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 

@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -45,7 +46,7 @@ const AdminPopups = () => {
             const response = await getAllPopups();
             setPopups(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -78,7 +79,7 @@ const AdminPopups = () => {
             setFormData(prev => ({ ...prev, mediaUrl: response.data.url }));
             toast.success(t('messages.fileUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUploadFile'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUploadFile'));
         } finally {
             setUploading(false);
         }
@@ -97,7 +98,7 @@ const AdminPopups = () => {
             resetForm();
             fetchPopups();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
         }
     };
 
@@ -127,7 +128,7 @@ const AdminPopups = () => {
             toast.success(t('messages.popupDeleted'));
             fetchPopups();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 
@@ -136,7 +137,7 @@ const AdminPopups = () => {
             await togglePopup(id);
             fetchPopups();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 

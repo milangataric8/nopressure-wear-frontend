@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../api/axiosInstance'
@@ -79,7 +80,7 @@ const AdminEmployees = () => {
             setEmployees(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -105,7 +106,7 @@ const AdminEmployees = () => {
             await fetchEmployees();
         } catch (error) {
             if (!applyServerErrors(error, t, createForm.setErrors)) {
-                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         }
     };
@@ -117,7 +118,7 @@ const AdminEmployees = () => {
             toast.success(t('messages.employeeDeleted'));
             await fetchEmployees();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 
@@ -130,7 +131,7 @@ const AdminEmployees = () => {
             }
             fetchEmployees();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 
@@ -170,18 +171,17 @@ const AdminEmployees = () => {
             await fetchEmployees();
         } catch (e) {
             const status = e.response?.status;
-            const message = e.response?.data?.message;
             if (status === 409) {
                 // e.g. "would leave zero active super admins" — the attempt didn't take,
                 // so the form's role field shouldn't keep showing it as if it had.
-                toast.error(message || t('messages.superAdminInvariant'));
+                toast.error(getApiErrorMessage(e, 'messages.superAdminInvariant'));
                 editForm.setFieldValue('role', editingEmployee.role);
                 setHandoverTarget(null);
                 setHandoverInput('');
             } else if (status === 403) {
                 // the axios interceptor already toasted "not authorized" without logging out
             } else if (!applyServerErrors(e, t, editForm.setErrors)) {
-                toast.error(message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
             }
         }
     };

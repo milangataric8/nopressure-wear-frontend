@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -85,13 +86,11 @@ const RegisterPage = () => {
             if (applyServerErrors(error, t, setErrors)) {
                 // inline
             } else {
-                const status = error.response?.status;
-                const msg = error.response?.data?.message || '';
-                if (status === 409 || msg.toLowerCase().includes('email already exists')) {
+                if (error.response?.data?.code === 'EMAIL_ALREADY_TAKEN') {
                     setErrors({ email: t('validation.emailTaken') });
                     focusFirstError();
                 } else {
-                    toast.error(msg || 'Registration failed');
+                    toast.error(getApiErrorMessage(error, 'messages.failedToRegister'));
                 }
             }
         } finally {
@@ -105,7 +104,7 @@ const RegisterPage = () => {
             await resendVerification(registeredEmail);
             toast.success(t('auth.resend'));
         } catch {
-            toast.error('Failed to resend verification email');
+            toast.error(t('messages.failedToResendVerification'));
         }
     };
 

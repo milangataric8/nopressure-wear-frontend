@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -17,10 +18,7 @@ const ForgotPasswordPage = () => {
             await forgotPassword(email.trim());
             setSent(true);
         } catch (error) {
-            const key = error.response?.data?.messageKey;
-            toast.error(key ? t(key, { defaultValue: t('auth.resetEmailFailed') })
-                : error.response ? t('auth.resetEmailFailed')
-                    : t('auth.connectionFailed'));
+            toast.error(getApiErrorMessage(error, 'auth.resetEmailFailed'));
         } finally {
             setLoading(false);
         }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { t } from 'i18next';
+import { getApiErrorMessage } from '../utils/apiError.js';
 
 const axiosInstance = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}/api`,
@@ -56,7 +56,7 @@ axiosInstance.interceptors.response.use(
                 window.location.href = '/change-password';
             }
         } else if (status === 403 && !isAuthEndpoint && !error.config?.skipForbiddenToast) {
-            toast.error(t('messages.forbidden'));
+            toast.error(getApiErrorMessage(error, 'messages.forbidden'));
         }
 
         return Promise.reject(error);

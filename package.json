@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "prebuild": "npm run check:i18n"
   },
   "dependencies": {
     "@sentry/react": "^10.62.0",

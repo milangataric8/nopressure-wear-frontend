@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -109,7 +110,7 @@ const AdminSettings = () => {
             const response = await getSettings();
             setSettings(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -132,7 +133,7 @@ const AdminSettings = () => {
             fetchSettings();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 
@@ -141,7 +142,7 @@ const AdminSettings = () => {
             const response = await getAllFilters();
             setFilters(response.data);
         } catch (e) {
-            console.log(e.response?.data?.message || t('messages.failedToLoadFilters'));
+            console.log(getApiErrorMessage(e, 'messages.failedToLoadFilters'));
         }
     }, []);
 
@@ -156,7 +157,7 @@ const AdminSettings = () => {
             fetchFilters();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 
@@ -166,7 +167,7 @@ const AdminSettings = () => {
             fetchFilters();
             window.dispatchEvent(new Event('settings-updated'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 
@@ -258,7 +259,7 @@ const AdminSettings = () => {
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
@@ -279,7 +280,7 @@ const AdminSettings = () => {
                                                                 setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: e.target.value } : s));
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         className="w-12 h-9 border border-gray-300 cursor-pointer"
@@ -325,7 +326,7 @@ const AdminSettings = () => {
                                                                     fetchSettings();
                                                                     window.dispatchEvent(new Event('settings-updated'));
                                                                 } catch (err) {
-                                                                    toast.error(err.response?.data?.message || t('messages.failedToUploadImage'));
+                                                                    toast.error(getApiErrorMessage(err, 'messages.failedToUploadImage'));
                                                                 }
                                                             }}
                                                         />
@@ -365,7 +366,7 @@ const AdminSettings = () => {
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToSave'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToSave'));
                                                             }
                                                         }}
                                                         className="mt-2 bg-black text-white text-xs font-semibold uppercase tracking-wide px-4 py-2 hover:bg-gray-800 transition-colors"
@@ -384,7 +385,7 @@ const AdminSettings = () => {
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         className="border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-black"
@@ -407,7 +408,7 @@ const AdminSettings = () => {
                                                                 setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: val } : s));
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         onBlur={() => { toast.success(t('messages.settingUpdated')); fetchSettings(); }}
@@ -432,7 +433,7 @@ const AdminSettings = () => {
                                                                 setSettings(prev => prev.map(s => s.id === setting.id ? { ...s, value: val } : s));
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (err) {
-                                                                toast.error(err.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(err, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         onBlur={() => { toast.success(t('messages.settingUpdated')); fetchSettings(); }}
@@ -464,7 +465,7 @@ const AdminSettings = () => {
                                                                 fetchSettings();
                                                                 window.dispatchEvent(new Event('settings-updated'));
                                                             } catch (e) {
-                                                                toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+                                                                toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
                                                             }
                                                         }}
                                                         className={`w-10 h-5 rounded-full transition-colors relative ${
@@ -521,7 +522,7 @@ const AdminSettings = () => {
                                                                         fetchSettings();
                                                                         window.dispatchEvent(new Event('settings-updated'));
                                                                     } catch (e) {
-                                                                        toast.error(e.response?.data?.message || t('messages.failedToUploadLogo'));
+                                                                        toast.error(getApiErrorMessage(e, 'messages.failedToUploadLogo'));
                                                                     }
                                                                 }}
                                                             />

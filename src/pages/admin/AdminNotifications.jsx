@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +43,7 @@ const AdminNotifications = () => {
             setChannelStatus(statusRes.data);
             setHistory(historyRes.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -94,7 +95,7 @@ const AdminNotifications = () => {
             setTextColor('#111111');
             fetchData();
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToSendNotification'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToSendNotification'));
         } finally {
             setSending(false);
         }
@@ -124,7 +125,7 @@ const AdminNotifications = () => {
             toast.success(t('messages.notificationDeleted'));
             setHistory(prev => prev.filter(b => b.id !== id));
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToDeleteNotification'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToDeleteNotification'));
         }
     };
 
@@ -226,7 +227,7 @@ const AdminNotifications = () => {
                                         setImageUrl(response.data.url);
                                         toast.success(t('messages.imageUploaded'));
                                     } catch (e) {
-                                        toast.error(e.response?.data?.message || t('messages.failedToUploadImage'));
+                                        toast.error(getApiErrorMessage(e, 'messages.failedToUploadImage'));
                                     } finally {
                                         setUploading(false);
                                     }

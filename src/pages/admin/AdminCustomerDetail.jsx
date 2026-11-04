@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import axiosInstance from '../../api/axiosInstance';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -37,7 +38,7 @@ const AdminCustomerDetail = () => {
             const response = await axiosInstance.get(`/users/${customerId}`);
             setCustomer(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
             navigate('/admin/customers');
         } finally {
             setLoading(false);
@@ -54,7 +55,7 @@ const AdminCustomerDetail = () => {
             setTotalPages(response.data.totalPages);
             setTotalOrders(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setOrdersLoading(false);
         }
@@ -86,7 +87,7 @@ const AdminCustomerDetail = () => {
             toast.success(t('admin.customerAnonymized'));
             navigate('/admin/customers');
         } catch (e) {
-            toast.error(e.response?.data?.message || t('admin.anonymizeFailed'));
+            toast.error(getApiErrorMessage(e, 'admin.anonymizeFailed'));
         }
     };
 

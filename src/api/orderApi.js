@@ -8,17 +8,17 @@ export const checkout = (userId, couponCode, paymentMethod) =>
         params: {
             ...(couponCode ? { couponCode } : {}),
             ...(paymentMethod ? { paymentMethod } : {}),
-            lang: i18n.language
+            lang: i18n.resolvedLanguage || 'sr'
         }
     });
 export const guestCheckout = (data) =>
-    axiosInstance.post('/orders/guest-checkout', data, { skipForbiddenToast: true, params: { lang: i18n.language } });
+    axiosInstance.post('/orders/guest-checkout', data, { skipForbiddenToast: true, params: { lang: i18n.resolvedLanguage || 'sr' } });
 export const getOrders = (userId, params) =>
     axiosInstance.get(`/orders/${userId}`, { params });
 export const getOrderById = (userId, orderId) =>
     axiosInstance.get(`/orders/${userId}/${orderId}`);
 export const updateOrderStatus = (orderId, status) =>
-    axiosInstance.patch(`/orders/${orderId}/status`, null, { params: { status, lang: i18n.language } });
+    axiosInstance.patch(`/orders/${orderId}/status`, null, { params: { status, lang: i18n.resolvedLanguage || 'sr' } });
 export const getOrdersByAdmin =  (params) => axiosInstance.get('/orders/all', { params });
 export const getOrderByIdAdmin = (orderId) =>
     axiosInstance.get(`/orders/admin/${orderId}`);

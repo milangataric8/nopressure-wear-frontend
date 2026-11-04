@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -69,7 +70,7 @@ const ContactPage = () => {
             setErrors({});
         } catch (error) {
             if (!applyServerErrors(error, t, setErrors)) {
-                toast.error(error.response?.data?.message || (i18n.language === 'sr' ? 'Slanje nije uspelo' : 'Failed to send'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSend'));
             }
         } finally {
             setSending(false);

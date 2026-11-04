@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import axiosInstance from '../api/axiosInstance';
 
 import { useNavigate } from 'react-router-dom';
@@ -80,12 +81,7 @@ const ChangePasswordPage = () => {
             if (applyServerErrors(error, t, form.setErrors)) {
                 // inline
             } else {
-                const msg = error.response?.data?.message || '';
-                if (msg.toLowerCase().includes('current password')) {
-                    form.setErrors({ currentPassword: t('validation.currentPasswordWrong') });
-                } else {
-                    toast.error(msg || t('messages.failedToSave'));
-                }
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         } finally {
             setLoading(false);

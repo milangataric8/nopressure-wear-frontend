@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +29,7 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
             const updated = await getAllStoresForProduct(productId);
             setProductStores(updated.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToToggleStock'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToToggleStock'));
         }
     };
 
@@ -42,7 +43,7 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
             setProductStores(prev => prev.filter(s => s.id !== ps.id));
             toast.success(t('messages.storeRemoved'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToRemoveStore'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToRemoveStore'));
         }
     };
 
@@ -72,7 +73,7 @@ const StoreAvailabilityManager = ({ productId, allStores, productStores, setProd
             setSelectedStoreId('');
             toast.success(t('messages.storeAdded'));
         } catch (error) {
-            toast.error(error.response?.data?.message || t('messages.failedToAddStore'));
+            toast.error(getApiErrorMessage(error, 'messages.failedToAddStore'));
         }
     };
 

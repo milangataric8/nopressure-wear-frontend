@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import axiosInstance from '../../api/axiosInstance';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -50,7 +51,7 @@ const AdminCoupons = () => {
             setCoupons(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -78,7 +79,7 @@ const AdminCoupons = () => {
             fetchCoupons();
         } catch (error) {
             if (!applyServerErrors(error, t, form.setErrors)) {
-                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         }
     };
@@ -90,7 +91,7 @@ const AdminCoupons = () => {
             toast.success(t('messages.couponDeleted'));
             fetchCoupons();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToSave'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToSave'));
         }
     };
 
@@ -99,7 +100,7 @@ const AdminCoupons = () => {
             await axiosInstance.patch(`/coupons/${id}/toggle`);
             fetchCoupons();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 

@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import axiosInstance from "../../api/axiosInstance.js";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -53,7 +54,7 @@ const AdminCategories = () => {
             setCategories(response.data.content);
             setTotalPages(response.data.totalPages);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }
@@ -87,7 +88,7 @@ const AdminCategories = () => {
             fetchCategories();
         } catch (error) {
             if (!applyServerErrors(error, t, form.setErrors)) {
-                toast.error(error.response?.data?.message || t('messages.failedToSave'));
+                toast.error(getApiErrorMessage(error, 'messages.failedToSave'));
             }
         }
     };
@@ -109,7 +110,7 @@ const AdminCategories = () => {
             fetchCategories();
             localStorage.setItem('categories-updated', Date.now().toString());
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 

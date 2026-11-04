@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { uploadImage } from '../../api/uploadApi';
@@ -25,7 +26,7 @@ const ImageUpload = ({ currentImageUrl, onImageUploaded }) => {
             onImageUploaded(response.data.url);
             toast.success(t('messages.imageUploaded'));
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUploadImage'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUploadImage'));
         } finally {
             setUploading(false);
         }

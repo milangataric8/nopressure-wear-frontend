@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useBackgroundRemovalEnabled } from '../../hooks/useBackgroundRemovalEnabled';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -34,7 +35,7 @@ const ProductMediaManager = ({
                 toast.success(backgroundRemovalEnabled && removeBg ? t('messages.imageUploadedBgRemoved') : t('messages.mainImageUploaded'));
             }
         } catch (err) {
-            toast.error(err.response?.data?.message || t('messages.failedToUploadImage'));
+            toast.error(getApiErrorMessage(err, 'messages.failedToUploadImage'));
         }
     };
 
@@ -60,7 +61,7 @@ const ProductMediaManager = ({
                 setPendingImages(prev => [...prev, url]);
             }
         } catch (err) {
-            toast.error(err.response?.data?.message || t('messages.failedToAddImage'));
+            toast.error(getApiErrorMessage(err, 'messages.failedToAddImage'));
         }
     };
 
@@ -73,7 +74,7 @@ const ProductMediaManager = ({
                 images: prev.images.filter(img => img.id !== imageId)
             }));
         } catch (err) {
-            toast.error(err.response?.data?.message || t('messages.failedToDeleteImage'));
+            toast.error(getApiErrorMessage(err, 'messages.failedToDeleteImage'));
         }
     };
 
@@ -86,7 +87,7 @@ const ProductMediaManager = ({
             setFormData(prev => ({ ...prev, videoUrl: response.data.url }));
             toast.success(t('messages.videoUploaded'));
         } catch (err) {
-            toast.error(err.response?.data?.message || t('messages.failedToUploadVideo'));
+            toast.error(getApiErrorMessage(err, 'messages.failedToUploadVideo'));
         }
     };
 

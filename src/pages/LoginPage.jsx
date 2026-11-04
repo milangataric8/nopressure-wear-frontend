@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -77,19 +78,7 @@ const LoginPage = () => {
                 setLoading(false);
                 return;
             }
-            const status = error.response?.status;
-            const msg = error.response?.data?.message || '';
-            if (status === 423) {
-                const match = msg.match(/(\d+) minute/);
-                const minutes = match ? parseInt(match[1]) : null;
-                setErrors({ general: minutes !== null ? t('auth.accountLockedMinutes', { count: minutes }) : t('auth.accountLocked') });
-            } else if (status === 403 && msg.toLowerCase().includes('verify')) {
-                setErrors({ general: t('auth.emailNotVerified') });
-            } else if (status === 403) {
-                toast.error(t('auth.loginDisabled'));
-            } else {
-                setErrors({ general: t('auth.loginFailed') });
-            }
+            setErrors({ general: getApiErrorMessage(error, 'auth.loginFailed') });
         } finally {
             setLoading(false);
         }

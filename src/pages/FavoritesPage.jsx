@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -23,7 +24,7 @@ const FavoritesPage = () => {
             setFavorites(response.data);
             setFavoriteCount(response.data.length);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoadFavorites'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoadFavorites'));
         } finally {
             setLoading(false);
         }
@@ -53,7 +54,7 @@ const FavoritesPage = () => {
                 } catch (e) {
                     setFavorites(previousFavorites);
                     setFavoriteCount(previousFavorites.length);
-                    toast.error(e.response?.data?.message || t('messages.failedToRemoveFromFavorites'));
+                    toast.error(getApiErrorMessage(e, 'messages.failedToRemoveFromFavorites'));
                 }
             },
         });

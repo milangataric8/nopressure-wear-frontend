@@ -2,7 +2,7 @@ import axiosInstance from './axiosInstance';
 import i18n from '../i18n/i18n';
 
 const downloadFile = (url, filename) => {
-    const lang = i18n.language || 'en';
+    const lang = i18n.resolvedLanguage || 'sr';
     const separator = url.includes('?') ? '&' : '?';
     return axiosInstance.get(`${url}${separator}lang=${lang}`, { responseType: 'blob' })
         .then(response => {

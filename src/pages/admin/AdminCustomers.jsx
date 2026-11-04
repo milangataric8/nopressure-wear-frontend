@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import axiosInstance from '../../api/axiosInstance';
 
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +37,7 @@ const AdminCustomers = () => {
             setTotalPages(response.data.totalPages);
             setTotalElements(response.data.totalElements);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
         } finally {
             setLoading(false);
         }

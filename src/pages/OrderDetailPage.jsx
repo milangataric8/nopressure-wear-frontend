@@ -1,3 +1,4 @@
+import { getApiErrorMessage } from '../utils/apiError.js';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -42,7 +43,7 @@ const OrderDetailPage = () => {
             }
             setOrder(response.data);
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToLoad'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToLoad'));
             navigate(isStaff ? '/admin/orders' : '/orders');
         } finally {
             setLoading(false);
@@ -59,7 +60,7 @@ const OrderDetailPage = () => {
             toast.success(t('messages.orderUpdated'));
             fetchOrder();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToUpdate'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToUpdate'));
         }
     };
 

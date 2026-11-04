@@ -1,6 +1,6 @@
+import { getApiErrorMessage } from '../../utils/apiError.js';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-import {t} from "i18next";
 
 const DownloadButtons = ({ pdfFn,
                            excelFn,
@@ -14,7 +14,7 @@ const DownloadButtons = ({ pdfFn,
         try {
             await fn();
         } catch (e) {
-            toast.error(e.response?.data?.message || t('messages.failedToDownloadReport'));
+            toast.error(getApiErrorMessage(e, 'messages.failedToDownloadReport'));
         } finally {
             setDownloading('');
         }
